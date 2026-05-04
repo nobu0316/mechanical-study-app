@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>機械設計2級 基礎復習ノート</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <p class="eyebrow">Mechanical Design Study</p>
+      <h1>機械設計2級 基礎復習ノート</h1>
+      <p class="lead">
+        過去問演習の前後に、基礎論点・公式・用語・弱点分野を短時間で見返すための自己学習アプリです。
+      </p>
+    </header>
+
+    <main>
+      <section id="messageArea" class="message hidden" aria-live="polite"></section>
+
+      <section id="homeScreen" class="screen active-screen">
+        <div class="panel">
+          <h2>今日の復習</h2>
+          <div class="control-group">
+            <label for="fieldSelect">分野</label>
+            <select id="fieldSelect"></select>
+          </div>
+
+          <div class="control-group">
+            <span class="label-text">出題数</span>
+            <div class="segmented" role="group" aria-label="出題数">
+              <label>
+                <input type="radio" name="questionCount" value="5" checked>
+                <span>5問</span>
+              </label>
+              <label>
+                <input type="radio" name="questionCount" value="10">
+                <span>10問</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="button-row">
+            <button id="startQuizBtn" class="primary-btn" type="button">クイズ開始</button>
+            <button id="reviewMistakesBtn" type="button">弱点復習</button>
+            <button id="showStatsBtn" type="button">成績確認</button>
+          </div>
+        </div>
+
+        <div class="info-band">
+          <h2>使い方</h2>
+          <p>5〜10問だけ解き、解説で要点を確認します。間違えた問題は自動で保存され、あとから弱点復習で再出題できます。</p>
+        </div>
+      </section>
+
+      <section id="quizScreen" class="screen">
+        <div class="quiz-top">
+          <span id="progressText">1 / 5</span>
+          <span id="timerText">00:00</span>
+        </div>
+
+        <article class="question-card">
+          <div class="meta-row">
+            <span id="fieldBadge"></span>
+            <span id="topicBadge"></span>
+            <span id="levelBadge"></span>
+          </div>
+          <h2 id="questionText"></h2>
+          <div id="choicesArea" class="choices"></div>
+          <div id="feedbackArea" class="feedback hidden"></div>
+          <button id="nextQuestionBtn" class="primary-btn hidden" type="button">次の問題へ</button>
+        </article>
+      </section>
+
+      <section id="resultScreen" class="screen">
+        <div class="panel">
+          <h2>結果</h2>
+          <div class="result-grid">
+            <div>
+              <span class="stat-label">正解数</span>
+              <strong id="resultScore"></strong>
+            </div>
+            <div>
+              <span class="stat-label">正答率</span>
+              <strong id="resultRate"></strong>
+            </div>
+            <div>
+              <span class="stat-label">時間</span>
+              <strong id="resultTime"></strong>
+            </div>
+          </div>
+
+          <h3>間違えた問題</h3>
+          <div id="wrongList" class="list-area"></div>
+
+          <div class="button-row">
+            <button id="homeFromResultBtn" type="button">ホームへ戻る</button>
+            <button id="reviewFromResultBtn" class="primary-btn" type="button">弱点復習へ進む</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="statsScreen" class="screen">
+        <div class="panel">
+          <h2>成績</h2>
+          <div class="result-grid">
+            <div>
+              <span class="stat-label">総回答数</span>
+              <strong id="totalAnswers"></strong>
+            </div>
+            <div>
+              <span class="stat-label">総正解数</span>
+              <strong id="totalCorrect"></strong>
+            </div>
+            <div>
+              <span class="stat-label">全体正答率</span>
+              <strong id="overallRate"></strong>
+            </div>
+          </div>
+
+          <h3>分野別正答率</h3>
+          <div id="fieldStats" class="stats-list"></div>
+
+          <h3>トピック別正答率</h3>
+          <div id="topicStats" class="stats-list"></div>
+
+          <h3>間違い回数が多い問題</h3>
+          <div id="frequentMistakes" class="list-area"></div>
+
+          <div class="button-row">
+            <button id="resetHistoryBtn" class="danger-btn" type="button">学習履歴リセット</button>
+            <button id="homeFromStatsBtn" type="button">ホームへ戻る</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
