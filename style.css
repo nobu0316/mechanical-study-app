@@ -304,7 +304,8 @@ select {
 
 .result-grid > div,
 .stat-row,
-.mistake-item {
+.mistake-item,
+.ranking-item {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fbfdfd;
@@ -341,6 +342,25 @@ select {
   font-weight: 700;
 }
 
+.stat-row-header span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.stat-row-header span:last-child {
+  flex: 0 0 auto;
+}
+
+.stat-row-meta {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.stat-row.needs-more .bar span {
+  background: var(--accent);
+}
+
 .bar {
   height: 10px;
   overflow: hidden;
@@ -357,6 +377,42 @@ select {
 
 .mistake-item p {
   margin-bottom: 6px;
+}
+
+.ranking-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+}
+
+.rank-badge {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 999px;
+  background: #e3f1f2;
+  color: var(--primary-dark);
+  font-weight: 800;
+}
+
+.ranking-body {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.ranking-title {
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.ranking-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .muted {
@@ -386,5 +442,19 @@ select {
 
   button {
     width: 100%;
+  }
+
+  .stat-row-header {
+    display: grid;
+    gap: 2px;
+  }
+
+  .ranking-item {
+    grid-template-columns: 1fr;
+  }
+
+  .rank-badge {
+    width: 32px;
+    height: 32px;
   }
 }
