@@ -104,38 +104,66 @@
       <section id="statsScreen" class="screen">
         <div class="panel">
           <h2>成績</h2>
-          <div class="result-grid">
-            <div>
-              <span class="stat-label">総回答数</span>
-              <strong id="totalAnswers"></strong>
-            </div>
-            <div>
-              <span class="stat-label">総正解数</span>
-              <strong id="totalCorrect"></strong>
-            </div>
-            <div>
+          <div class="stats-summary">
+            <div class="summary-card">
               <span class="stat-label">全体正答率</span>
-              <strong id="overallRate"></strong>
+              <strong id="summaryOverallRate"></strong>
+            </div>
+            <div class="summary-card">
+              <span class="stat-label">総回答数</span>
+              <strong id="summaryTotalAnswers"></strong>
+            </div>
+            <div class="summary-card">
+              <span class="stat-label">要注意トピック数</span>
+              <strong id="summaryWeakTopicCount"></strong>
+            </div>
+            <div class="summary-card">
+              <span class="stat-label">最近のミス件数</span>
+              <strong id="summaryRecentMistakeCount"></strong>
             </div>
           </div>
 
-          <h3>弱点ランキング</h3>
-          <div id="weaknessRanking" class="list-area"></div>
+          <div class="stats-tabs" role="tablist" aria-label="成績の表示切り替え">
+            <button class="tab-btn active-tab" type="button" role="tab" aria-selected="true" data-stats-tab="weakness">弱点</button>
+            <button class="tab-btn" type="button" role="tab" aria-selected="false" data-stats-tab="recent">最近のミス</button>
+            <button class="tab-btn" type="button" role="tab" aria-selected="false" data-stats-tab="field">分野別</button>
+            <button class="tab-btn" type="button" role="tab" aria-selected="false" data-stats-tab="question">問題別</button>
+            <button class="tab-btn" type="button" role="tab" aria-selected="false" data-stats-tab="insufficient">判定不足</button>
+          </div>
 
-          <h3>判定不足のトピック</h3>
-          <div id="insufficientTopics" class="list-area"></div>
+          <div class="tab-panels">
+            <section id="weaknessPanel" class="tab-panel active-tab-panel" data-tab-panel="weakness">
+              <div class="tab-panel-head">
+                <h3>弱点ランキング</h3>
+                <button id="reviewVisibleWeaknessBtn" class="compact-primary-btn hidden" type="button">この弱点だけ復習する</button>
+              </div>
+              <div id="weaknessRanking" class="list-area"></div>
+              <button id="showMoreWeaknessBtn" class="more-btn hidden" type="button">もっと見る</button>
+            </section>
 
-          <h3>分野別正答率</h3>
-          <div id="fieldStats" class="stats-list"></div>
+            <section id="recentPanel" class="tab-panel" data-tab-panel="recent">
+              <h3>最近間違えた問題</h3>
+              <div id="recentMistakes" class="list-area"></div>
+              <button id="showMoreRecentBtn" class="more-btn hidden" type="button">もっと見る</button>
+            </section>
 
-          <h3>トピック別正答率</h3>
-          <div id="topicStats" class="stats-list"></div>
+            <section id="fieldPanel" class="tab-panel" data-tab-panel="field">
+              <h3>分野別正答率</h3>
+              <div id="fieldStats" class="stats-list compact-list"></div>
+            </section>
 
-          <h3>間違い回数が多い問題</h3>
-          <div id="frequentMistakes" class="list-area"></div>
+            <section id="questionPanel" class="tab-panel" data-tab-panel="question">
+              <h3>間違い回数が多い問題</h3>
+              <div id="frequentMistakes" class="list-area"></div>
+              <button id="showMoreQuestionsBtn" class="more-btn hidden" type="button">もっと見る</button>
+            </section>
 
-          <h3>最近間違えた問題</h3>
-          <div id="recentMistakes" class="list-area"></div>
+            <section id="insufficientPanel" class="tab-panel" data-tab-panel="insufficient">
+              <h3>判定不足のトピック</h3>
+              <div id="insufficientTopics" class="list-area compact-list"></div>
+              <button id="showMoreInsufficientBtn" class="more-btn hidden" type="button">もっと見る</button>
+            </section>
+          </div>
 
           <div class="button-row">
             <button id="resetHistoryBtn" class="danger-btn" type="button">学習履歴リセット</button>
