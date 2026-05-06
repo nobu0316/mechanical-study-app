@@ -13,6 +13,7 @@ const FIELDS = [
 ];
 
 const STORAGE_KEY = "mechanicalStudyHistoryV1";
+const QUESTIONS_CSV = "questions.csv";
 
 let questions = [];
 let currentQuiz = [];
@@ -59,7 +60,7 @@ function bindEvents() {
 }
 
 function loadQuestions() {
-  fetch("questions.csv")
+  fetch(getQuestionsCsvUrl(), { cache: "no-store" })
     .then((response) => {
       if (!response.ok) {
         throw new Error("CSVファイルを取得できませんでした。");
@@ -82,7 +83,10 @@ function loadQuestions() {
 function loadQuestionsWithXhr() {
   // ブラウザで直接開いた場合にfetchが使えない環境があるため、XMLHttpRequestも試します。
   const request = new XMLHttpRequest();
-  request.open("GET", "questions.csv", true);
+  request.open("GET", getQuestionsCsvUrl(), true);
+  if (window.location.protocol !== "file:") {
+    request.setRequestHeader("Cache-Control", "no-cache");
+  }
   request.onload = () => {
     if (request.status === 0 || (request.status >= 200 && request.status < 300)) {
       questions = parseCsv(request.responseText);
@@ -101,6 +105,13 @@ function loadQuestionsWithXhr() {
 
 function showCsvError() {
   showMessage("questions.csvを読み込めませんでした。index.htmlとquestions.csvを同じフォルダに置いてください。ブラウザで直接開いて失敗する場合は、GitHub Pages上で確認してください。");
+}
+
+function getQuestionsCsvUrl() {
+  if (window.location.protocol === "file:") {
+    return QUESTIONS_CSV;
+  }
+  return `${QUESTIONS_CSV}?v=${Date.now()}`;
 }
 
 function parseCsv(csvText) {
@@ -144,7 +155,7 @@ function startNormalQuiz() {
     return;
   }
 
-  startQuiz(shuffle(pool).slice(0, Math.min(count, pool.length)));
+  startQuiz(selectNormalQuizQuestions(pool, count));
 }
 
 function startMistakeReview() {
@@ -174,6 +185,21 @@ function startQuiz(selectedQuestions) {
   startTimer();
   showScreen("quiz");
   renderQuestion();
+}
+
+function selectNormalQuizQuestions(pool, count) {
+  const history = getHistory();
+  const targetCount = Math.min(count, pool.length);
+
+  return [...pool]
+    .map((question) => ({
+      question,
+      answeredCount: history.byQuestion[question.id]?.totalCount || 0,
+      randomOrder: Math.random()
+    }))
+    .sort((a, b) => a.answeredCount - b.answeredCount || a.randomOrder - b.randomOrder)
+    .slice(0, targetCount)
+    .map((item) => item.question);
 }
 
 function renderQuestion() {
