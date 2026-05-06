@@ -273,36 +273,114 @@ function showStats() {
   const history = getHistory();
   const total = history.totalAnswers;
   const correct = history.totalCorrect;
+  const topicSummaries = buildTopicSummaries(history);
 
   document.getElementById("totalAnswers").textContent = total;
   document.getElementById("totalCorrect").textContent = correct;
   document.getElementById("overallRate").textContent = formatRate(correct, total);
-  document.getElementById("fieldStats").innerHTML = renderStatsRows(history.byField);
-  document.getElementById("topicStats").innerHTML = renderStatsRows(history.byTopic);
+  document.getElementById("weaknessRanking").innerHTML = renderWeaknessRanking(topicSummaries);
+  document.getElementById("insufficientTopics").innerHTML = renderInsufficientTopics(topicSummaries);
+  document.getElementById("fieldStats").innerHTML = renderStatsRows(history.byField, { lowRateFirst: true });
+  document.getElementById("topicStats").innerHTML = renderTopicStats(topicSummaries);
   renderFrequentMistakes(history);
+  renderRecentMistakes(history);
 
   hideMessage();
   showScreen("stats");
 }
 
-function renderStatsRows(statsObject) {
-  const rows = Object.entries(statsObject).sort((a, b) => b[1].total - a[1].total);
+function renderStatsRows(statsObject, options = {}) {
+  const rows = Object.entries(statsObject).sort((a, b) => {
+    const rateA = getRate(a[1]);
+    const rateB = getRate(b[1]);
+    if (options.lowRateFirst && rateA !== rateB) {
+      return rateA - rateB;
+    }
+    return b[1].total - a[1].total;
+  });
   if (rows.length === 0) {
     return `<p class="muted">まだ学習履歴がありません。</p>`;
   }
 
   return rows.map(([name, stat]) => {
-    const rate = stat.total === 0 ? 0 : Math.round((stat.correct / stat.total) * 100);
+    const rate = getRate(stat);
     return `
       <div class="stat-row">
         <div class="stat-row-header">
-          <span>${name}</span>
+          <span>${escapeHtml(name)}</span>
           <span>${stat.correct}/${stat.total} ${rate}%</span>
         </div>
         <div class="bar" aria-hidden="true"><span style="width: ${rate}%"></span></div>
       </div>
     `;
   }).join("");
+}
+
+function renderTopicStats(topicSummaries) {
+  const rows = [...topicSummaries].sort(sortByLowRateThenCount);
+  if (rows.length === 0) {
+    return `<p class="muted">まだ学習履歴がありません。</p>`;
+  }
+
+  return rows.map((stat) => {
+    const rate = getRate(stat);
+    const status = stat.total < 3 ? "判定不足" : `${rate}%`;
+    return `
+      <div class="stat-row ${stat.total < 3 ? "needs-more" : ""}">
+        <div class="stat-row-header">
+          <span>${escapeHtml(stat.topic)}</span>
+          <span>${status}</span>
+        </div>
+        <p class="stat-row-meta">${escapeHtml(stat.field)} ・ 回答 ${stat.total}回 ・ 間違い ${stat.wrong}回</p>
+        <div class="bar" aria-hidden="true"><span style="width: ${rate}%"></span></div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderWeaknessRanking(topicSummaries) {
+  const rows = topicSummaries
+    .filter((stat) => stat.total >= 3)
+    .sort(sortByLowRateThenCount);
+
+  if (rows.length === 0) {
+    return `<p class="muted">回答数が3回以上のトピックがまだありません。</p>`;
+  }
+
+  return rows.map((stat, index) => {
+    const rate = getRate(stat);
+    return `
+      <div class="ranking-item">
+        <div class="rank-badge">${index + 1}</div>
+        <div class="ranking-body">
+          <div class="ranking-title">${escapeHtml(stat.field)} / ${escapeHtml(stat.topic)}</div>
+          <div class="ranking-metrics">
+            <span>正答率 ${rate}%</span>
+            <span>回答 ${stat.total}回</span>
+            <span>間違い ${stat.wrong}回</span>
+          </div>
+          <div class="bar" aria-hidden="true"><span style="width: ${rate}%"></span></div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderInsufficientTopics(topicSummaries) {
+  const rows = topicSummaries
+    .filter((stat) => stat.total > 0 && stat.total < 3)
+    .sort((a, b) => a.total - b.total || a.field.localeCompare(b.field, "ja") || a.topic.localeCompare(b.topic, "ja"));
+
+  if (rows.length === 0) {
+    return `<p class="muted">判定不足のトピックはありません。</p>`;
+  }
+
+  return rows.map((stat) => `
+    <div class="mistake-item">
+      <p><strong>${escapeHtml(stat.topic)}</strong></p>
+      <p class="muted">${escapeHtml(stat.field)}：回答数${stat.total}回のため判定不足</p>
+    </div>
+  `).join("");
 }
 
 function renderFrequentMistakes(history) {
@@ -319,15 +397,86 @@ function renderFrequentMistakes(history) {
 
   frequentMistakes.innerHTML = rows.map(([id, stat]) => {
     const question = questions.find((q) => q.id === id);
-    const title = question ? question.question : `問題ID：${id}`;
+    const title = question ? question.question : stat.question || `問題ID：${id}`;
+    const field = stat.field || question?.field || "分野不明";
+    const topic = stat.topic || question?.topic || "トピック不明";
     return `
       <div class="mistake-item">
-        <p><strong>${title}</strong></p>
-        <p class="muted">${stat.field} / ${stat.topic}</p>
+        <p><strong>${escapeHtml(id)}</strong></p>
+        <p class="muted">${escapeHtml(field)} / ${escapeHtml(topic)}</p>
+        <p>${escapeHtml(title)}</p>
         <p>間違い ${stat.wrongCount}回 ・ 正解 ${stat.correctCount}回</p>
       </div>
     `;
   }).join("");
+}
+
+function renderRecentMistakes(history) {
+  const recentMistakes = document.getElementById("recentMistakes");
+  const rows = [...(history.records || [])]
+    .filter((record) => record && record.isCorrect === false)
+    .sort((a, b) => new Date(b.answeredAt) - new Date(a.answeredAt))
+    .slice(0, 5);
+
+  if (rows.length === 0) {
+    recentMistakes.innerHTML = `<p class="muted">まだ最近間違えた問題はありません。</p>`;
+    return;
+  }
+
+  recentMistakes.innerHTML = rows.map((record) => {
+    const question = questions.find((q) => q.id === record.questionId);
+    const field = record.field || question?.field || "分野不明";
+    const topic = record.topic || question?.topic || "トピック不明";
+    const questionText = record.question || question?.question || `問題ID：${record.questionId}`;
+    return `
+      <div class="mistake-item">
+        <p><strong>${formatDateTime(record.answeredAt)}</strong></p>
+        <p class="muted">${escapeHtml(field)} / ${escapeHtml(topic)}</p>
+        <p>${escapeHtml(questionText)}</p>
+      </div>
+    `;
+  }).join("");
+}
+
+function buildTopicSummaries(history) {
+  const summaries = {};
+  const records = history.records || [];
+
+  records.forEach((record) => {
+    const question = questions.find((q) => q.id === record.questionId);
+    const field = record.field || question?.field;
+    const topic = record.topic || question?.topic;
+    if (!field || !topic) {
+      return;
+    }
+    const key = getTopicKey(field, topic);
+    if (!summaries[key]) {
+      summaries[key] = { field, topic, total: 0, correct: 0, wrong: 0 };
+    }
+    summaries[key].total += 1;
+    if (record.isCorrect) {
+      summaries[key].correct += 1;
+    } else {
+      summaries[key].wrong += 1;
+    }
+  });
+
+  if (Object.keys(summaries).length === 0) {
+    Object.entries(history.byTopic || {}).forEach(([key, stat]) => {
+      const keyParts = key.split("||");
+      const topic = stat.topic || keyParts[keyParts.length - 1];
+      const field = stat.field || (keyParts.length > 1 ? keyParts[0] : findFieldByTopic(topic));
+      summaries[getTopicKey(field, topic)] = {
+        field,
+        topic,
+        total: stat.total || 0,
+        correct: stat.correct || 0,
+        wrong: Math.max((stat.total || 0) - (stat.correct || 0), 0)
+      };
+    });
+  }
+
+  return Object.values(summaries);
 }
 
 function saveAnswer(question, isCorrect) {
@@ -340,12 +489,13 @@ function saveAnswer(question, isCorrect) {
   }
 
   addAggregate(history.byField, question.field, isCorrect);
-  addAggregate(history.byTopic, question.topic, isCorrect);
+  addTopicAggregate(history.byTopic, question, isCorrect);
 
   if (!history.byQuestion[question.id]) {
     history.byQuestion[question.id] = {
       field: question.field,
       topic: question.topic,
+      question: question.question,
       wrongCount: 0,
       correctCount: 0,
       totalCount: 0,
@@ -354,6 +504,9 @@ function saveAnswer(question, isCorrect) {
   }
 
   const questionStat = history.byQuestion[question.id];
+  questionStat.field = question.field;
+  questionStat.topic = question.topic;
+  questionStat.question = question.question;
   questionStat.totalCount += 1;
   questionStat.lastAnsweredAt = now;
   if (isCorrect) {
@@ -367,7 +520,8 @@ function saveAnswer(question, isCorrect) {
     isCorrect,
     answeredAt: now,
     field: question.field,
-    topic: question.topic
+    topic: question.topic,
+    question: question.question
   });
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
@@ -376,6 +530,22 @@ function saveAnswer(question, isCorrect) {
 function addAggregate(target, key, isCorrect) {
   if (!target[key]) {
     target[key] = { total: 0, correct: 0 };
+  }
+  target[key].total += 1;
+  if (isCorrect) {
+    target[key].correct += 1;
+  }
+}
+
+function addTopicAggregate(target, question, isCorrect) {
+  const key = getTopicKey(question.field, question.topic);
+  if (!target[key]) {
+    target[key] = {
+      field: question.field,
+      topic: question.topic,
+      total: 0,
+      correct: 0
+    };
   }
   target[key].total += 1;
   if (isCorrect) {
@@ -394,7 +564,18 @@ function getHistory() {
   };
 
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultHistory;
+    const storedHistory = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!storedHistory) {
+      return defaultHistory;
+    }
+    return {
+      ...defaultHistory,
+      ...storedHistory,
+      records: storedHistory.records || [],
+      byQuestion: storedHistory.byQuestion || {},
+      byField: storedHistory.byField || {},
+      byTopic: storedHistory.byTopic || {}
+    };
   } catch {
     return defaultHistory;
   }
@@ -457,6 +638,53 @@ function formatRate(correct, total) {
     return "0%";
   }
   return `${Math.round((correct / total) * 100)}%`;
+}
+
+function getRate(stat) {
+  if (!stat || stat.total === 0) {
+    return 0;
+  }
+  return Math.round((stat.correct / stat.total) * 100);
+}
+
+function sortByLowRateThenCount(a, b) {
+  const rateDiff = getRate(a) - getRate(b);
+  if (rateDiff !== 0) {
+    return rateDiff;
+  }
+  return b.total - a.total || b.wrong - a.wrong || a.field.localeCompare(b.field, "ja") || a.topic.localeCompare(b.topic, "ja");
+}
+
+function getTopicKey(field, topic) {
+  return `${field}||${topic}`;
+}
+
+function findFieldByTopic(topic) {
+  const question = questions.find((item) => item.topic === topic);
+  return question ? question.field : "分野不明";
+}
+
+function formatDateTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "日時不明";
+  }
+  return date.toLocaleString("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function showScreen(screenName) {
