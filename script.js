@@ -14,6 +14,7 @@ const FIELDS = [
 
 const STORAGE_KEY = "mechanicalStudyHistoryV1";
 const QUESTIONS_CSV = "questions.csv";
+const WEAK_TOPIC_RATE_LIMIT = 70;
 
 let questions = [];
 let currentQuiz = [];
@@ -22,6 +23,7 @@ let quizStartTime = 0;
 let timerId = null;
 let quizAnswers = [];
 let reviewMode = false;
+let statsState = createDefaultStatsState();
 
 const screens = {
   home: document.getElementById("homeScreen"),
@@ -56,6 +58,14 @@ function bindEvents() {
   document.getElementById("reviewFromResultBtn").addEventListener("click", startMistakeReview);
   document.getElementById("homeFromStatsBtn").addEventListener("click", showHome);
   document.getElementById("resetHistoryBtn").addEventListener("click", resetHistory);
+  document.querySelectorAll("[data-stats-tab]").forEach((button) => {
+    button.addEventListener("click", () => switchStatsTab(button.dataset.statsTab));
+  });
+  document.getElementById("showMoreWeaknessBtn").addEventListener("click", () => showMoreStatsItems("weakness"));
+  document.getElementById("showMoreRecentBtn").addEventListener("click", () => showMoreStatsItems("recent"));
+  document.getElementById("showMoreQuestionsBtn").addEventListener("click", () => showMoreStatsItems("question"));
+  document.getElementById("showMoreInsufficientBtn").addEventListener("click", () => showMoreStatsItems("insufficient"));
+  document.getElementById("reviewVisibleWeaknessBtn").addEventListener("click", startVisibleWeaknessReview);
   nextQuestionBtn.addEventListener("click", goNextQuestion);
 }
 
@@ -174,6 +184,20 @@ function startMistakeReview() {
   }
 
   startQuiz(pool.slice(0, Math.min(getSelectedCount(), pool.length)));
+}
+
+function startVisibleWeaknessReview() {
+  const visibleTopics = statsState.weaknessRows.slice(0, statsState.visibleCounts.weakness);
+  const topicKeys = new Set(visibleTopics.map((item) => getTopicKey(item.field, item.topic)));
+  const pool = questions.filter((question) => topicKeys.has(getTopicKey(question.field, question.topic)));
+
+  if (pool.length === 0) {
+    showMessage("表示中の弱点トピックに対応する問題が見つかりませんでした。");
+    return;
+  }
+
+  reviewMode = true;
+  startQuiz(selectNormalQuizQuestions(pool, getSelectedCount()));
 }
 
 function startQuiz(selectedQuestions) {
@@ -297,83 +321,100 @@ function renderWrongList(wrongAnswers) {
 
 function showStats() {
   const history = getHistory();
-  const total = history.totalAnswers;
-  const correct = history.totalCorrect;
   const topicSummaries = buildTopicSummaries(history);
+  statsState = buildStatsState(history, topicSummaries);
 
-  document.getElementById("totalAnswers").textContent = total;
-  document.getElementById("totalCorrect").textContent = correct;
-  document.getElementById("overallRate").textContent = formatRate(correct, total);
-  document.getElementById("weaknessRanking").innerHTML = renderWeaknessRanking(topicSummaries);
-  document.getElementById("insufficientTopics").innerHTML = renderInsufficientTopics(topicSummaries);
-  document.getElementById("fieldStats").innerHTML = renderStatsRows(history.byField, { lowRateFirst: true });
-  document.getElementById("topicStats").innerHTML = renderTopicStats(topicSummaries);
-  renderFrequentMistakes(history);
-  renderRecentMistakes(history);
+  document.getElementById("summaryOverallRate").textContent = formatRate(history.totalCorrect, history.totalAnswers);
+  document.getElementById("summaryTotalAnswers").textContent = history.totalAnswers;
+  document.getElementById("summaryWeakTopicCount").textContent = statsState.weaknessRows.filter((stat) => getRate(stat) < WEAK_TOPIC_RATE_LIMIT).length;
+  document.getElementById("summaryRecentMistakeCount").textContent = statsState.recentRows.length;
+  switchStatsTab(statsState.activeTab);
 
   hideMessage();
   showScreen("stats");
 }
 
-function renderStatsRows(statsObject, options = {}) {
-  const rows = Object.entries(statsObject).sort((a, b) => {
-    const rateA = getRate(a[1]);
-    const rateB = getRate(b[1]);
-    if (options.lowRateFirst && rateA !== rateB) {
-      return rateA - rateB;
-    }
-    return b[1].total - a[1].total;
-  });
-  if (rows.length === 0) {
-    return `<p class="muted">まだ学習履歴がありません。</p>`;
-  }
-
-  return rows.map(([name, stat]) => {
-    const rate = getRate(stat);
-    return `
-      <div class="stat-row">
-        <div class="stat-row-header">
-          <span>${escapeHtml(name)}</span>
-          <span>${stat.correct}/${stat.total} ${rate}%</span>
-        </div>
-        <div class="bar" aria-hidden="true"><span style="width: ${rate}%"></span></div>
-      </div>
-    `;
-  }).join("");
+function createDefaultStatsState() {
+  return {
+    activeTab: "weakness",
+    visibleCounts: {
+      weakness: 5,
+      recent: 5,
+      question: 5,
+      insufficient: 10
+    },
+    weaknessRows: [],
+    recentRows: [],
+    fieldRows: [],
+    questionRows: [],
+    insufficientRows: []
+  };
 }
 
-function renderTopicStats(topicSummaries) {
-  const rows = [...topicSummaries].sort(sortByLowRateThenCount);
-  if (rows.length === 0) {
-    return `<p class="muted">まだ学習履歴がありません。</p>`;
-  }
-
-  return rows.map((stat) => {
-    const rate = getRate(stat);
-    const status = stat.total < 3 ? "判定不足" : `${rate}%`;
-    return `
-      <div class="stat-row ${stat.total < 3 ? "needs-more" : ""}">
-        <div class="stat-row-header">
-          <span>${escapeHtml(stat.topic)}</span>
-          <span>${status}</span>
-        </div>
-        <p class="stat-row-meta">${escapeHtml(stat.field)} ・ 回答 ${stat.total}回 ・ 間違い ${stat.wrong}回</p>
-        <div class="bar" aria-hidden="true"><span style="width: ${rate}%"></span></div>
-      </div>
-    `;
-  }).join("");
-}
-
-function renderWeaknessRanking(topicSummaries) {
-  const rows = topicSummaries
+function buildStatsState(history, topicSummaries) {
+  const state = createDefaultStatsState();
+  state.activeTab = "weakness";
+  state.weaknessRows = [...topicSummaries]
     .filter((stat) => stat.total >= 3)
     .sort(sortByLowRateThenCount);
+  state.insufficientRows = [...topicSummaries]
+    .filter((stat) => stat.total > 0 && stat.total < 3)
+    .sort((a, b) => a.total - b.total || a.field.localeCompare(b.field, "ja") || a.topic.localeCompare(b.topic, "ja"));
+  state.fieldRows = Object.entries(history.byField || {})
+    .map(([field, stat]) => ({ field, total: stat.total || 0, correct: stat.correct || 0 }))
+    .sort(sortByLowRateThenCount);
+  state.questionRows = buildQuestionMistakeRows(history);
+  state.recentRows = buildRecentMistakeRows(history);
+  return state;
+}
 
-  if (rows.length === 0) {
-    return `<p class="muted">回答数が3回以上のトピックがまだありません。</p>`;
+function switchStatsTab(tabName) {
+  statsState.activeTab = tabName;
+  document.querySelectorAll("[data-stats-tab]").forEach((button) => {
+    const isActive = button.dataset.statsTab === tabName;
+    button.classList.toggle("active-tab", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+  });
+  document.querySelectorAll("[data-tab-panel]").forEach((panel) => {
+    panel.classList.toggle("active-tab-panel", panel.dataset.tabPanel === tabName);
+  });
+  renderActiveStatsTab();
+}
+
+function showMoreStatsItems(kind) {
+  const step = kind === "insufficient" ? 10 : 5;
+  statsState.visibleCounts[kind] += step;
+  renderActiveStatsTab();
+}
+
+function renderActiveStatsTab() {
+  if (statsState.activeTab === "weakness") {
+    renderWeaknessTab();
+  } else if (statsState.activeTab === "recent") {
+    renderRecentMistakesTab();
+  } else if (statsState.activeTab === "field") {
+    renderFieldStatsTab();
+  } else if (statsState.activeTab === "question") {
+    renderQuestionMistakesTab();
+  } else if (statsState.activeTab === "insufficient") {
+    renderInsufficientTopicsTab();
+  }
+}
+
+function renderWeaknessTab() {
+  const rows = statsState.weaknessRows;
+  const visibleRows = rows.slice(0, statsState.visibleCounts.weakness);
+  const weaknessRanking = document.getElementById("weaknessRanking");
+  const reviewButton = document.getElementById("reviewVisibleWeaknessBtn");
+
+  reviewButton.classList.toggle("hidden", visibleRows.length === 0);
+  if (visibleRows.length === 0) {
+    weaknessRanking.innerHTML = `<p class="muted">回答数が3回以上のトピックがまだありません。</p>`;
+    updateMoreButton("showMoreWeaknessBtn", 0, 0);
+    return;
   }
 
-  return rows.map((stat, index) => {
+  weaknessRanking.innerHTML = visibleRows.map((stat, index) => {
     const rate = getRate(stat);
     return `
       <div class="ranking-item">
@@ -390,78 +431,144 @@ function renderWeaknessRanking(topicSummaries) {
       </div>
     `;
   }).join("");
+  updateMoreButton("showMoreWeaknessBtn", visibleRows.length, rows.length);
 }
 
-function renderInsufficientTopics(topicSummaries) {
-  const rows = topicSummaries
-    .filter((stat) => stat.total > 0 && stat.total < 3)
-    .sort((a, b) => a.total - b.total || a.field.localeCompare(b.field, "ja") || a.topic.localeCompare(b.topic, "ja"));
+function renderRecentMistakesTab() {
+  const rows = statsState.recentRows;
+  const visibleRows = rows.slice(0, statsState.visibleCounts.recent);
+  const recentMistakes = document.getElementById("recentMistakes");
 
-  if (rows.length === 0) {
-    return `<p class="muted">判定不足のトピックはありません。</p>`;
+  if (visibleRows.length === 0) {
+    recentMistakes.innerHTML = `<p class="muted">まだ最近間違えた問題はありません。</p>`;
+    updateMoreButton("showMoreRecentBtn", 0, 0);
+    return;
   }
 
-  return rows.map((stat) => `
+  recentMistakes.innerHTML = visibleRows.map((record) => `
     <div class="mistake-item">
-      <p><strong>${escapeHtml(stat.topic)}</strong></p>
-      <p class="muted">${escapeHtml(stat.field)}：回答数${stat.total}回のため判定不足</p>
+      <p><strong>${formatDateTime(record.answeredAt)}</strong></p>
+      <p class="muted">${escapeHtml(record.field)} / ${escapeHtml(record.topic)}</p>
+      <p>${escapeHtml(record.question)}</p>
     </div>
   `).join("");
+  updateMoreButton("showMoreRecentBtn", visibleRows.length, rows.length);
 }
 
-function renderFrequentMistakes(history) {
+function renderFieldStatsTab() {
+  const fieldStats = document.getElementById("fieldStats");
+  if (statsState.fieldRows.length === 0) {
+    fieldStats.innerHTML = `<p class="muted">まだ学習履歴がありません。</p>`;
+    return;
+  }
+
+  fieldStats.innerHTML = statsState.fieldRows.map((stat) => {
+    const rate = getRate(stat);
+    const status = stat.total < 3 ? "判定不足" : `${rate}%`;
+    return `
+      <div class="compact-stat-row ${stat.total < 3 ? "needs-more" : ""}">
+        <div>
+          <strong>${escapeHtml(stat.field)}</strong>
+          <span>回答 ${stat.total}回</span>
+        </div>
+        <div class="compact-rate">${status}</div>
+        <div class="bar" aria-hidden="true"><span style="width: ${rate}%"></span></div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderQuestionMistakesTab() {
+  const rows = statsState.questionRows;
+  const visibleRows = rows.slice(0, statsState.visibleCounts.question);
   const frequentMistakes = document.getElementById("frequentMistakes");
-  const rows = Object.entries(history.byQuestion)
+
+  if (visibleRows.length === 0) {
+    frequentMistakes.innerHTML = `<p class="muted">まだ間違えた問題はありません。</p>`;
+    updateMoreButton("showMoreQuestionsBtn", 0, 0);
+    return;
+  }
+
+  frequentMistakes.innerHTML = visibleRows.map((stat) => `
+    <details class="mistake-item mistake-details">
+      <summary>
+        <span>
+          <strong>${escapeHtml(stat.id)}</strong>
+          <small>${escapeHtml(stat.field)} / ${escapeHtml(stat.topic)}</small>
+          <small class="question-preview">${escapeHtml(truncateText(stat.question, 42))}</small>
+        </span>
+        <span class="mistake-counts">間違い ${stat.wrongCount}回 ・ 正解 ${stat.correctCount}回</span>
+      </summary>
+      <p>${escapeHtml(stat.question)}</p>
+    </details>
+  `).join("");
+  updateMoreButton("showMoreQuestionsBtn", visibleRows.length, rows.length);
+}
+
+function renderInsufficientTopicsTab() {
+  const rows = statsState.insufficientRows;
+  const visibleRows = rows.slice(0, statsState.visibleCounts.insufficient);
+  const insufficientTopics = document.getElementById("insufficientTopics");
+
+  if (visibleRows.length === 0) {
+    insufficientTopics.innerHTML = `<p class="muted">判定不足のトピックはありません。</p>`;
+    updateMoreButton("showMoreInsufficientBtn", 0, 0);
+    return;
+  }
+
+  insufficientTopics.innerHTML = visibleRows.map((stat) => `
+    <div class="compact-stat-row needs-more">
+      <div>
+        <strong>${escapeHtml(stat.topic)}</strong>
+        <span>${escapeHtml(stat.field)}</span>
+      </div>
+      <div class="compact-rate">回答 ${stat.total}回</div>
+    </div>
+  `).join("");
+  updateMoreButton("showMoreInsufficientBtn", visibleRows.length, rows.length);
+}
+
+function updateMoreButton(buttonId, visibleCount, totalCount) {
+  const button = document.getElementById(buttonId);
+  button.classList.toggle("hidden", visibleCount >= totalCount);
+}
+
+function buildQuestionMistakeRows(history) {
+  return Object.entries(history.byQuestion || {})
     .filter(([, stat]) => stat.wrongCount > 0)
     .sort((a, b) => b[1].wrongCount - a[1].wrongCount)
-    .slice(0, 10);
-
-  if (rows.length === 0) {
-    frequentMistakes.innerHTML = `<p class="muted">まだ間違えた問題はありません。</p>`;
-    return;
-  }
-
-  frequentMistakes.innerHTML = rows.map(([id, stat]) => {
-    const question = questions.find((q) => q.id === id);
-    const title = question ? question.question : stat.question || `問題ID：${id}`;
-    const field = stat.field || question?.field || "分野不明";
-    const topic = stat.topic || question?.topic || "トピック不明";
-    return `
-      <div class="mistake-item">
-        <p><strong>${escapeHtml(id)}</strong></p>
-        <p class="muted">${escapeHtml(field)} / ${escapeHtml(topic)}</p>
-        <p>${escapeHtml(title)}</p>
-        <p>間違い ${stat.wrongCount}回 ・ 正解 ${stat.correctCount}回</p>
-      </div>
-    `;
-  }).join("");
+    .map(([id, stat]) => {
+      const question = questions.find((q) => q.id === id);
+      const title = question ? question.question : stat.question || `問題ID：${id}`;
+      const field = stat.field || question?.field || "分野不明";
+      const topic = stat.topic || question?.topic || "トピック不明";
+      return {
+        id,
+        field,
+        topic,
+        question: title,
+        wrongCount: stat.wrongCount || 0,
+        correctCount: stat.correctCount || 0
+      };
+    });
 }
 
-function renderRecentMistakes(history) {
-  const recentMistakes = document.getElementById("recentMistakes");
-  const rows = [...(history.records || [])]
+function buildRecentMistakeRows(history) {
+  return [...(history.records || [])]
     .filter((record) => record && record.isCorrect === false)
     .sort((a, b) => new Date(b.answeredAt) - new Date(a.answeredAt))
-    .slice(0, 5);
-
-  if (rows.length === 0) {
-    recentMistakes.innerHTML = `<p class="muted">まだ最近間違えた問題はありません。</p>`;
-    return;
-  }
-
-  recentMistakes.innerHTML = rows.map((record) => {
-    const question = questions.find((q) => q.id === record.questionId);
-    const field = record.field || question?.field || "分野不明";
-    const topic = record.topic || question?.topic || "トピック不明";
-    const questionText = record.question || question?.question || `問題ID：${record.questionId}`;
-    return `
-      <div class="mistake-item">
-        <p><strong>${formatDateTime(record.answeredAt)}</strong></p>
-        <p class="muted">${escapeHtml(field)} / ${escapeHtml(topic)}</p>
-        <p>${escapeHtml(questionText)}</p>
-      </div>
-    `;
-  }).join("");
+    .map((record) => {
+      const question = questions.find((q) => q.id === record.questionId);
+      const field = record.field || question?.field || "分野不明";
+      const topic = record.topic || question?.topic || "トピック不明";
+      const questionText = record.question || question?.question || `問題ID：${record.questionId}`;
+      return {
+        answeredAt: record.answeredAt,
+        field,
+        topic,
+        question: questionText
+      };
+    });
 }
 
 function buildTopicSummaries(history) {
@@ -678,7 +785,10 @@ function sortByLowRateThenCount(a, b) {
   if (rateDiff !== 0) {
     return rateDiff;
   }
-  return b.total - a.total || b.wrong - a.wrong || a.field.localeCompare(b.field, "ja") || a.topic.localeCompare(b.topic, "ja");
+  return b.total - a.total
+    || (b.wrong || 0) - (a.wrong || 0)
+    || String(a.field || "").localeCompare(String(b.field || ""), "ja")
+    || String(a.topic || "").localeCompare(String(b.topic || ""), "ja");
 }
 
 function getTopicKey(field, topic) {
@@ -702,6 +812,14 @@ function formatDateTime(value) {
     hour: "2-digit",
     minute: "2-digit"
   });
+}
+
+function truncateText(value, maxLength) {
+  const text = String(value ?? "");
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return `${text.slice(0, maxLength)}...`;
 }
 
 function escapeHtml(value) {
