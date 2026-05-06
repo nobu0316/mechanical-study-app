@@ -302,8 +302,16 @@ select {
   gap: 10px;
 }
 
+.stats-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
 .result-grid > div,
+.summary-card,
 .stat-row,
+.compact-stat-row,
 .mistake-item,
 .ranking-item {
   border: 1px solid var(--line);
@@ -322,6 +330,72 @@ select {
   display: block;
   margin-top: 4px;
   font-size: 1.35rem;
+}
+
+.summary-card strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.45rem;
+  line-height: 1.2;
+}
+
+.stats-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.tab-btn {
+  min-height: 44px;
+  padding: 9px 8px;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.tab-btn.active-tab {
+  border-color: var(--primary);
+  background: #e3f1f2;
+  color: var(--primary-dark);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.active-tab-panel {
+  display: block;
+}
+
+.tab-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.tab-panel-head h3 {
+  margin: 0;
+}
+
+.compact-primary-btn,
+.more-btn {
+  min-height: 42px;
+  padding: 9px 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.compact-primary-btn {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.more-btn {
+  width: 100%;
+  margin-top: 10px;
 }
 
 .stats-list,
@@ -361,6 +435,43 @@ select {
   background: var(--accent);
 }
 
+.compact-list {
+  gap: 8px;
+}
+
+.compact-stat-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 12px;
+  align-items: center;
+}
+
+.compact-stat-row strong,
+.compact-stat-row span {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.compact-stat-row span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.compact-rate {
+  color: var(--text);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.compact-stat-row .bar {
+  grid-column: 1 / -1;
+}
+
+.compact-stat-row.needs-more .bar span {
+  background: var(--accent);
+}
+
 .bar {
   height: 10px;
   overflow: hidden;
@@ -377,6 +488,43 @@ select {
 
 .mistake-item p {
   margin-bottom: 6px;
+}
+
+.mistake-details summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: start;
+  cursor: pointer;
+}
+
+.mistake-details summary::marker {
+  color: var(--muted);
+}
+
+.mistake-details small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.mistake-details .question-preview {
+  margin-top: 3px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.mistake-details p {
+  margin: 10px 0 0;
+}
+
+.mistake-counts {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .ranking-item {
@@ -440,6 +588,23 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .stats-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stats-tabs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tab-btn {
+    min-height: 46px;
+  }
+
+  .tab-panel-head {
+    display: grid;
+    align-items: stretch;
+  }
+
   button {
     width: 100%;
   }
@@ -456,5 +621,14 @@ select {
   .rank-badge {
     width: 32px;
     height: 32px;
+  }
+
+  .mistake-details summary,
+  .compact-stat-row {
+    grid-template-columns: 1fr;
+  }
+
+  .mistake-counts {
+    white-space: normal;
   }
 }
