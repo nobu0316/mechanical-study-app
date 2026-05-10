@@ -296,6 +296,45 @@ select {
   margin-bottom: 6px;
 }
 
+.status-area {
+  margin-top: 16px;
+}
+
+.status-title {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.status-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.status-buttons button {
+  min-height: 56px;
+  font-weight: 800;
+}
+
+.status-buttons [data-status="わかった"] {
+  border-color: #b7dcca;
+}
+
+.status-buttons [data-status="迷った"] {
+  border-color: #dfc17b;
+}
+
+.status-buttons [data-status="間違えた"] {
+  border-color: #d7aaa5;
+}
+
+.status-buttons .selected-status {
+  border-color: var(--primary);
+  background: #e3f1f2;
+  color: var(--primary-dark);
+}
+
 .result-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -567,6 +606,16 @@ select {
   color: var(--muted);
 }
 
+.history-tools {
+  margin-top: 26px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+
+.history-tools h3 {
+  margin-top: 0;
+}
+
 @media (max-width: 640px) {
   body {
     font-size: 16px;
@@ -583,7 +632,8 @@ select {
   }
 
   .button-row,
-  .result-grid {
+  .result-grid,
+  .status-buttons {
     display: grid;
     grid-template-columns: 1fr;
   }
