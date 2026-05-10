@@ -12,9 +12,16 @@ const FIELDS = [
   "環境・安全"
 ];
 
-const STORAGE_KEY = "mechanicalStudyHistoryV1";
+const STORAGE_KEY = "mechanicalStudyHistory";
+const LEGACY_STORAGE_KEY = "mechanicalStudyHistoryV1";
 const QUESTIONS_CSV = "questions.csv";
 const WEAK_TOPIC_RATE_LIMIT = 70;
+const REVIEW_STATUSES = ["迷った", "間違えた"];
+const STATUS_PRIORITY = {
+  "間違えた": 2,
+  "迷った": 1,
+  "わかった": 0
+};
 
 let questions = [];
 let currentQuiz = [];
@@ -36,7 +43,10 @@ const messageArea = document.getElementById("messageArea");
 const fieldSelect = document.getElementById("fieldSelect");
 const choicesArea = document.getElementById("choicesArea");
 const feedbackArea = document.getElementById("feedbackArea");
+const statusArea = document.getElementById("statusArea");
 const nextQuestionBtn = document.getElementById("nextQuestionBtn");
+const historyImportInput = document.getElementById("historyImportInput");
+let importMode = "merge";
 
 document.addEventListener("DOMContentLoaded", initApp);
 
@@ -53,6 +63,7 @@ function setupFields() {
 function bindEvents() {
   document.getElementById("startQuizBtn").addEventListener("click", startNormalQuiz);
   document.getElementById("reviewMistakesBtn").addEventListener("click", startMistakeReview);
+  document.getElementById("reviewStatusBtn").addEventListener("click", startStatusReview);
   document.getElementById("showStatsBtn").addEventListener("click", showStats);
   document.getElementById("homeFromResultBtn").addEventListener("click", showHome);
   document.getElementById("reviewFromResultBtn").addEventListener("click", startMistakeReview);
@@ -66,6 +77,10 @@ function bindEvents() {
   document.getElementById("showMoreQuestionsBtn").addEventListener("click", () => showMoreStatsItems("question"));
   document.getElementById("showMoreInsufficientBtn").addEventListener("click", () => showMoreStatsItems("insufficient"));
   document.getElementById("reviewVisibleWeaknessBtn").addEventListener("click", startVisibleWeaknessReview);
+  document.getElementById("exportHistoryBtn").addEventListener("click", exportHistory);
+  document.getElementById("importMergeBtn").addEventListener("click", () => chooseImportFile("merge"));
+  document.getElementById("importReplaceBtn").addEventListener("click", () => chooseImportFile("replace"));
+  historyImportInput.addEventListener("change", importHistoryFromFile);
   nextQuestionBtn.addEventListener("click", goNextQuestion);
 }
 
@@ -186,6 +201,35 @@ function startMistakeReview() {
   startQuiz(pool.slice(0, Math.min(getSelectedCount(), pool.length)));
 }
 
+function startStatusReview() {
+  reviewMode = true;
+  const studyHistory = getStudyHistory();
+  // 復習モードでは「間違えた」を先に、同じ状態なら古い回答から出します。
+  const pool = Object.values(studyHistory)
+    .filter((item) => REVIEW_STATUSES.includes(item.status))
+    .map((item) => ({
+      record: item,
+      question: questions.find((q) => q.id === item.id)
+    }))
+    .filter((item) => item.question)
+    .sort((a, b) => {
+      const priorityDiff = STATUS_PRIORITY[b.record.status] - STATUS_PRIORITY[a.record.status];
+      if (priorityDiff !== 0) {
+        return priorityDiff;
+      }
+      return new Date(a.record.lastAnsweredAt || 0) - new Date(b.record.lastAnsweredAt || 0);
+    })
+    .map((item) => item.question);
+
+  if (pool.length === 0) {
+    showMessage("復習対象の問題はありません。");
+    showHome();
+    return;
+  }
+
+  startQuiz(pool.slice(0, Math.min(getSelectedCount(), pool.length)));
+}
+
 function startVisibleWeaknessReview() {
   const visibleTopics = statsState.weaknessRows.slice(0, statsState.visibleCounts.weakness);
   const topicKeys = new Set(visibleTopics.map((item) => getTopicKey(item.field, item.topic)));
@@ -236,6 +280,8 @@ function renderQuestion() {
 
   feedbackArea.className = "feedback hidden";
   feedbackArea.innerHTML = "";
+  statusArea.className = "status-area hidden";
+  statusArea.innerHTML = "";
   nextQuestionBtn.classList.add("hidden");
 
   choicesArea.innerHTML = "";
@@ -265,8 +311,7 @@ function answerQuestion(selectedNumber) {
     }
   });
 
-  quizAnswers.push({ question, selectedNumber, isCorrect });
-  saveAnswer(question, isCorrect);
+  quizAnswers.push({ question, selectedNumber, isCorrect, status: "" });
 
   feedbackArea.className = `feedback ${isCorrect ? "correct" : "wrong"}`;
   feedbackArea.innerHTML = `
@@ -274,8 +319,40 @@ function answerQuestion(selectedNumber) {
     <div>正解：${question.answer}. ${question.choices[question.answer - 1]}</div>
     <div>${question.explanation}</div>
   `;
-  nextQuestionBtn.textContent = currentIndex === currentQuiz.length - 1 ? "結果を見る" : "次の問題へ";
-  nextQuestionBtn.classList.remove("hidden");
+  renderStatusButtons(question, isCorrect, selectedNumber);
+}
+
+function renderStatusButtons(question, isCorrect, selectedNumber) {
+  statusArea.className = "status-area";
+  statusArea.innerHTML = `
+    <p class="status-title">この問題の手応えを記録してください</p>
+    <div class="status-buttons" role="group" aria-label="学習状態を記録">
+      <button type="button" data-status="わかった">わかった</button>
+      <button type="button" data-status="迷った">迷った</button>
+      <button type="button" data-status="間違えた">間違えた</button>
+    </div>
+  `;
+
+  statusArea.querySelectorAll("[data-status]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const status = button.dataset.status;
+      const latestAnswer = quizAnswers[quizAnswers.length - 1];
+      if (latestAnswer && latestAnswer.question.id === question.id) {
+        // 同じ回答で押し直した場合は、回数を増やさず最後の状態だけ直します。
+        if (latestAnswer.status) {
+          updateLatestAnswerStatus(question.id, status);
+        } else {
+          saveAnswer(question, isCorrect, selectedNumber, status);
+        }
+        latestAnswer.status = status;
+      }
+      statusArea.querySelectorAll("[data-status]").forEach((item) => {
+        item.classList.toggle("selected-status", item === button);
+      });
+      nextQuestionBtn.textContent = currentIndex === currentQuiz.length - 1 ? "結果を見る" : "次の問題へ";
+      nextQuestionBtn.classList.remove("hidden");
+    });
+  });
 }
 
 function goNextQuestion() {
@@ -612,52 +689,61 @@ function buildTopicSummaries(history) {
   return Object.values(summaries);
 }
 
-function saveAnswer(question, isCorrect) {
-  const history = getHistory();
+function saveAnswer(question, isCorrect, selectedNumber, status) {
+  const studyHistory = getStudyHistory();
   const now = new Date().toISOString();
 
-  history.totalAnswers += 1;
-  if (isCorrect) {
-    history.totalCorrect += 1;
-  }
-
-  addAggregate(history.byField, question.field, isCorrect);
-  addTopicAggregate(history.byTopic, question, isCorrect);
-
-  if (!history.byQuestion[question.id]) {
-    history.byQuestion[question.id] = {
+  if (!studyHistory[question.id]) {
+    studyHistory[question.id] = {
+      id: question.id,
       field: question.field,
       topic: question.topic,
-      question: question.question,
-      wrongCount: 0,
+      status: "",
       correctCount: 0,
-      totalCount: 0,
-      lastAnsweredAt: ""
+      incorrectCount: 0,
+      lastAnsweredAt: "",
+      lastSelectedStatus: "",
+      history: []
     };
   }
 
-  const questionStat = history.byQuestion[question.id];
+  const questionStat = studyHistory[question.id];
+  // questions.csvを変更しないため、履歴側にも表示に必要な最小情報だけ持たせます。
   questionStat.field = question.field;
   questionStat.topic = question.topic;
-  questionStat.question = question.question;
-  questionStat.totalCount += 1;
+  questionStat.id = question.id;
+  questionStat.status = status;
+  questionStat.lastSelectedStatus = status;
   questionStat.lastAnsweredAt = now;
   if (isCorrect) {
     questionStat.correctCount += 1;
   } else {
-    questionStat.wrongCount += 1;
+    questionStat.incorrectCount += 1;
   }
-
-  history.records.push({
-    questionId: question.id,
-    isCorrect,
+  questionStat.history.push({
     answeredAt: now,
-    field: question.field,
-    topic: question.topic,
-    question: question.question
+    isCorrect,
+    status,
+    selectedNumber
   });
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  saveStudyHistory(studyHistory);
+}
+
+function updateLatestAnswerStatus(questionId, status) {
+  const studyHistory = getStudyHistory();
+  const questionStat = studyHistory[questionId];
+  if (!questionStat) {
+    return;
+  }
+
+  const latestRecord = questionStat.history[questionStat.history.length - 1];
+  if (latestRecord) {
+    latestRecord.status = status;
+  }
+  questionStat.status = status;
+  questionStat.lastSelectedStatus = status;
+  saveStudyHistory(studyHistory);
 }
 
 function addAggregate(target, key, isCorrect) {
@@ -696,22 +782,175 @@ function getHistory() {
     totalCorrect: 0
   };
 
+  const studyHistory = getStudyHistory();
+  Object.values(studyHistory).forEach((item) => {
+    const question = questions.find((q) => q.id === item.id);
+    const field = item.field || question?.field || "分野不明";
+    const topic = item.topic || question?.topic || "トピック不明";
+    const correctCount = Number(item.correctCount || 0);
+    const incorrectCount = Number(item.incorrectCount || item.wrongCount || 0);
+    const totalCount = correctCount + incorrectCount;
+
+    defaultHistory.byQuestion[item.id] = {
+      field,
+      topic,
+      question: question?.question || item.question || `問題ID：${item.id}`,
+      wrongCount: incorrectCount,
+      correctCount,
+      totalCount,
+      lastAnsweredAt: item.lastAnsweredAt || "",
+      status: item.status || item.lastSelectedStatus || ""
+    };
+
+    (item.history || []).forEach((record) => {
+      const isCorrect = Boolean(record.isCorrect);
+      const answeredAt = record.answeredAt || item.lastAnsweredAt || "";
+      defaultHistory.totalAnswers += 1;
+      if (isCorrect) {
+        defaultHistory.totalCorrect += 1;
+      }
+      addAggregate(defaultHistory.byField, field, isCorrect);
+      addTopicAggregate(defaultHistory.byTopic, { field, topic }, isCorrect);
+      defaultHistory.records.push({
+        questionId: item.id,
+        isCorrect,
+        answeredAt,
+        field,
+        topic,
+        question: question?.question || item.question || `問題ID：${item.id}`,
+        status: record.status || item.status || ""
+      });
+    });
+  });
+
+  return defaultHistory;
+}
+
+function getStudyHistory() {
   try {
     const storedHistory = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (!storedHistory) {
-      return defaultHistory;
+    if (storedHistory) {
+      return normalizeStudyHistory(storedHistory);
     }
-    return {
-      ...defaultHistory,
-      ...storedHistory,
-      records: storedHistory.records || [],
-      byQuestion: storedHistory.byQuestion || {},
-      byField: storedHistory.byField || {},
-      byTopic: storedHistory.byTopic || {}
-    };
   } catch {
-    return defaultHistory;
+    return {};
   }
+
+  const legacyHistory = migrateLegacyHistory();
+  if (Object.keys(legacyHistory).length > 0) {
+    saveStudyHistory(legacyHistory);
+  }
+  return legacyHistory;
+}
+
+function saveStudyHistory(studyHistory) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizeStudyHistory(studyHistory)));
+}
+
+function normalizeStudyHistory(rawHistory) {
+  const source = rawHistory && rawHistory.byQuestion ? migrateLegacyObject(rawHistory) : rawHistory;
+  const normalized = {};
+
+  Object.entries(source || {}).forEach(([id, item]) => {
+    if (!id || !item) {
+      return;
+    }
+
+    const history = Array.isArray(item.history)
+      ? item.history
+          .filter((record) => record && record.answeredAt)
+          .map((record) => ({
+            answeredAt: record.answeredAt,
+            isCorrect: Boolean(record.isCorrect),
+            status: normalizeStatus(record.status || item.status || item.lastSelectedStatus),
+            selectedNumber: record.selectedNumber || null
+          }))
+      : [];
+    const latestRecord = getLatestRecord(history);
+    const status = normalizeStatus(item.status || item.lastSelectedStatus || latestRecord?.status);
+    // JSONを手で直した場合にも壊れにくいよう、数値は安全に補正します。
+    const correctCount = Number.isFinite(Number(item.correctCount)) ? Number(item.correctCount) : history.filter((record) => record.isCorrect).length;
+    const incorrectCount = Number.isFinite(Number(item.incorrectCount)) ? Number(item.incorrectCount) : Number(item.wrongCount || history.filter((record) => !record.isCorrect).length);
+
+    normalized[id] = {
+      id: item.id || id,
+      field: item.field || "",
+      topic: item.topic || "",
+      status,
+      correctCount,
+      incorrectCount,
+      lastAnsweredAt: item.lastAnsweredAt || latestRecord?.answeredAt || "",
+      lastSelectedStatus: normalizeStatus(item.lastSelectedStatus || status),
+      history
+    };
+  });
+
+  return normalized;
+}
+
+function normalizeStatus(status) {
+  return ["わかった", "迷った", "間違えた"].includes(status) ? status : "";
+}
+
+function getLatestRecord(history) {
+  return [...(history || [])].sort((a, b) => new Date(b.answeredAt || 0) - new Date(a.answeredAt || 0))[0];
+}
+
+function migrateLegacyHistory() {
+  try {
+    return migrateLegacyObject(JSON.parse(localStorage.getItem(LEGACY_STORAGE_KEY)));
+  } catch {
+    return {};
+  }
+}
+
+function migrateLegacyObject(legacyHistory) {
+  const migrated = {};
+  if (!legacyHistory || !legacyHistory.byQuestion) {
+    return migrated;
+  }
+
+  Object.entries(legacyHistory.byQuestion).forEach(([id, item]) => {
+    migrated[id] = {
+      id,
+      field: item.field || "",
+      topic: item.topic || "",
+      status: item.wrongCount > 0 ? "間違えた" : "わかった",
+      correctCount: item.correctCount || 0,
+      incorrectCount: item.wrongCount || 0,
+      lastAnsweredAt: item.lastAnsweredAt || "",
+      lastSelectedStatus: item.wrongCount > 0 ? "間違えた" : "わかった",
+      history: []
+    };
+  });
+
+  (legacyHistory.records || []).forEach((record) => {
+    const id = record.questionId;
+    if (!id) {
+      return;
+    }
+    if (!migrated[id]) {
+      migrated[id] = {
+        id,
+        field: record.field || "",
+        topic: record.topic || "",
+        status: "",
+        correctCount: 0,
+        incorrectCount: 0,
+        lastAnsweredAt: "",
+        lastSelectedStatus: "",
+        history: []
+      };
+    }
+    migrated[id].history.push({
+      answeredAt: record.answeredAt,
+      isCorrect: Boolean(record.isCorrect),
+      status: record.isCorrect ? "わかった" : "間違えた",
+      selectedNumber: null
+    });
+  });
+
+  return normalizeStudyHistory(migrated);
 }
 
 function resetHistory() {
@@ -720,6 +959,7 @@ function resetHistory() {
     return;
   }
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(LEGACY_STORAGE_KEY);
   showStats();
   showMessage("学習履歴をリセットしました。");
 }
@@ -727,6 +967,98 @@ function resetHistory() {
 function hasMistakes() {
   const history = getHistory();
   return Object.values(history.byQuestion).some((item) => item.wrongCount > 0);
+}
+
+function exportHistory() {
+  const studyHistory = getStudyHistory();
+  const today = new Date();
+  const yyyymmdd = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, "0"),
+    String(today.getDate()).padStart(2, "0")
+  ].join("");
+  const blob = new Blob([JSON.stringify(studyHistory, null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+
+  link.href = URL.createObjectURL(blob);
+  link.download = `study-history-${yyyymmdd}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(link.href);
+  showMessage("学習履歴をJSONファイルとしてエクスポートしました。");
+}
+
+function chooseImportFile(mode) {
+  importMode = mode;
+  historyImportInput.value = "";
+  historyImportInput.click();
+}
+
+function importHistoryFromFile(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    return;
+  }
+
+  const message = importMode === "replace"
+    ? "現在の履歴をすべて削除して、選択したJSONの内容で全上書き復元します。よろしいですか？"
+    : "選択したJSONの履歴を現在の履歴に統合します。よろしいですか？";
+  if (!confirm(message)) {
+    historyImportInput.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const importedHistory = normalizeStudyHistory(JSON.parse(reader.result));
+      const currentHistory = importMode === "replace" ? {} : getStudyHistory();
+      const mergedHistory = importMode === "replace"
+        ? importedHistory
+        : mergeStudyHistories(currentHistory, importedHistory);
+      saveStudyHistory(mergedHistory);
+      showStats();
+      showMessage(`インポートが完了しました。${Object.keys(importedHistory).length}件の問題履歴を読み込みました。`);
+    } catch {
+      showMessage("JSONファイルを読み込めませんでした。エクスポートした履歴ファイルか確認してください。");
+    } finally {
+      historyImportInput.value = "";
+    }
+  };
+  reader.readAsText(file);
+}
+
+function mergeStudyHistories(currentHistory, importedHistory) {
+  const merged = normalizeStudyHistory(currentHistory);
+
+  Object.entries(normalizeStudyHistory(importedHistory)).forEach(([id, importedItem]) => {
+    if (!merged[id]) {
+      merged[id] = importedItem;
+      return;
+    }
+
+    const currentItem = merged[id];
+    const currentLast = new Date(currentItem.lastAnsweredAt || 0).getTime();
+    const importedLast = new Date(importedItem.lastAnsweredAt || 0).getTime();
+    // 統合では履歴と回数は足し合わせ、現在の状態だけ新しい回答日のものを採用します。
+    const history = [...(currentItem.history || []), ...(importedItem.history || [])]
+      .sort((a, b) => new Date(a.answeredAt || 0) - new Date(b.answeredAt || 0));
+
+    merged[id] = {
+      id,
+      field: importedItem.field || currentItem.field,
+      topic: importedItem.topic || currentItem.topic,
+      status: importedLast >= currentLast ? importedItem.status : currentItem.status,
+      correctCount: (currentItem.correctCount || 0) + (importedItem.correctCount || 0),
+      incorrectCount: (currentItem.incorrectCount || 0) + (importedItem.incorrectCount || 0),
+      lastAnsweredAt: importedLast >= currentLast ? importedItem.lastAnsweredAt : currentItem.lastAnsweredAt,
+      lastSelectedStatus: importedLast >= currentLast ? importedItem.lastSelectedStatus : currentItem.lastSelectedStatus,
+      history
+    };
+  });
+
+  return normalizeStudyHistory(merged);
 }
 
 function getSelectedCount() {
