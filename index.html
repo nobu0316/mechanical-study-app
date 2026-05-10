@@ -44,6 +44,7 @@
           <div class="button-row">
             <button id="startQuizBtn" class="primary-btn" type="button">クイズ開始</button>
             <button id="reviewMistakesBtn" type="button">弱点復習</button>
+            <button id="reviewStatusBtn" type="button">迷った・間違えた復習</button>
             <button id="showStatsBtn" type="button">成績確認</button>
           </div>
         </div>
@@ -69,6 +70,7 @@
           <h2 id="questionText"></h2>
           <div id="choicesArea" class="choices"></div>
           <div id="feedbackArea" class="feedback hidden"></div>
+          <div id="statusArea" class="status-area hidden" aria-live="polite"></div>
           <button id="nextQuestionBtn" class="primary-btn hidden" type="button">次の問題へ</button>
         </article>
       </section>
@@ -164,6 +166,17 @@
               <button id="showMoreInsufficientBtn" class="more-btn hidden" type="button">もっと見る</button>
             </section>
           </div>
+
+          <section class="history-tools" aria-labelledby="historyToolsTitle">
+            <h3 id="historyToolsTitle">学習履歴の保存・復元</h3>
+            <p class="muted">通常は「統合インポート」がおすすめです。スマホとタブレット間でJSONファイルを移して履歴を引き継げます。</p>
+            <div class="button-row">
+              <button id="exportHistoryBtn" type="button">履歴をエクスポート</button>
+              <button id="importMergeBtn" class="primary-btn" type="button">履歴をインポート</button>
+              <button id="importReplaceBtn" class="danger-btn" type="button">全上書き復元</button>
+            </div>
+            <input id="historyImportInput" class="hidden" type="file" accept="application/json,.json">
+          </section>
 
           <div class="button-row">
             <button id="resetHistoryBtn" class="danger-btn" type="button">学習履歴リセット</button>
