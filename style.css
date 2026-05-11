@@ -544,6 +544,23 @@ textarea {
   overflow-wrap: anywhere;
 }
 
+.note-open-btn {
+  width: auto;
+  min-height: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  padding: 0;
+  text-align: left;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.note-open-btn:hover {
+  color: var(--primary);
+  border-color: transparent;
+}
+
 .slide-card-meta {
   color: var(--primary-dark);
   font-size: 0.9rem;
@@ -658,6 +675,48 @@ textarea {
   font-size: 0.9rem;
   font-weight: 800;
   padding: 5px 10px;
+}
+
+.related-question-btn {
+  min-height: 42px;
+  padding: 8px 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.related-question-btn.missing-question {
+  border-color: #d7aaa5;
+  color: var(--error);
+}
+
+.feedback-actions {
+  margin-top: 12px;
+}
+
+.note-link-btn {
+  min-height: 42px;
+  border-color: var(--line);
+  color: var(--primary-dark);
+  padding: 8px 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.note-source {
+  margin-bottom: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfd;
+  padding: 14px;
+}
+
+.note-source h3 {
+  margin-top: 0;
+}
+
+.note-detail-memo {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .zoom-overlay {
