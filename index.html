@@ -149,7 +149,7 @@
 
             <div class="control-group">
               <label for="noteMemoInput">要点メモ</label>
-              <textarea id="noteMemoInput" rows="8" required placeholder="短い箇条書きや、自分が間違えた理由を書きます。"></textarea>
+              <textarea id="noteMemoInput" rows="8" placeholder="短い箇条書きや、自分が間違えた理由を書きます。"></textarea>
             </div>
 
             <div class="form-grid">
@@ -160,13 +160,19 @@
               <div class="control-group">
                 <label for="noteStatusSelect">理解状態</label>
                 <select id="noteStatusSelect">
-                  <option value="確認中">確認中</option>
+                  <option value="未理解">未理解</option>
                   <option value="要復習">要復習</option>
-                  <option value="だいたいOK">だいたいOK</option>
-                  <option value="覚えた">覚えた</option>
+                  <option value="理解済み">理解済み</option>
                 </select>
               </div>
             </div>
+
+            <section id="noteSourcePanel" class="note-source hidden" aria-labelledby="noteSourceTitle">
+              <h3 id="noteSourceTitle">参考：元の問題</h3>
+              <p class="muted" id="noteSourceMeta"></p>
+              <p id="noteSourceQuestion"></p>
+              <p class="muted" id="noteSourceExplanation"></p>
+            </section>
 
             <div class="button-row">
               <button id="saveNoteCardBtn" class="primary-btn" type="submit">保存する</button>
@@ -175,6 +181,41 @@
             </div>
           </form>
         </div>
+      </section>
+
+      <section id="noteDetailScreen" class="screen">
+        <article class="panel slide-detail">
+          <div class="screen-head">
+            <div>
+              <h2 id="noteDetailTitle"></h2>
+              <div class="meta-row">
+                <span id="noteDetailField"></span>
+                <span id="noteDetailTopic"></span>
+                <span id="noteDetailStatus"></span>
+              </div>
+            </div>
+            <button id="backToNotesBtn" type="button">一覧へ戻る</button>
+          </div>
+
+          <section>
+            <h3>要点メモ</h3>
+            <p id="noteDetailMemo" class="note-detail-memo"></p>
+          </section>
+
+          <section>
+            <h3>関連する問題ID</h3>
+            <div id="noteDetailRelatedQuestionIds" class="related-question-ids"></div>
+          </section>
+
+          <p id="noteDetailUpdatedAt" class="muted"></p>
+
+          <div class="button-row">
+            <button id="startNoteRelatedQuizBtn" class="primary-btn" type="button">関連問題をまとめて解く</button>
+            <button id="editNoteDetailBtn" type="button">編集</button>
+            <button id="deleteNoteDetailBtn" class="danger-btn" type="button">削除</button>
+            <button id="backToNotesBottomBtn" type="button">一覧へ戻る</button>
+          </div>
+        </article>
       </section>
 
       <section id="slideDetailScreen" class="screen">
@@ -206,7 +247,7 @@
           </section>
 
           <div class="button-row">
-            <button id="startRelatedQuizBtn" class="primary-btn" type="button">関連問題を解く</button>
+            <button id="startRelatedQuizBtn" class="primary-btn" type="button">関連問題をまとめて解く</button>
             <button id="backToSlidesBottomBtn" type="button">一覧へ戻る</button>
           </div>
         </article>
