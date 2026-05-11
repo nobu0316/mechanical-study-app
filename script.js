@@ -14,7 +14,9 @@ const FIELDS = [
 
 const STORAGE_KEY = "mechanicalStudyHistory";
 const LEGACY_STORAGE_KEY = "mechanicalStudyHistoryV1";
+const NOTE_CARDS_STORAGE_KEY = "mechanicalStudyNoteCards";
 const QUESTIONS_CSV = "questions.csv";
+const SLIDES_JSON = "slides.json";
 const WEAK_TOPIC_RATE_LIMIT = 70;
 const REVIEW_STATUSES = ["迷った", "間違えた"];
 const STATUS_PRIORITY = {
@@ -22,8 +24,94 @@ const STATUS_PRIORITY = {
   "迷った": 1,
   "わかった": 0
 };
+const FALLBACK_QUESTIONS = [
+  {
+    id: "C003",
+    field: "制御・メカトロ",
+    topic: "PID制御",
+    level: "基礎",
+    question: "I動作を強くしすぎた場合に起こりやすい現象はどれですか。",
+    choices: ["定常偏差が必ず増える", "振動やオーバーシュートが起こりやすい", "比例帯が消える", "外乱に反応しなくなる"],
+    answer: 2,
+    explanation: "I動作は偏差の累積を補正しますが、強すぎると過補正になり振動しやすくなります。"
+  },
+  {
+    id: "T003",
+    field: "熱工学",
+    topic: "熱力学変化",
+    level: "基礎",
+    question: "定積変化で0になるものとして適切なものはどれですか。",
+    choices: ["境界仕事", "内部エネルギー変化", "温度変化", "圧力変化"],
+    answer: 1,
+    explanation: "定積変化では体積変化がないため、境界仕事は0になります。"
+  },
+  {
+    id: "F003",
+    field: "流体工学",
+    topic: "レイノルズ数",
+    level: "基礎",
+    question: "レイノルズ数が表すものとして適切なものはどれですか。",
+    choices: ["圧力と温度の比", "慣性力と粘性力の比", "熱量と仕事の比", "流量と密度の比"],
+    answer: 2,
+    explanation: "レイノルズ数は慣性力と粘性力の比を表す無次元数です。"
+  }
+];
+const FALLBACK_SLIDES = [
+  {
+    id: "SLIDE_C001",
+    field: "制御・メカトロ",
+    topic: "PID制御",
+    title: "PID制御：I動作の強い・弱い",
+    description: "I動作の強弱とオーバーシュートの関係を確認するスライド",
+    image: "slides/pid-i-action.png",
+    summary: [
+      "I動作は偏差の累積を見て補正する働き",
+      "I動作が弱いと定常偏差が残りやすい",
+      "I動作が強すぎるとオーバーシュートや振動が起きやすい",
+      "試験では、I動作を強くしすぎると振動・ハンチングが起きやすいと覚える"
+    ],
+    relatedQuestionIds: ["C003", "C007"]
+  },
+  {
+    id: "SLIDE_H001",
+    field: "熱工学",
+    topic: "熱力学変化",
+    title: "定圧・定積・等温・断熱の違い",
+    description: "代表的な熱力学変化で一定になる量と熱の出入りを整理するスライド",
+    image: "slides/thermal-processes.png",
+    summary: [
+      "定圧変化は圧力が一定で、体積変化による仕事を考える",
+      "定積変化は体積が一定で、境界仕事は0になる",
+      "等温変化は温度が一定で、理想気体では内部エネルギー変化が0になる",
+      "断熱変化は熱の出入りがなく、温度・圧力・体積が同時に変化する"
+    ],
+    relatedQuestionIds: ["T003", "T005", "T006"]
+  },
+  {
+    id: "SLIDE_F001",
+    field: "流体工学",
+    topic: "レイノルズ数",
+    title: "レイノルズ数：層流と乱流",
+    description: "慣性力と粘性力の比から流れの状態を判断するスライド",
+    image: "slides/reynolds-number.png",
+    summary: [
+      "レイノルズ数は慣性力と粘性力の比を表す無次元数",
+      "値が小さいと粘性の影響が強く、層流になりやすい",
+      "値が大きいと慣性の影響が強く、乱流になりやすい",
+      "代表式 Re = ρVD / μ または Re = VD / ν を押さえる"
+    ],
+    relatedQuestionIds: ["F003", "F007", "F008"]
+  }
+];
 
 let questions = [];
+let slides = [];
+let noteCards = [];
+let currentSlide = null;
+let slideViewMode = "official";
+let editingNoteCardId = "";
+let questionsLoadedFromFallback = false;
+let slidesLoadedFromFallback = false;
 let currentQuiz = [];
 let currentIndex = 0;
 let quizStartTime = 0;
@@ -36,11 +124,21 @@ const screens = {
   home: document.getElementById("homeScreen"),
   quiz: document.getElementById("quizScreen"),
   result: document.getElementById("resultScreen"),
+  slides: document.getElementById("slidesScreen"),
+  noteForm: document.getElementById("noteFormScreen"),
+  slideDetail: document.getElementById("slideDetailScreen"),
   stats: document.getElementById("statsScreen")
 };
 
 const messageArea = document.getElementById("messageArea");
 const fieldSelect = document.getElementById("fieldSelect");
+const slideFieldFilter = document.getElementById("slideFieldFilter");
+const slideSearchInput = document.getElementById("slideSearchInput");
+const slideList = document.getElementById("slideList");
+const noteCardImportInput = document.getElementById("noteCardImportInput");
+const noteCardForm = document.getElementById("noteCardForm");
+const noteFieldSelect = document.getElementById("noteFieldSelect");
+const noteStatusSelect = document.getElementById("noteStatusSelect");
 const choicesArea = document.getElementById("choicesArea");
 const feedbackArea = document.getElementById("feedbackArea");
 const statusArea = document.getElementById("statusArea");
@@ -52,20 +150,67 @@ document.addEventListener("DOMContentLoaded", initApp);
 
 function initApp() {
   setupFields();
+  setupNoteFormFields();
+  noteCards = loadNoteCards();
   bindEvents();
   loadQuestions();
+  loadSlides();
 }
 
 function setupFields() {
   fieldSelect.innerHTML = FIELDS.map((field) => `<option value="${field}">${field}</option>`).join("");
 }
 
+function setupNoteFormFields() {
+  noteFieldSelect.innerHTML = FIELDS
+    .filter((field) => field !== "全分野")
+    .map((field) => `<option value="${field}">${field}</option>`)
+    .join("");
+}
+
 function bindEvents() {
   document.getElementById("startQuizBtn").addEventListener("click", startNormalQuiz);
   document.getElementById("reviewMistakesBtn").addEventListener("click", startMistakeReview);
   document.getElementById("reviewStatusBtn").addEventListener("click", startStatusReview);
+  document.getElementById("showSlidesBtn").addEventListener("click", showSlides);
   document.getElementById("showStatsBtn").addEventListener("click", showStats);
   document.getElementById("homeFromResultBtn").addEventListener("click", showHome);
+  document.getElementById("homeFromSlidesBtn").addEventListener("click", showHome);
+  document.getElementById("backToSlidesBtn").addEventListener("click", showSlides);
+  document.getElementById("backToSlidesBottomBtn").addEventListener("click", showSlides);
+  document.getElementById("startRelatedQuizBtn").addEventListener("click", startCurrentSlideQuiz);
+  document.getElementById("slideImageButton").addEventListener("click", openSlideZoom);
+  document.getElementById("closeSlideZoomBtn").addEventListener("click", closeSlideZoom);
+  document.getElementById("slideZoomOverlay").addEventListener("click", (event) => {
+    if (event.target.id === "slideZoomOverlay") {
+      closeSlideZoom();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeSlideZoom();
+    }
+  });
+  slideFieldFilter.addEventListener("change", renderSlideList);
+  slideSearchInput.addEventListener("input", renderSlideList);
+  document.querySelectorAll("input[name='slideViewMode']").forEach((input) => {
+    input.addEventListener("change", () => {
+      slideViewMode = input.value;
+      setupSlideFilters();
+      renderSlideList();
+    });
+  });
+  document.getElementById("addNoteCardBtn").addEventListener("click", () => showNoteForm());
+  document.getElementById("cancelNoteCardBtn").addEventListener("click", showSlides);
+  document.getElementById("cancelNoteCardBottomBtn").addEventListener("click", showSlides);
+  document.getElementById("deleteNoteCardBtn").addEventListener("click", deleteEditingNoteCard);
+  document.getElementById("exportNoteCardsBtn").addEventListener("click", exportNoteCards);
+  document.getElementById("importNoteCardsBtn").addEventListener("click", () => {
+    noteCardImportInput.value = "";
+    noteCardImportInput.click();
+  });
+  noteCardImportInput.addEventListener("change", importNoteCards);
+  noteCardForm.addEventListener("submit", saveNoteCardFromForm);
   document.getElementById("reviewFromResultBtn").addEventListener("click", startMistakeReview);
   document.getElementById("homeFromStatsBtn").addEventListener("click", showHome);
   document.getElementById("resetHistoryBtn").addEventListener("click", resetHistory);
@@ -129,14 +274,13 @@ function loadQuestionsWithXhr() {
 }
 
 function showCsvError() {
-  showMessage("questions.csvを読み込めませんでした。index.htmlとquestions.csvを同じフォルダに置いてください。ブラウザで直接開いて失敗する場合は、GitHub Pages上で確認してください。");
+  questions = FALLBACK_QUESTIONS;
+  questionsLoadedFromFallback = true;
+  showMessage("questions.csvを読み込めませんでした。ローカルで確認する場合は VS Code の Live Server などを使用してください。現在は画面確認用のサンプル問題で動作しています。");
 }
 
 function getQuestionsCsvUrl() {
-  if (window.location.protocol === "file:") {
-    return QUESTIONS_CSV;
-  }
-  return `${QUESTIONS_CSV}?v=${Date.now()}`;
+  return getDataUrl(QUESTIONS_CSV);
 }
 
 function parseCsv(csvText) {
@@ -160,6 +304,466 @@ function parseCsv(csvText) {
       explanation: cols[10]
     };
   }).filter((item) => item.id && item.field && item.question && item.answer >= 1 && item.answer <= 4);
+}
+
+function loadSlides() {
+  fetch(getDataUrl(SLIDES_JSON), { cache: "no-store" })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("slides.jsonを取得できませんでした。");
+      }
+      return response.json();
+    })
+    .then((json) => {
+      slides = normalizeSlides(json);
+      slidesLoadedFromFallback = false;
+      setupSlideFilters();
+      renderSlideList();
+    })
+    .catch(() => {
+      slides = normalizeSlides(FALLBACK_SLIDES);
+      slidesLoadedFromFallback = true;
+      setupSlideFilters();
+      renderSlideList();
+      showMessage("slides.jsonを読み込めませんでした。ローカルで確認する場合は VS Code の Live Server などを使用してください。現在は画面確認用のサンプルスライドで動作しています。");
+    });
+}
+
+function getDataUrl(fileName) {
+  if (window.location.protocol === "file:") {
+    return fileName;
+  }
+  return `${fileName}?v=${Date.now()}`;
+}
+
+function normalizeSlides(rawSlides) {
+  return (Array.isArray(rawSlides) ? rawSlides : [])
+    .map((slide) => ({
+      id: String(slide.id || ""),
+      field: String(slide.field || "分野不明"),
+      topic: String(slide.topic || "トピック不明"),
+      title: String(slide.title || "無題のスライド"),
+      description: String(slide.description || ""),
+      image: String(slide.image || ""),
+      summary: Array.isArray(slide.summary) ? slide.summary.map((item) => String(item)) : [],
+      relatedQuestionIds: Array.isArray(slide.relatedQuestionIds)
+        ? slide.relatedQuestionIds.map((id) => String(id)).filter(Boolean)
+        : []
+    }))
+    .filter((slide) => slide.id);
+}
+
+function setupSlideFilters() {
+  const source = slideViewMode === "notes" ? noteCards : slides;
+  const fields = ["全分野", ...new Set(source.map((item) => item.field).filter(Boolean))];
+  const currentValue = slideFieldFilter.value || "全分野";
+  slideFieldFilter.innerHTML = fields.map((field) => `<option value="${escapeHtml(field)}">${escapeHtml(field)}</option>`).join("");
+  slideFieldFilter.value = fields.includes(currentValue) ? currentValue : "全分野";
+}
+
+function showSlides() {
+  stopTimer();
+  renderSlideList();
+  if (slidesLoadedFromFallback) {
+    showMessage("slides.jsonを読み込めませんでした。ローカルで確認する場合は VS Code の Live Server などを使用してください。現在は画面確認用のサンプルスライドで動作しています。");
+  } else {
+    hideMessage();
+  }
+  showScreen("slides");
+}
+
+function renderSlideList() {
+  const selectedField = slideFieldFilter.value || "全分野";
+  const keyword = normalizeSearchText(slideSearchInput.value);
+  document.getElementById("addNoteCardBtn").classList.toggle("compact-primary-btn", slideViewMode === "official");
+  document.getElementById("addNoteCardBtn").classList.toggle("primary-btn", slideViewMode === "notes");
+  document.querySelectorAll("input[name='slideViewMode']").forEach((input) => {
+    input.checked = input.value === slideViewMode;
+  });
+
+  if (slideViewMode === "notes") {
+    renderNoteCardList(selectedField, keyword);
+    return;
+  }
+
+  const visibleSlides = slides.filter((slide) => {
+    const matchesField = selectedField === "全分野" || slide.field === selectedField;
+    const haystack = normalizeSearchText(`${slide.title} ${slide.field} ${slide.topic} ${slide.description}`);
+    return matchesField && haystack.includes(keyword);
+  });
+
+  if (visibleSlides.length === 0) {
+    slideList.innerHTML = `<p class="muted">条件に合うスライドはありません。</p>`;
+    return;
+  }
+
+  slideList.innerHTML = visibleSlides.map((slide) => `
+    <button class="slide-card" type="button" data-slide-id="${escapeHtml(slide.id)}">
+      <span class="slide-card-title">${escapeHtml(slide.title)}</span>
+      <span class="slide-card-meta">${escapeHtml(slide.field)} / ${escapeHtml(slide.topic)}</span>
+      <span class="slide-card-description">${escapeHtml(slide.description)}</span>
+      <span class="slide-card-count">関連問題 ${slide.relatedQuestionIds.length}件</span>
+    </button>
+  `).join("");
+
+  slideList.querySelectorAll("[data-slide-id]").forEach((button) => {
+    button.addEventListener("click", () => showSlideDetail(button.dataset.slideId));
+  });
+}
+
+function renderNoteCardList(selectedField, keyword) {
+  const visibleNotes = noteCards.filter((note) => {
+    const matchesField = selectedField === "全分野" || note.field === selectedField;
+    const haystack = normalizeSearchText(`${note.title} ${note.field} ${note.topic} ${note.memo} ${note.understandingStatus}`);
+    return matchesField && haystack.includes(keyword);
+  });
+
+  if (visibleNotes.length === 0) {
+    slideList.innerHTML = `
+      <div class="empty-state">
+        <p class="muted">保存済みの要点カードはまだありません。</p>
+        <button class="primary-btn" type="button" data-note-action="add">最初の要点カードを追加</button>
+      </div>
+    `;
+    slideList.querySelector("[data-note-action='add']").addEventListener("click", () => showNoteForm());
+    return;
+  }
+
+  slideList.innerHTML = visibleNotes.map((note) => `
+    <article class="slide-card note-card">
+      <div>
+        <div class="slide-card-title">${escapeHtml(note.title)}</div>
+        <div class="slide-card-meta">${escapeHtml(note.field)} / ${escapeHtml(note.topic || "トピック未設定")}</div>
+      </div>
+      <p class="note-preview">${escapeHtml(truncateText(note.memo, 90))}</p>
+      <div class="note-card-footer">
+        <span class="note-status">${escapeHtml(note.understandingStatus || "確認中")}</span>
+        <span class="slide-card-count">関連問題 ${note.relatedQuestionIds.length}件</span>
+      </div>
+      <div class="button-row note-card-buttons">
+        <button class="compact-primary-btn" type="button" data-note-action="quiz" data-note-id="${escapeHtml(note.id)}" ${note.relatedQuestionIds.length === 0 ? "disabled" : ""}>関連問題を解く</button>
+        <button type="button" data-note-action="edit" data-note-id="${escapeHtml(note.id)}">編集</button>
+        <button class="danger-btn" type="button" data-note-action="delete" data-note-id="${escapeHtml(note.id)}">削除</button>
+      </div>
+    </article>
+  `).join("");
+
+  slideList.querySelectorAll("[data-note-action]").forEach((button) => {
+    button.addEventListener("click", () => handleNoteCardAction(button.dataset.noteAction, button.dataset.noteId));
+  });
+}
+
+function handleNoteCardAction(action, noteId) {
+  const note = noteCards.find((item) => item.id === noteId);
+  if (!note) {
+    showMessage("要点カードが見つかりませんでした。");
+    return;
+  }
+
+  if (action === "edit") {
+    showNoteForm(note);
+    return;
+  }
+
+  if (action === "delete") {
+    deleteNoteCard(noteId);
+    return;
+  }
+
+  if (action === "quiz") {
+    startQuestionIdQuiz(note.relatedQuestionIds, `${note.title}の関連問題`);
+  }
+}
+
+function showNoteForm(note = null) {
+  editingNoteCardId = note?.id || "";
+  document.getElementById("noteFormTitle").textContent = note ? "要点カード編集" : "要点カード追加";
+  document.getElementById("noteTitleInput").value = note?.title || "";
+  if (note?.field && ![...noteFieldSelect.options].some((option) => option.value === note.field)) {
+    noteFieldSelect.add(new Option(note.field, note.field));
+  }
+  noteFieldSelect.value = note?.field || "制御・メカトロ";
+  document.getElementById("noteTopicInput").value = note?.topic || "";
+  document.getElementById("noteMemoInput").value = note?.memo || "";
+  document.getElementById("noteRelatedIdsInput").value = (note?.relatedQuestionIds || []).join(", ");
+  noteStatusSelect.value = note?.understandingStatus || "確認中";
+  document.getElementById("deleteNoteCardBtn").classList.toggle("hidden", !note);
+  hideMessage();
+  showScreen("noteForm");
+}
+
+function saveNoteCardFromForm(event) {
+  event.preventDefault();
+  const now = new Date().toISOString();
+  const title = document.getElementById("noteTitleInput").value.trim();
+  const field = noteFieldSelect.value;
+  const topic = document.getElementById("noteTopicInput").value.trim();
+  const memo = document.getElementById("noteMemoInput").value.trim();
+  const relatedQuestionIds = parseQuestionIds(document.getElementById("noteRelatedIdsInput").value);
+  const understandingStatus = noteStatusSelect.value;
+
+  if (!title || !memo) {
+    showMessage("タイトルと要点メモを入力してください。");
+    return;
+  }
+
+  if (editingNoteCardId) {
+    noteCards = noteCards.map((note) => note.id === editingNoteCardId
+      ? { ...note, title, field, topic, memo, relatedQuestionIds, understandingStatus, updatedAt: now }
+      : note);
+  } else {
+    noteCards.unshift({
+      id: createNoteCardId(),
+      title,
+      field,
+      topic,
+      memo,
+      relatedQuestionIds,
+      understandingStatus,
+      createdAt: now,
+      updatedAt: now
+    });
+  }
+
+  saveNoteCards(noteCards);
+  slideViewMode = "notes";
+  setupSlideFilters();
+  showSlides();
+  showMessage("要点カードを保存しました。");
+}
+
+function deleteEditingNoteCard() {
+  if (!editingNoteCardId) {
+    return;
+  }
+  deleteNoteCard(editingNoteCardId, true);
+}
+
+function deleteNoteCard(noteId, fromForm = false) {
+  const note = noteCards.find((item) => item.id === noteId);
+  if (!note) {
+    return;
+  }
+  const ok = confirm(`「${note.title}」を削除します。よろしいですか？`);
+  if (!ok) {
+    return;
+  }
+  noteCards = noteCards.filter((item) => item.id !== noteId);
+  saveNoteCards(noteCards);
+  slideViewMode = "notes";
+  setupSlideFilters();
+  if (fromForm) {
+    showSlides();
+  } else {
+    renderSlideList();
+  }
+  showMessage("要点カードを削除しました。");
+}
+
+function loadNoteCards() {
+  try {
+    return normalizeNoteCards(JSON.parse(localStorage.getItem(NOTE_CARDS_STORAGE_KEY)));
+  } catch {
+    return [];
+  }
+}
+
+function saveNoteCards(cards) {
+  localStorage.setItem(NOTE_CARDS_STORAGE_KEY, JSON.stringify(normalizeNoteCards(cards)));
+}
+
+function normalizeNoteCards(rawCards) {
+  return (Array.isArray(rawCards) ? rawCards : [])
+    .map((card) => ({
+      id: String(card.id || createNoteCardId()),
+      title: String(card.title || "無題の要点カード"),
+      field: String(card.field || "分野不明"),
+      topic: String(card.topic || ""),
+      memo: String(card.memo || card.summary || ""),
+      relatedQuestionIds: Array.isArray(card.relatedQuestionIds)
+        ? card.relatedQuestionIds.map((id) => String(id)).filter(Boolean)
+        : parseQuestionIds(card.relatedQuestionIds || ""),
+      understandingStatus: String(card.understandingStatus || card.status || "確認中"),
+      createdAt: String(card.createdAt || new Date().toISOString()),
+      updatedAt: String(card.updatedAt || card.createdAt || new Date().toISOString())
+    }))
+    .filter((card) => card.id && card.title);
+}
+
+function exportNoteCards() {
+  const blob = new Blob([JSON.stringify(noteCards, null, 2)], { type: "application/json" });
+  const today = new Date();
+  const yyyymmdd = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, "0"),
+    String(today.getDate()).padStart(2, "0")
+  ].join("");
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `note-cards-${yyyymmdd}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(link.href);
+  showMessage("要点カードをJSONファイルとしてエクスポートしました。");
+}
+
+function importNoteCards(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const importedCards = normalizeNoteCards(JSON.parse(reader.result));
+      const merged = new Map(noteCards.map((card) => [card.id, card]));
+      importedCards.forEach((card) => merged.set(card.id, card));
+      noteCards = [...merged.values()].sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+      saveNoteCards(noteCards);
+      slideViewMode = "notes";
+      setupSlideFilters();
+      renderSlideList();
+      showMessage(`要点カードを${importedCards.length}件インポートしました。`);
+    } catch {
+      showMessage("要点カードのJSONを読み込めませんでした。エクスポートしたファイルか確認してください。");
+    } finally {
+      noteCardImportInput.value = "";
+    }
+  };
+  reader.readAsText(file);
+}
+
+function parseQuestionIds(value) {
+  if (Array.isArray(value)) {
+    return value.map((id) => String(id).trim()).filter(Boolean);
+  }
+  return String(value || "")
+    .split(/[\s,、]+/)
+    .map((id) => id.trim())
+    .filter(Boolean);
+}
+
+function createNoteCardId() {
+  return `NOTE_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function showSlideDetail(slideId) {
+  currentSlide = slides.find((slide) => slide.id === slideId);
+  if (!currentSlide) {
+    showMessage("スライドが見つかりませんでした。");
+    return;
+  }
+
+  document.getElementById("slideDetailTitle").textContent = currentSlide.title;
+  document.getElementById("slideDetailField").textContent = currentSlide.field;
+  document.getElementById("slideDetailTopic").textContent = currentSlide.topic;
+  renderSlideImage(currentSlide);
+  renderSlideSummary(currentSlide);
+  renderRelatedQuestionIds(currentSlide);
+
+  document.getElementById("startRelatedQuizBtn").disabled = currentSlide.relatedQuestionIds.length === 0;
+  hideMessage();
+  showScreen("slideDetail");
+}
+
+function renderSlideImage(slide) {
+  const image = document.getElementById("slideDetailImage");
+  const imageButton = document.getElementById("slideImageButton");
+  const error = document.getElementById("slideImageError");
+
+  image.classList.add("hidden");
+  image.removeAttribute("src");
+  error.classList.add("hidden");
+  error.textContent = "";
+  imageButton.disabled = !slide.image;
+
+  if (!slide.image) {
+    error.textContent = "このスライドには画像が設定されていません。要点テキストで確認できます。";
+    error.classList.remove("hidden");
+    return;
+  }
+
+  image.alt = slide.title;
+  image.onload = () => {
+    image.classList.remove("hidden");
+    error.classList.add("hidden");
+    imageButton.disabled = false;
+  };
+  image.onerror = () => {
+    image.classList.add("hidden");
+    imageButton.disabled = true;
+    error.textContent = "画像を読み込めませんでした。slidesフォルダ内のファイル名を確認してください。要点テキストはこのまま確認できます。";
+    error.classList.remove("hidden");
+  };
+  image.src = slide.image;
+}
+
+function renderSlideSummary(slide) {
+  const summaryList = document.getElementById("slideSummaryList");
+  if (slide.summary.length === 0) {
+    summaryList.innerHTML = `<li>要点テキストはまだ登録されていません。</li>`;
+    return;
+  }
+  summaryList.innerHTML = slide.summary.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+}
+
+function renderRelatedQuestionIds(slide) {
+  const relatedArea = document.getElementById("relatedQuestionIds");
+  if (slide.relatedQuestionIds.length === 0) {
+    relatedArea.innerHTML = `<p class="muted">関連問題IDは未設定です。</p>`;
+    return;
+  }
+  relatedArea.innerHTML = slide.relatedQuestionIds.map((id) => `<span>${escapeHtml(id)}</span>`).join("");
+}
+
+function startCurrentSlideQuiz() {
+  if (!currentSlide) {
+    return;
+  }
+  startQuestionIdQuiz(currentSlide.relatedQuestionIds, `${currentSlide.title}の関連問題`);
+}
+
+function startQuestionIdQuiz(questionIds, label) {
+  const idSet = new Set(questionIds || []);
+  const pool = questions.filter((question) => idSet.has(question.id));
+  const missingIds = (questionIds || []).filter((id) => !questions.some((question) => question.id === id));
+
+  if (questions.length === 0) {
+    showMessage("問題データが読み込まれていません。questions.csvを確認してください。");
+    return;
+  }
+
+  if (pool.length === 0) {
+    showMessage(`${label}に使える問題が見つかりませんでした。slides.jsonのrelatedQuestionIdsとquestions.csvのIDを確認してください。`);
+    return;
+  }
+
+  if (missingIds.length > 0) {
+    showMessage(`一部の関連問題IDがquestions.csvに見つかりませんでした：${missingIds.join(", ")}`);
+  }
+
+  reviewMode = true;
+  startQuiz(pool);
+}
+
+function openSlideZoom() {
+  const image = document.getElementById("slideDetailImage");
+  if (!currentSlide || !currentSlide.image || image.classList.contains("hidden")) {
+    return;
+  }
+
+  const zoomImage = document.getElementById("slideZoomImage");
+  zoomImage.src = currentSlide.image;
+  zoomImage.alt = currentSlide.title;
+  document.getElementById("slideZoomOverlay").classList.remove("hidden");
+  document.body.classList.add("modal-open");
+}
+
+function closeSlideZoom() {
+  document.getElementById("slideZoomOverlay").classList.add("hidden");
+  document.body.classList.remove("modal-open");
 }
 
 function startNormalQuiz() {
@@ -245,7 +849,14 @@ function startVisibleWeaknessReview() {
 }
 
 function startQuiz(selectedQuestions) {
+  if (!selectedQuestions || selectedQuestions.length === 0) {
+    showMessage("出題できる問題がありません。条件や関連問題IDを確認してください。");
+    return;
+  }
   hideMessage();
+  if (questionsLoadedFromFallback) {
+    showMessage("questions.csvを読み込めなかったため、画面確認用のサンプル問題で出題しています。");
+  }
   currentQuiz = selectedQuestions;
   currentIndex = 0;
   quizAnswers = [];
@@ -1152,6 +1763,10 @@ function truncateText(value, maxLength) {
     return text;
   }
   return `${text.slice(0, maxLength)}...`;
+}
+
+function normalizeSearchText(value) {
+  return String(value ?? "").trim().toLowerCase();
 }
 
 function escapeHtml(value) {
