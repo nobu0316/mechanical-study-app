@@ -45,6 +45,7 @@
             <button id="startQuizBtn" class="primary-btn" type="button">クイズ開始</button>
             <button id="reviewMistakesBtn" type="button">弱点復習</button>
             <button id="reviewStatusBtn" type="button">迷った・間違えた復習</button>
+            <button id="showSlidesBtn" type="button">要点スライド</button>
             <button id="showStatsBtn" type="button">成績確認</button>
           </div>
         </div>
@@ -72,6 +73,142 @@
           <div id="feedbackArea" class="feedback hidden"></div>
           <div id="statusArea" class="status-area hidden" aria-live="polite"></div>
           <button id="nextQuestionBtn" class="primary-btn hidden" type="button">次の問題へ</button>
+        </article>
+      </section>
+
+      <section id="slidesScreen" class="screen">
+        <div class="panel">
+          <div class="screen-head">
+            <div>
+              <h2>要点スライド</h2>
+              <p class="muted">間違えやすい公式・用語・考え方を1枚ずつ見返します。</p>
+            </div>
+            <button id="homeFromSlidesBtn" type="button">ホームへ戻る</button>
+          </div>
+
+          <div class="slide-controls">
+            <div class="control-group">
+              <label for="slideFieldFilter">分野フィルター</label>
+              <select id="slideFieldFilter"></select>
+            </div>
+            <div class="control-group">
+              <label for="slideSearchInput">トピック検索</label>
+              <input id="slideSearchInput" type="search" placeholder="例：PID、レイノルズ、断熱">
+            </div>
+          </div>
+
+          <div class="slide-list-toolbar">
+            <div class="segmented compact-segmented" role="group" aria-label="要点の表示切り替え">
+              <label>
+                <input type="radio" name="slideViewMode" value="official" checked>
+                <span>公式スライド</span>
+              </label>
+              <label>
+                <input type="radio" name="slideViewMode" value="notes">
+                <span>自分の要点カード</span>
+              </label>
+            </div>
+            <div class="button-row note-actions">
+              <button id="addNoteCardBtn" class="primary-btn" type="button">要点カード追加</button>
+              <button id="exportNoteCardsBtn" type="button">JSONエクスポート</button>
+              <button id="importNoteCardsBtn" type="button">JSONインポート</button>
+            </div>
+            <input id="noteCardImportInput" class="hidden" type="file" accept="application/json,.json">
+          </div>
+
+          <div id="slideList" class="slide-list"></div>
+        </div>
+      </section>
+
+      <section id="noteFormScreen" class="screen">
+        <div class="panel">
+          <div class="screen-head">
+            <div>
+              <h2 id="noteFormTitle">要点カード追加</h2>
+              <p class="muted">学習中に気づいた論点をテキストで保存します。</p>
+            </div>
+            <button id="cancelNoteCardBtn" type="button">一覧へ戻る</button>
+          </div>
+
+          <form id="noteCardForm" class="note-form">
+            <div class="control-group">
+              <label for="noteTitleInput">タイトル</label>
+              <input id="noteTitleInput" type="text" required placeholder="例：I動作を強くしすぎたとき">
+            </div>
+
+            <div class="form-grid">
+              <div class="control-group">
+                <label for="noteFieldSelect">分野</label>
+                <select id="noteFieldSelect"></select>
+              </div>
+              <div class="control-group">
+                <label for="noteTopicInput">トピック</label>
+                <input id="noteTopicInput" type="text" placeholder="例：PID制御">
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label for="noteMemoInput">要点メモ</label>
+              <textarea id="noteMemoInput" rows="8" required placeholder="短い箇条書きや、自分が間違えた理由を書きます。"></textarea>
+            </div>
+
+            <div class="form-grid">
+              <div class="control-group">
+                <label for="noteRelatedIdsInput">関連問題ID</label>
+                <input id="noteRelatedIdsInput" type="text" placeholder="例：C003, C007">
+              </div>
+              <div class="control-group">
+                <label for="noteStatusSelect">理解状態</label>
+                <select id="noteStatusSelect">
+                  <option value="確認中">確認中</option>
+                  <option value="要復習">要復習</option>
+                  <option value="だいたいOK">だいたいOK</option>
+                  <option value="覚えた">覚えた</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="button-row">
+              <button id="saveNoteCardBtn" class="primary-btn" type="submit">保存する</button>
+              <button id="deleteNoteCardBtn" class="danger-btn hidden" type="button">削除する</button>
+              <button id="cancelNoteCardBottomBtn" type="button">一覧へ戻る</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section id="slideDetailScreen" class="screen">
+        <article class="panel slide-detail">
+          <div class="screen-head">
+            <div>
+              <h2 id="slideDetailTitle"></h2>
+              <div class="meta-row">
+                <span id="slideDetailField"></span>
+                <span id="slideDetailTopic"></span>
+              </div>
+            </div>
+            <button id="backToSlidesBtn" type="button">一覧へ戻る</button>
+          </div>
+
+          <button id="slideImageButton" class="slide-image-button" type="button" aria-label="スライド画像を拡大表示">
+            <img id="slideDetailImage" alt="">
+            <span id="slideImageError" class="slide-image-error hidden"></span>
+          </button>
+
+          <section>
+            <h3>要点テキスト</h3>
+            <ul id="slideSummaryList" class="summary-list"></ul>
+          </section>
+
+          <section>
+            <h3>関連する問題ID</h3>
+            <div id="relatedQuestionIds" class="related-question-ids"></div>
+          </section>
+
+          <div class="button-row">
+            <button id="startRelatedQuizBtn" class="primary-btn" type="button">関連問題を解く</button>
+            <button id="backToSlidesBottomBtn" type="button">一覧へ戻る</button>
+          </div>
         </article>
       </section>
 
@@ -185,6 +322,13 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <div id="slideZoomOverlay" class="zoom-overlay hidden" role="dialog" aria-modal="true" aria-label="スライド画像の拡大表示">
+    <button id="closeSlideZoomBtn" class="zoom-close" type="button" aria-label="拡大表示を閉じる">閉じる</button>
+    <div class="zoom-scroll">
+      <img id="slideZoomImage" alt="">
+    </div>
   </div>
 
   <script src="script.js"></script>
