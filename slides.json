@@ -44,7 +44,7 @@
     ],
 
     {
-  "id": "SLIDE_E009",
+  "id": "SLIDE_E001",
   "field": "機械要素",
   "topic": "伸びボルト",
   "title": "伸びボルト：普通ボルトとの違い",
@@ -56,7 +56,7 @@
     "伸びボルトは細くして弱くするボルトではなく、伸びて荷重をならすボルトと覚える",
     "繰返し荷重を受ける締結部で使われることがある"
   ],
-  "relatedQuestionIds": ["E009"]
+  "relatedQuestionIds": ["E001"]
 }
     "relatedQuestionIds": ["F003", "F007", "F008"]
   }
