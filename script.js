@@ -108,6 +108,7 @@ let questions = [];
 let slides = [];
 let noteCards = [];
 let currentSlide = null;
+let currentNoteCard = null;
 let slideViewMode = "official";
 let editingNoteCardId = "";
 let questionsLoadedFromFallback = false;
@@ -126,6 +127,7 @@ const screens = {
   result: document.getElementById("resultScreen"),
   slides: document.getElementById("slidesScreen"),
   noteForm: document.getElementById("noteFormScreen"),
+  noteDetail: document.getElementById("noteDetailScreen"),
   slideDetail: document.getElementById("slideDetailScreen"),
   stats: document.getElementById("statsScreen")
 };
@@ -204,6 +206,23 @@ function bindEvents() {
   document.getElementById("cancelNoteCardBtn").addEventListener("click", showSlides);
   document.getElementById("cancelNoteCardBottomBtn").addEventListener("click", showSlides);
   document.getElementById("deleteNoteCardBtn").addEventListener("click", deleteEditingNoteCard);
+  document.getElementById("backToNotesBtn").addEventListener("click", showNotesList);
+  document.getElementById("backToNotesBottomBtn").addEventListener("click", showNotesList);
+  document.getElementById("editNoteDetailBtn").addEventListener("click", () => {
+    if (currentNoteCard) {
+      showNoteForm(currentNoteCard);
+    }
+  });
+  document.getElementById("deleteNoteDetailBtn").addEventListener("click", () => {
+    if (currentNoteCard) {
+      deleteNoteCard(currentNoteCard.id, false, true);
+    }
+  });
+  document.getElementById("startNoteRelatedQuizBtn").addEventListener("click", () => {
+    if (currentNoteCard) {
+      startQuestionIdQuiz(currentNoteCard.relatedQuestionIds, `${currentNoteCard.title}の関連問題`);
+    }
+  });
   document.getElementById("exportNoteCardsBtn").addEventListener("click", exportNoteCards);
   document.getElementById("importNoteCardsBtn").addEventListener("click", () => {
     noteCardImportInput.value = "";
@@ -432,15 +451,17 @@ function renderNoteCardList(selectedField, keyword) {
   slideList.innerHTML = visibleNotes.map((note) => `
     <article class="slide-card note-card">
       <div>
-        <div class="slide-card-title">${escapeHtml(note.title)}</div>
+        <button class="note-open-btn" type="button" data-note-action="detail" data-note-id="${escapeHtml(note.id)}">${escapeHtml(note.title)}</button>
         <div class="slide-card-meta">${escapeHtml(note.field)} / ${escapeHtml(note.topic || "トピック未設定")}</div>
       </div>
       <p class="note-preview">${escapeHtml(truncateText(note.memo, 90))}</p>
       <div class="note-card-footer">
-        <span class="note-status">${escapeHtml(note.understandingStatus || "確認中")}</span>
-        <span class="slide-card-count">関連問題 ${note.relatedQuestionIds.length}件</span>
+        <span class="note-status">${escapeHtml(getNoteStatus(note))}</span>
+        <span class="slide-card-count">関連問題 ${escapeHtml(note.relatedQuestionIds.join(", ") || "未設定")}</span>
+        <span class="slide-card-count">更新 ${escapeHtml(formatDateShort(note.updatedAt))}</span>
       </div>
       <div class="button-row note-card-buttons">
+        <button class="compact-primary-btn" type="button" data-note-action="detail" data-note-id="${escapeHtml(note.id)}">詳細</button>
         <button class="compact-primary-btn" type="button" data-note-action="quiz" data-note-id="${escapeHtml(note.id)}" ${note.relatedQuestionIds.length === 0 ? "disabled" : ""}>関連問題を解く</button>
         <button type="button" data-note-action="edit" data-note-id="${escapeHtml(note.id)}">編集</button>
         <button class="danger-btn" type="button" data-note-action="delete" data-note-id="${escapeHtml(note.id)}">削除</button>
@@ -465,6 +486,11 @@ function handleNoteCardAction(action, noteId) {
     return;
   }
 
+  if (action === "detail") {
+    showNoteDetail(noteId);
+    return;
+  }
+
   if (action === "delete") {
     deleteNoteCard(noteId);
     return;
@@ -475,21 +501,34 @@ function handleNoteCardAction(action, noteId) {
   }
 }
 
-function showNoteForm(note = null) {
+function showNoteForm(note = null, sourceQuestion = null) {
   editingNoteCardId = note?.id || "";
+  const titleValue = note?.title || (sourceQuestion ? `${sourceQuestion.topic ? `【${sourceQuestion.topic}】` : `【${sourceQuestion.id}】`}の要点` : "");
   document.getElementById("noteFormTitle").textContent = note ? "要点カード編集" : "要点カード追加";
-  document.getElementById("noteTitleInput").value = note?.title || "";
+  document.getElementById("noteTitleInput").value = titleValue;
   if (note?.field && ![...noteFieldSelect.options].some((option) => option.value === note.field)) {
     noteFieldSelect.add(new Option(note.field, note.field));
   }
-  noteFieldSelect.value = note?.field || "制御・メカトロ";
-  document.getElementById("noteTopicInput").value = note?.topic || "";
+  noteFieldSelect.value = note?.field || sourceQuestion?.field || "制御・メカトロ";
+  document.getElementById("noteTopicInput").value = note?.topic || sourceQuestion?.topic || "";
   document.getElementById("noteMemoInput").value = note?.memo || "";
-  document.getElementById("noteRelatedIdsInput").value = (note?.relatedQuestionIds || []).join(", ");
-  noteStatusSelect.value = note?.understandingStatus || "確認中";
+  document.getElementById("noteRelatedIdsInput").value = (note?.relatedQuestionIds || (sourceQuestion ? [sourceQuestion.id] : [])).join(", ");
+  noteStatusSelect.value = getNoteStatus(note) || (sourceQuestion ? "要復習" : "要復習");
   document.getElementById("deleteNoteCardBtn").classList.toggle("hidden", !note);
+  renderNoteSource(sourceQuestion);
   hideMessage();
   showScreen("noteForm");
+}
+
+function renderNoteSource(question) {
+  const panel = document.getElementById("noteSourcePanel");
+  panel.classList.toggle("hidden", !question);
+  if (!question) {
+    return;
+  }
+  document.getElementById("noteSourceMeta").textContent = `${question.id} / ${question.field} / ${question.topic}`;
+  document.getElementById("noteSourceQuestion").textContent = question.question;
+  document.getElementById("noteSourceExplanation").textContent = `解説：${question.explanation}`;
 }
 
 function saveNoteCardFromForm(event) {
@@ -500,16 +539,16 @@ function saveNoteCardFromForm(event) {
   const topic = document.getElementById("noteTopicInput").value.trim();
   const memo = document.getElementById("noteMemoInput").value.trim();
   const relatedQuestionIds = parseQuestionIds(document.getElementById("noteRelatedIdsInput").value);
-  const understandingStatus = noteStatusSelect.value;
+  const status = noteStatusSelect.value;
 
-  if (!title || !memo) {
-    showMessage("タイトルと要点メモを入力してください。");
+  if (!title) {
+    showMessage("タイトルを入力してください。");
     return;
   }
 
   if (editingNoteCardId) {
     noteCards = noteCards.map((note) => note.id === editingNoteCardId
-      ? { ...note, title, field, topic, memo, relatedQuestionIds, understandingStatus, updatedAt: now }
+      ? { ...note, title, field, topic, memo, relatedQuestionIds, status, understandingStatus: status, updatedAt: now }
       : note);
   } else {
     noteCards.unshift({
@@ -519,7 +558,8 @@ function saveNoteCardFromForm(event) {
       topic,
       memo,
       relatedQuestionIds,
-      understandingStatus,
+      status,
+      understandingStatus: status,
       createdAt: now,
       updatedAt: now
     });
@@ -539,7 +579,7 @@ function deleteEditingNoteCard() {
   deleteNoteCard(editingNoteCardId, true);
 }
 
-function deleteNoteCard(noteId, fromForm = false) {
+function deleteNoteCard(noteId, fromForm = false, fromDetail = false) {
   const note = noteCards.find((item) => item.id === noteId);
   if (!note) {
     return;
@@ -552,7 +592,7 @@ function deleteNoteCard(noteId, fromForm = false) {
   saveNoteCards(noteCards);
   slideViewMode = "notes";
   setupSlideFilters();
-  if (fromForm) {
+  if (fromForm || fromDetail) {
     showSlides();
   } else {
     renderSlideList();
@@ -583,7 +623,8 @@ function normalizeNoteCards(rawCards) {
       relatedQuestionIds: Array.isArray(card.relatedQuestionIds)
         ? card.relatedQuestionIds.map((id) => String(id)).filter(Boolean)
         : parseQuestionIds(card.relatedQuestionIds || ""),
-      understandingStatus: String(card.understandingStatus || card.status || "確認中"),
+      status: normalizeNoteStatus(card.status || card.understandingStatus),
+      understandingStatus: normalizeNoteStatus(card.status || card.understandingStatus),
       createdAt: String(card.createdAt || new Date().toISOString()),
       updatedAt: String(card.updatedAt || card.createdAt || new Date().toISOString())
     }))
@@ -649,6 +690,51 @@ function createNoteCardId() {
   return `NOTE_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
+function normalizeNoteStatus(status) {
+  const normalized = {
+    "確認中": "要復習",
+    "だいたいOK": "理解済み",
+    "覚えた": "理解済み"
+  }[status] || status;
+  return ["未理解", "要復習", "理解済み"].includes(normalized) ? normalized : "要復習";
+}
+
+function getNoteStatus(note) {
+  if (!note) {
+    return "";
+  }
+  return normalizeNoteStatus(note.status || note.understandingStatus);
+}
+
+function showNotesList() {
+  slideViewMode = "notes";
+  setupSlideFilters();
+  showSlides();
+}
+
+function showNoteDetail(noteId) {
+  currentNoteCard = noteCards.find((note) => note.id === noteId);
+  if (!currentNoteCard) {
+    showMessage("要点カードが見つかりませんでした。");
+    return;
+  }
+
+  document.getElementById("noteDetailTitle").textContent = currentNoteCard.title;
+  document.getElementById("noteDetailField").textContent = currentNoteCard.field;
+  document.getElementById("noteDetailTopic").textContent = currentNoteCard.topic || "トピック未設定";
+  document.getElementById("noteDetailStatus").textContent = getNoteStatus(currentNoteCard);
+  document.getElementById("noteDetailMemo").textContent = currentNoteCard.memo;
+  document.getElementById("noteDetailUpdatedAt").textContent = `更新日：${formatDateTime(currentNoteCard.updatedAt)}`;
+  renderRelatedQuestionButtons(
+    document.getElementById("noteDetailRelatedQuestionIds"),
+    currentNoteCard.relatedQuestionIds,
+    `${currentNoteCard.title}の関連問題`
+  );
+  document.getElementById("startNoteRelatedQuizBtn").disabled = getExistingQuestionsByIds(currentNoteCard.relatedQuestionIds).length === 0;
+  hideMessage();
+  showScreen("noteDetail");
+}
+
 function showSlideDetail(slideId) {
   currentSlide = slides.find((slide) => slide.id === slideId);
   if (!currentSlide) {
@@ -711,11 +797,7 @@ function renderSlideSummary(slide) {
 
 function renderRelatedQuestionIds(slide) {
   const relatedArea = document.getElementById("relatedQuestionIds");
-  if (slide.relatedQuestionIds.length === 0) {
-    relatedArea.innerHTML = `<p class="muted">関連問題IDは未設定です。</p>`;
-    return;
-  }
-  relatedArea.innerHTML = slide.relatedQuestionIds.map((id) => `<span>${escapeHtml(id)}</span>`).join("");
+  renderRelatedQuestionButtons(relatedArea, slide.relatedQuestionIds, `${slide.title}の関連問題`);
 }
 
 function startCurrentSlideQuiz() {
@@ -736,16 +818,45 @@ function startQuestionIdQuiz(questionIds, label) {
   }
 
   if (pool.length === 0) {
-    showMessage(`${label}に使える問題が見つかりませんでした。slides.jsonのrelatedQuestionIdsとquestions.csvのIDを確認してください。`);
+    showMessage("関連問題が見つかりません。");
     return;
-  }
-
-  if (missingIds.length > 0) {
-    showMessage(`一部の関連問題IDがquestions.csvに見つかりませんでした：${missingIds.join(", ")}`);
   }
 
   reviewMode = true;
   startQuiz(pool);
+  if (missingIds.length > 0) {
+    showMessage(`一部の関連問題が見つかりませんでした：${missingIds.join(", ")}`);
+  }
+}
+
+function renderRelatedQuestionButtons(container, questionIds, label) {
+  const ids = parseQuestionIds(questionIds);
+  if (ids.length === 0) {
+    container.innerHTML = `<p class="muted">関連問題IDは未設定です。</p>`;
+    return;
+  }
+
+  const existingIds = ids.filter((id) => questions.some((question) => question.id === id));
+  container.innerHTML = `
+    ${ids.map((id) => {
+      const exists = existingIds.includes(id);
+      return `<button class="related-question-btn ${exists ? "" : "missing-question"}" type="button" data-question-id="${escapeHtml(id)}">${escapeHtml(id)}を解く</button>`;
+    }).join("")}
+    <button class="related-question-btn primary-btn" type="button" data-question-id="__all">関連問題をまとめて解く</button>
+  `;
+
+  container.querySelectorAll("[data-question-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const questionId = button.dataset.questionId;
+      const targetIds = questionId === "__all" ? ids : [questionId];
+      startQuestionIdQuiz(targetIds, label);
+    });
+  });
+}
+
+function getExistingQuestionsByIds(questionIds) {
+  const idSet = new Set(parseQuestionIds(questionIds));
+  return questions.filter((question) => idSet.has(question.id));
 }
 
 function openSlideZoom() {
@@ -929,7 +1040,11 @@ function answerQuestion(selectedNumber) {
     <strong>${isCorrect ? "正解です" : "不正解です"}</strong>
     <div>正解：${question.answer}. ${question.choices[question.answer - 1]}</div>
     <div>${question.explanation}</div>
+    <div class="feedback-actions">
+      <button class="note-link-btn" type="button" data-add-note-from-current>この問題の要点カードを追加</button>
+    </div>
   `;
+  feedbackArea.querySelector("[data-add-note-from-current]").addEventListener("click", () => showNoteForm(null, question));
   renderStatusButtons(question, isCorrect, selectedNumber);
 }
 
@@ -1003,8 +1118,17 @@ function renderWrongList(wrongAnswers) {
       <p><strong>${question.field} / ${question.topic}</strong></p>
       <p>${question.question}</p>
       <p class="muted">正解：${question.answer}. ${question.choices[question.answer - 1]}</p>
+      <button class="note-link-btn" type="button" data-add-note-question-id="${escapeHtml(question.id)}">この問題の要点カードを追加</button>
     </div>
   `).join("");
+  wrongList.querySelectorAll("[data-add-note-question-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const question = questions.find((item) => item.id === button.dataset.addNoteQuestionId);
+      if (question) {
+        showNoteForm(null, question);
+      }
+    });
+  });
 }
 
 function showStats() {
@@ -1754,6 +1878,18 @@ function formatDateTime(value) {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit"
+  });
+}
+
+function formatDateShort(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "不明";
+  }
+  return date.toLocaleDateString("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
   });
 }
 
