@@ -29,7 +29,9 @@ body {
 }
 
 button,
-select {
+select,
+input,
+textarea {
   font: inherit;
 }
 
@@ -150,6 +152,36 @@ select {
   padding: 10px 12px;
 }
 
+input[type="search"] {
+  width: 100%;
+  min-height: 50px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfd;
+  color: var(--text);
+  padding: 10px 12px;
+}
+
+input[type="text"],
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfd;
+  color: var(--text);
+  padding: 10px 12px;
+}
+
+input[type="text"] {
+  min-height: 50px;
+}
+
+textarea {
+  min-height: 160px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
 .segmented {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -188,6 +220,22 @@ select {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 18px;
+}
+
+.screen-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.screen-head h2 {
+  margin-bottom: 6px;
+}
+
+.screen-head p {
+  margin-bottom: 0;
 }
 
 .primary-btn {
@@ -443,6 +491,210 @@ select {
   gap: 10px;
 }
 
+.slide-controls {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.45fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.slide-list-toolbar {
+  display: grid;
+  gap: 12px;
+  margin: 4px 0 16px;
+}
+
+.compact-segmented {
+  max-width: 520px;
+}
+
+.note-actions {
+  margin-top: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.42fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.note-form .button-row {
+  margin-top: 8px;
+}
+
+.slide-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.slide-card {
+  display: grid;
+  width: 100%;
+  min-height: 0;
+  gap: 6px;
+  text-align: left;
+  background: #fbfdfd;
+  padding: 14px;
+}
+
+.slide-card-title {
+  color: var(--text);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.slide-card-meta {
+  color: var(--primary-dark);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.slide-card-description,
+.slide-card-count {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.slide-card-count {
+  font-weight: 700;
+}
+
+.note-card {
+  border: 1px solid var(--line);
+  cursor: default;
+}
+
+.note-preview {
+  margin-bottom: 0;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.note-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.note-status {
+  border-radius: 999px;
+  background: #fff8e8;
+  color: #6f4b12;
+  font-size: 0.86rem;
+  font-weight: 800;
+  padding: 4px 10px;
+}
+
+.note-card-buttons {
+  margin-top: 4px;
+}
+
+.empty-state {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: #fbfdfd;
+  padding: 16px;
+}
+
+.empty-state p {
+  margin-bottom: 0;
+}
+
+.slide-detail h3 {
+  margin-top: 22px;
+}
+
+.slide-image-button {
+  display: grid;
+  width: 100%;
+  min-height: 170px;
+  place-items: center;
+  border-style: dashed;
+  background: #f8fbfb;
+  padding: 10px;
+}
+
+.slide-image-button:disabled {
+  opacity: 1;
+}
+
+.slide-image-button img {
+  display: block;
+  width: 100%;
+  max-height: 62vh;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.slide-image-error {
+  color: var(--muted);
+  text-align: center;
+}
+
+.summary-list {
+  margin: 0;
+  padding-left: 1.25em;
+}
+
+.summary-list li {
+  margin-bottom: 8px;
+}
+
+.related-question-ids {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.related-question-ids span {
+  border-radius: 999px;
+  background: #edf4f5;
+  color: var(--primary-dark);
+  font-size: 0.9rem;
+  font-weight: 800;
+  padding: 5px 10px;
+}
+
+.zoom-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+  background: rgba(13, 25, 29, 0.86);
+  padding: 14px;
+}
+
+.zoom-close {
+  justify-self: end;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: #ffffff;
+}
+
+.zoom-scroll {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.zoom-scroll img {
+  display: block;
+  width: min(1200px, 100%);
+  min-width: min(760px, 100%);
+  margin: 0 auto;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.modal-open {
+  overflow: hidden;
+}
+
 .stat-row {
   display: grid;
   gap: 7px;
@@ -653,6 +905,38 @@ select {
   .tab-panel-head {
     display: grid;
     align-items: stretch;
+  }
+
+  .screen-head,
+  .slide-controls,
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .compact-segmented {
+    max-width: none;
+  }
+
+  .note-card-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .slide-image-button {
+    min-height: 150px;
+  }
+
+  .slide-image-button img {
+    max-height: 48vh;
+  }
+
+  .zoom-overlay {
+    padding: 10px;
+  }
+
+  .zoom-scroll img {
+    width: 100%;
+    min-width: 620px;
   }
 
   button {
