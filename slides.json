@@ -60,5 +60,31 @@
       "試験では「圧力角＝nとsの角度」「tとnは90°」を必ず押さえる"
     ],
     "relatedQuestionIds": ["M_DESIGN_CAM_001", "M_DESIGN_CAM_002", "M_DESIGN_CAM_003", "M_DESIGN_CAM_004", "M_DESIGN_CAM_005", "M_DESIGN_CAM_006"]
+  },
+  {
+    "id": "SLIDE_MATH_TRIG_001",
+    "field": "数学・力学基礎",
+    "topic": "三角関数・力の分解",
+    "title": "三角関数の復習①：力の分解まで",
+    "description": "sin・cos・tan の基本、角度の取り方、力の分解、符号付き成分を復習するスライド",
+    "image": "slides/trigonometry-force-decomposition.png",
+    "summary": [
+      "三角関数は、直角三角形における辺の長さの比を表す",
+      "sinθ = 向かい側 ÷ 斜辺、cosθ = 隣辺 ÷ 斜辺、tanθ = 向かい側 ÷ 隣辺",
+      "力の分解では、角度に近い側が cos、角度の向かい側が sin になる",
+      "角度を水平から取る場合は、水平成分 = F cosθ、鉛直成分 = F sinθ",
+      "角度を鉛直から取る場合は、鉛直成分 = F cosθ、水平成分 = F sinθ",
+      "成分の大きさを求めた後、右向き・上向きはプラス、左向き・下向きはマイナスとして符号を付ける"
+    ],
+    "relatedQuestionIds": [
+      "MATH_TRIG_001",
+      "MATH_TRIG_002",
+      "MATH_TRIG_003",
+      "MATH_TRIG_004",
+      "MATH_TRIG_005",
+      "MATH_TRIG_006",
+      "MATH_TRIG_007",
+      "MATH_TRIG_008"
+    ]
   }
 ]
