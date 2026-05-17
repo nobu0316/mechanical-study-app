@@ -86,5 +86,123 @@
       "MATH_TRIG_007",
       "MATH_TRIG_008"
     ]
+  },
+  {
+    "id": "SLIDE_MOMENT_001",
+    "field": "数学・力学基礎",
+    "topic": "モーメント",
+    "title": "モーメントの復習①：基本から斜めの力まで",
+    "description": "モーメントの基本式 M=F×L、斜めの力、直角成分、角度による効き方を復習するスライド",
+    "image": "slides/moment-basic-oblique-force.png",
+    "summary": [
+      "モーメントは、物体を支点まわりに回転させようとする働き",
+      "基本式は M = F × L",
+      "力がレバーに直角なら、その力がそのまま回転に効く",
+      "斜めの力では、レバーに対して直角な成分だけが回転に効く",
+      "レバーと力のなす角をθとすると、M = F × L × sinθ",
+      "0°では回らず、90°で最大になる"
+    ],
+    "relatedQuestionIds": [
+      "MOMENT_BASIC_001",
+      "MOMENT_BASIC_002",
+      "MOMENT_BASIC_003",
+      "MOMENT_BASIC_004",
+      "MOMENT_BASIC_005"
+    ]
+  },
+  {
+    "id": "SLIDE_MOMENT_002",
+    "field": "数学・力学基礎",
+    "topic": "作用線と垂直距離",
+    "title": "作用線と垂直距離のイメージ",
+    "description": "作用線、垂直距離h、h=L×sinθ、M=F×h の関係を復習するスライド",
+    "image": "slides/moment-line-of-action-distance.png",
+    "summary": [
+      "作用線は、力の矢印をそのまま延長した線",
+      "垂直距離hは、支点から作用線まで直角に測った最短距離",
+      "モーメントで使う距離は、支点から力点までの長さではなく、支点から作用線までの垂直距離",
+      "レバー長さをL、レバーと力のなす角をθとすると、h = L × sinθ",
+      "モーメントは M = F × h で求められる"
+    ],
+    "relatedQuestionIds": [
+      "MOMENT_LINE_001",
+      "MOMENT_LINE_002",
+      "MOMENT_LINE_003",
+      "MOMENT_LINE_004",
+      "MOMENT_LINE_005"
+    ]
+  },
+  {
+    "id": "SLIDE_MOMENT_003",
+    "field": "数学・力学基礎",
+    "topic": "作用線と垂直距離",
+    "title": "なぜ sin を使うと垂直距離 h が出せるのか",
+    "description": "sinθ = 向かい側 ÷ 斜辺 の関係から、h = L×sinθ になる理由を図で確認するスライド",
+    "image": "slides/moment-sin-perpendicular-distance.png",
+    "summary": [
+      "sinθ は、角度θから見た向かい側の辺 ÷ 斜辺",
+      "モーメントの図では、垂直距離hがθの向かい側、レバー長さLが斜辺になる",
+      "そのため sinθ = h ÷ L となる",
+      "式を変形すると h = L × sinθ になる",
+      "0°ではh=0、30°ではhはLの半分、90°ではh=Lになる"
+    ],
+    "relatedQuestionIds": [
+      "MOMENT_SIN_001",
+      "MOMENT_SIN_002",
+      "MOMENT_SIN_003",
+      "MOMENT_SIN_004"
+    ]
+  },
+  {
+    "id": "SLIDE_MOMENT_004",
+    "field": "数学・力学基礎",
+    "topic": "符号付きモーメント",
+    "title": "符号付きモーメントと合計モーメント",
+    "description": "時計回り・反時計回りの符号、複数の力の合計モーメントを復習するスライド",
+    "image": "slides/moment-sign-and-sum.png",
+    "summary": [
+      "モーメントには、時計回り・反時計回りの向きがある",
+      "ここでは反時計回りをプラス、時計回りをマイナスとする",
+      "右下と左上は時計回りになりやすくマイナス",
+      "右上と左下は反時計回りになりやすくプラス",
+      "複数の力がある場合は、1つずつ M=F×距離 を求め、符号を付けて合計する"
+    ],
+    "relatedQuestionIds": [
+      "MOMENT_SIGN_001",
+      "MOMENT_SIGN_002",
+      "MOMENT_SIGN_003",
+      "MOMENT_SIGN_004",
+      "MOMENT_SIGN_005",
+      "MOMENT_SUM_001",
+      "MOMENT_SUM_002",
+      "MOMENT_SUM_003"
+    ]
+  },
+  {
+    "id": "SLIDE_C_TIME_CONSTANT_001",
+    "field": "制御工学",
+    "topic": "一次遅れ系・時定数",
+    "title": "一次遅れ系と時定数",
+    "description": "一次遅れ系の時定数T、63.2%、Tの大小による応答速度の違いを確認するスライド",
+    "image": "slides/time-constant-first-order.png",
+    "summary": [
+      "時定数Tは、反応の速さを表す目安",
+      "一次遅れ系では、1T後に最終値の約63.2%に到達する",
+      "Tが小さいほど応答は速く、Tが大きいほど応答は遅い",
+      "一次遅れ系は、温度・圧力・流量のように「じわっと目標値へ近づく」応答でよく出る",
+      "PID制御では、反応が遅い対象にI動作を強くしすぎると、行き過ぎや振動が起こりやすい"
+    ],
+    "relatedQuestionIds": [
+      "CONTROL_DELAY_001",
+      "CONTROL_DELAY_002",
+      "CONTROL_DELAY_003",
+      "CONTROL_DELAY_004",
+      "CONTROL_DELAY_005",
+      "CONTROL_DELAY_006",
+      "CONTROL_DELAY_007",
+      "CONTROL_DELAY_008",
+      "CONTROL_DELAY_009",
+      "CONTROL_DELAY_010"
+    ]
   }
 ]
