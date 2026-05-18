@@ -204,5 +204,24 @@
       "CONTROL_DELAY_009",
       "CONTROL_DELAY_010"
     ]
+  },
+  {
+    "id": "SLIDE_MATH_RADIAN_ANGULAR_VELOCITY",
+    "field": "数学・基礎",
+    "topic": "ラジアン・角速度",
+    "title": "ラジアンと角速度の基本",
+    "description": "s = rθ を起点に、360° = 2π rad、角速度 rad/s、カム問題での速度計算を整理するスライド",
+    "image": "slides/radian-angular-velocity.png",
+    "summary": [
+      "ラジアンは、弧の長さを使った角度の表し方である",
+      "基本式は s = rθ。弧の長さs = 半径r × 角度θ[rad]",
+      "1 rad は、弧の長さsが半径rと同じになる角度である",
+      "1周の円周は2πrなので、360° = 2π rad",
+      "半周は180° = π rad、90° = π/2 rad",
+      "角速度ωは、1秒あたりに回転する角度で、単位はrad/s",
+      "カム線図では、従動節速度 = カム線図の傾き × 角速度",
+      "例：35mmをπ radで上昇し、ω=2rad/sなら、v=(35/π)×2=22.3mm/s"
+    ],
+    "relatedQuestionIds": ["M_DESIGN_CAM_009", "M_DESIGN_CAM_010"]
   }
 ]
