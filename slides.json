@@ -222,6 +222,12 @@
       "カム線図では、従動節速度 = カム線図の傾き × 角速度",
       "例：35mmをπ radで上昇し、ω=2rad/sなら、v=(35/π)×2=22.3mm/s"
     ],
-    "relatedQuestionIds": ["M_DESIGN_CAM_009", "M_DESIGN_CAM_010"]
+    "relatedQuestionIds": [
+      "MATH_RADIAN_001",
+      "MATH_RADIAN_002",
+      "MATH_RADIAN_003",
+      "MATH_RADIAN_004",
+      "MATH_RADIAN_005"
+    ]
   }
 ]
