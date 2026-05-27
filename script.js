@@ -152,6 +152,16 @@ const nextQuestionBtn = document.getElementById("nextQuestionBtn");
 const historyImportInput = document.getElementById("historyImportInput");
 let importMode = "merge";
 
+window.addEventListener("error", (event) => {
+  console.error("JavaScript error:", event.error || event.message);
+  showMessage("JavaScriptエラーが発生しました。Consoleのエラー内容を確認してください。");
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+  console.error("Unhandled promise rejection:", event.reason);
+  showMessage("データ読み込み中にエラーが発生しました。Consoleのエラー内容を確認してください。");
+});
+
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initApp);
 } else {
@@ -190,20 +200,20 @@ function setupNoteFormFields() {
 }
 
 function bindEvents() {
-  document.getElementById("startQuizBtn").addEventListener("click", startNormalQuiz);
-  document.getElementById("reviewMistakesBtn").addEventListener("click", startMistakeReview);
-  document.getElementById("reviewStatusBtn").addEventListener("click", startStatusReview);
-  document.getElementById("showSlidesBtn").addEventListener("click", showSlides);
-  document.getElementById("showStatsBtn").addEventListener("click", showStats);
-  fieldSelect.addEventListener("change", setupTopicFilter);
-  document.getElementById("homeFromResultBtn").addEventListener("click", showHome);
-  document.getElementById("homeFromSlidesBtn").addEventListener("click", showHome);
-  document.getElementById("backToSlidesBtn").addEventListener("click", showSlides);
-  document.getElementById("backToSlidesBottomBtn").addEventListener("click", showSlides);
-  document.getElementById("startRelatedQuizBtn").addEventListener("click", startCurrentSlideQuiz);
-  document.getElementById("slideImageButton").addEventListener("click", openSlideZoom);
-  document.getElementById("closeSlideZoomBtn").addEventListener("click", closeSlideZoom);
-  document.getElementById("slideZoomOverlay").addEventListener("click", (event) => {
+  addEvent("startQuizBtn", "click", startNormalQuiz);
+  addEvent("reviewMistakesBtn", "click", startMistakeReview);
+  addEvent("reviewStatusBtn", "click", startStatusReview);
+  addEvent("showSlidesBtn", "click", showSlides);
+  addEvent("showStatsBtn", "click", showStats);
+  addElementEvent(fieldSelect, "fieldSelect", "change", setupTopicFilter);
+  addEvent("homeFromResultBtn", "click", showHome);
+  addEvent("homeFromSlidesBtn", "click", showHome);
+  addEvent("backToSlidesBtn", "click", showSlides);
+  addEvent("backToSlidesBottomBtn", "click", showSlides);
+  addEvent("startRelatedQuizBtn", "click", startCurrentSlideQuiz);
+  addEvent("slideImageButton", "click", openSlideZoom);
+  addEvent("closeSlideZoomBtn", "click", closeSlideZoom);
+  addEvent("slideZoomOverlay", "click", (event) => {
     if (event.target.id === "slideZoomOverlay") {
       closeSlideZoom();
     }
@@ -213,8 +223,8 @@ function bindEvents() {
       closeSlideZoom();
     }
   });
-  slideFieldFilter.addEventListener("change", renderSlideList);
-  slideSearchInput.addEventListener("input", renderSlideList);
+  addElementEvent(slideFieldFilter, "slideFieldFilter", "change", renderSlideList);
+  addElementEvent(slideSearchInput, "slideSearchInput", "input", renderSlideList);
   document.querySelectorAll("input[name='slideViewMode']").forEach((input) => {
     input.addEventListener("change", () => {
       slideViewMode = input.value;
@@ -222,50 +232,62 @@ function bindEvents() {
       renderSlideList();
     });
   });
-  document.getElementById("addNoteCardBtn").addEventListener("click", () => showNoteForm());
-  document.getElementById("cancelNoteCardBtn").addEventListener("click", showSlides);
-  document.getElementById("cancelNoteCardBottomBtn").addEventListener("click", showSlides);
-  document.getElementById("deleteNoteCardBtn").addEventListener("click", deleteEditingNoteCard);
-  document.getElementById("backToNotesBtn").addEventListener("click", showNotesList);
-  document.getElementById("backToNotesBottomBtn").addEventListener("click", showNotesList);
-  document.getElementById("editNoteDetailBtn").addEventListener("click", () => {
+  addEvent("addNoteCardBtn", "click", () => showNoteForm());
+  addEvent("cancelNoteCardBtn", "click", showSlides);
+  addEvent("cancelNoteCardBottomBtn", "click", showSlides);
+  addEvent("deleteNoteCardBtn", "click", deleteEditingNoteCard);
+  addEvent("backToNotesBtn", "click", showNotesList);
+  addEvent("backToNotesBottomBtn", "click", showNotesList);
+  addEvent("editNoteDetailBtn", "click", () => {
     if (currentNoteCard) {
       showNoteForm(currentNoteCard);
     }
   });
-  document.getElementById("deleteNoteDetailBtn").addEventListener("click", () => {
+  addEvent("deleteNoteDetailBtn", "click", () => {
     if (currentNoteCard) {
       deleteNoteCard(currentNoteCard.id, false, true);
     }
   });
-  document.getElementById("startNoteRelatedQuizBtn").addEventListener("click", () => {
+  addEvent("startNoteRelatedQuizBtn", "click", () => {
     if (currentNoteCard) {
       startQuestionIdQuiz(currentNoteCard.relatedQuestionIds, `${currentNoteCard.title}の関連問題`);
     }
   });
-  document.getElementById("exportNoteCardsBtn").addEventListener("click", exportNoteCards);
-  document.getElementById("importNoteCardsBtn").addEventListener("click", () => {
+  addEvent("exportNoteCardsBtn", "click", exportNoteCards);
+  addEvent("importNoteCardsBtn", "click", () => {
     noteCardImportInput.value = "";
     noteCardImportInput.click();
   });
-  noteCardImportInput.addEventListener("change", importNoteCards);
-  noteCardForm.addEventListener("submit", saveNoteCardFromForm);
-  document.getElementById("reviewFromResultBtn").addEventListener("click", startMistakeReview);
-  document.getElementById("homeFromStatsBtn").addEventListener("click", showHome);
-  document.getElementById("resetHistoryBtn").addEventListener("click", resetHistory);
+  addElementEvent(noteCardImportInput, "noteCardImportInput", "change", importNoteCards);
+  addElementEvent(noteCardForm, "noteCardForm", "submit", saveNoteCardFromForm);
+  addEvent("reviewFromResultBtn", "click", startMistakeReview);
+  addEvent("homeFromStatsBtn", "click", showHome);
+  addEvent("resetHistoryBtn", "click", resetHistory);
   document.querySelectorAll("[data-stats-tab]").forEach((button) => {
     button.addEventListener("click", () => switchStatsTab(button.dataset.statsTab));
   });
-  document.getElementById("showMoreWeaknessBtn").addEventListener("click", () => showMoreStatsItems("weakness"));
-  document.getElementById("showMoreRecentBtn").addEventListener("click", () => showMoreStatsItems("recent"));
-  document.getElementById("showMoreQuestionsBtn").addEventListener("click", () => showMoreStatsItems("question"));
-  document.getElementById("showMoreInsufficientBtn").addEventListener("click", () => showMoreStatsItems("insufficient"));
-  document.getElementById("reviewVisibleWeaknessBtn").addEventListener("click", startVisibleWeaknessReview);
-  document.getElementById("exportHistoryBtn").addEventListener("click", exportHistory);
-  document.getElementById("importMergeBtn").addEventListener("click", () => chooseImportFile("merge"));
-  document.getElementById("importReplaceBtn").addEventListener("click", () => chooseImportFile("replace"));
-  historyImportInput.addEventListener("change", importHistoryFromFile);
-  nextQuestionBtn.addEventListener("click", goNextQuestion);
+  addEvent("showMoreWeaknessBtn", "click", () => showMoreStatsItems("weakness"));
+  addEvent("showMoreRecentBtn", "click", () => showMoreStatsItems("recent"));
+  addEvent("showMoreQuestionsBtn", "click", () => showMoreStatsItems("question"));
+  addEvent("showMoreInsufficientBtn", "click", () => showMoreStatsItems("insufficient"));
+  addEvent("reviewVisibleWeaknessBtn", "click", startVisibleWeaknessReview);
+  addEvent("exportHistoryBtn", "click", exportHistory);
+  addEvent("importMergeBtn", "click", () => chooseImportFile("merge"));
+  addEvent("importReplaceBtn", "click", () => chooseImportFile("replace"));
+  addElementEvent(historyImportInput, "historyImportInput", "change", importHistoryFromFile);
+  addElementEvent(nextQuestionBtn, "nextQuestionBtn", "click", goNextQuestion);
+}
+
+function addEvent(id, eventName, handler) {
+  addElementEvent(document.getElementById(id), id, eventName, handler);
+}
+
+function addElementEvent(element, label, eventName, handler) {
+  if (!element) {
+    console.error(`要素が見つからないためイベント登録をスキップしました: ${label}`);
+    return;
+  }
+  element.addEventListener(eventName, handler);
 }
 
 function loadQuestions() {
@@ -285,7 +307,8 @@ function loadQuestions() {
         hideMessage();
       }
     })
-    .catch(() => {
+    .catch((error) => {
+      console.error("questions.csvのfetch読み込みに失敗しました。XMLHttpRequestに切り替えます。", error);
       loadQuestionsWithXhr();
     });
 }
@@ -308,9 +331,13 @@ function loadQuestionsWithXhr() {
       }
       return;
     }
+    console.error(`questions.csvを読み込めませんでした。status=${request.status}`);
     showCsvError();
   };
-  request.onerror = showCsvError;
+  request.onerror = () => {
+    console.error("questions.csvのXMLHttpRequest読み込みに失敗しました。");
+    showCsvError();
+  };
   request.send();
 }
 
@@ -345,8 +372,11 @@ function parseCsv(csvText) {
   }
 
   // このCSVはExcel編集を優先し、半角カンマを本文に使わない前提でシンプルに分割します。
-  return lines.map((line) => {
+  const parsedQuestions = lines.map((line, index) => {
     const cols = line.split(",");
+    if (cols.length !== 11) {
+      console.error(`questions.csv ${index + 2}行目の列数が不正です。期待値=11 実際=${cols.length}`, line);
+    }
     return {
       id: cols[0],
       field: cols[1],
@@ -357,7 +387,12 @@ function parseCsv(csvText) {
       answer: Number(cols[9]),
       explanation: cols[10]
     };
-  }).filter((item) => item.id && item.field && item.question && item.answer >= 1 && item.answer <= 4);
+  });
+  const validQuestions = parsedQuestions.filter((item) => item.id && item.field && item.question && item.answer >= 1 && item.answer <= 4);
+  if (validQuestions.length !== parsedQuestions.length) {
+    console.error(`questions.csvに無効な行があります。有効=${validQuestions.length} 全体=${parsedQuestions.length}`);
+  }
+  return validQuestions;
 }
 
 function loadSlides() {
@@ -374,7 +409,8 @@ function loadSlides() {
       setupSlideFilters();
       renderSlideList();
     })
-    .catch(() => {
+    .catch((error) => {
+      console.error("slides.jsonの読み込みに失敗しました。フォールバックデータを使用します。", error);
       slides = normalizeSlides(FALLBACK_SLIDES);
       slidesLoadedFromFallback = true;
       setupSlideFilters();
