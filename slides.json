@@ -229,5 +229,34 @@
       "MATH_RADIAN_004",
       "MATH_RADIAN_005"
     ]
+  },
+  {
+    "id": "SLIDE_C_TRANSFER_FEEDBACK_001",
+    "field": "制御工学",
+    "topic": "伝達関数・負帰還",
+    "title": "伝達関数の基本と負帰還",
+    "description": "伝達関数G(s)、ゲインK、時定数T、一次遅れ系、単位負帰還の基本を確認するスライド",
+    "image": "slides/transfer-function-negative-feedback.png",
+    "summary": [
+      "伝達関数は、入力に対して出力がどう反応するかを表す式",
+      "G(s)=K は、入力に対して出力がK倍になる比例要素",
+      "G(s)=K/(Ts+1) は一次遅れ系で、Kは大きさ、Tは反応の速さを表す",
+      "Tが小さいほど応答は速く、Tが大きいほど応答は遅い",
+      "単位負帰還の閉ループ伝達関数は G/(1+G)",
+      "一般の負帰還では G/(1+GH) となる",
+      "負帰還では現在値を戻して比較し、偏差 e = r - y を小さくする",
+      "負帰還なのに分母はプラスになる点を覚える"
+    ],
+    "relatedQuestionIds": [
+      "C_TRANSFER_001",
+      "C_TRANSFER_002",
+      "C_TRANSFER_003",
+      "C_TRANSFER_004",
+      "C_FEEDBACK_001",
+      "C_FEEDBACK_002",
+      "C_FEEDBACK_003",
+      "C_TIME_001",
+      "C_TIME_002"
+    ]
   }
 ]
