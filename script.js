@@ -122,6 +122,7 @@ let timerId = null;
 let quizAnswers = [];
 let reviewMode = false;
 let statsState = createDefaultStatsState();
+let appInitialized = false;
 
 const screens = {
   home: document.getElementById("homeScreen"),
@@ -151,15 +152,29 @@ const nextQuestionBtn = document.getElementById("nextQuestionBtn");
 const historyImportInput = document.getElementById("historyImportInput");
 let importMode = "merge";
 
-document.addEventListener("DOMContentLoaded", initApp);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}
 
 function initApp() {
-  setupFields();
-  setupNoteFormFields();
-  noteCards = loadNoteCards();
-  bindEvents();
-  loadQuestions();
-  loadSlides();
+  if (appInitialized) {
+    return;
+  }
+  appInitialized = true;
+
+  try {
+    bindEvents();
+    setupFields();
+    setupNoteFormFields();
+    noteCards = loadNoteCards();
+    loadQuestions();
+    loadSlides();
+  } catch (error) {
+    console.error(error);
+    showMessage("アプリの初期化中にエラーが発生しました。script.jsとindex.htmlのID対応を確認してください。");
+  }
 }
 
 function setupFields() {
