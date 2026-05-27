@@ -9,6 +9,7 @@ const FIELDS = [
   "工業材料",
   "工作法",
   "制御・メカトロ",
+  "制御工学",
   "数学・力学基礎",
   "環境・安全"
 ];
@@ -135,6 +136,7 @@ const screens = {
 
 const messageArea = document.getElementById("messageArea");
 const fieldSelect = document.getElementById("fieldSelect");
+const topicSelect = document.getElementById("topicSelect");
 const slideFieldFilter = document.getElementById("slideFieldFilter");
 const slideSearchInput = document.getElementById("slideSearchInput");
 const slideList = document.getElementById("slideList");
@@ -162,6 +164,7 @@ function initApp() {
 
 function setupFields() {
   fieldSelect.innerHTML = FIELDS.map((field) => `<option value="${field}">${field}</option>`).join("");
+  setupTopicFilter();
 }
 
 function setupNoteFormFields() {
@@ -177,6 +180,7 @@ function bindEvents() {
   document.getElementById("reviewStatusBtn").addEventListener("click", startStatusReview);
   document.getElementById("showSlidesBtn").addEventListener("click", showSlides);
   document.getElementById("showStatsBtn").addEventListener("click", showStats);
+  fieldSelect.addEventListener("change", setupTopicFilter);
   document.getElementById("homeFromResultBtn").addEventListener("click", showHome);
   document.getElementById("homeFromSlidesBtn").addEventListener("click", showHome);
   document.getElementById("backToSlidesBtn").addEventListener("click", showSlides);
@@ -262,6 +266,7 @@ function loadQuestions() {
       if (questions.length === 0) {
         showMessage("questions.csvに問題がありません。ヘッダー行と問題データを確認してください。");
       } else {
+        setupTopicFilter();
         hideMessage();
       }
     })
@@ -283,6 +288,7 @@ function loadQuestionsWithXhr() {
       if (questions.length === 0) {
         showMessage("questions.csvに問題がありません。ヘッダー行と問題データを確認してください。");
       } else {
+        setupTopicFilter();
         hideMessage();
       }
       return;
@@ -296,7 +302,20 @@ function loadQuestionsWithXhr() {
 function showCsvError() {
   questions = FALLBACK_QUESTIONS;
   questionsLoadedFromFallback = true;
+  setupTopicFilter();
   showMessage("questions.csvを読み込めませんでした。ローカルで確認する場合は VS Code の Live Server などを使用してください。現在は画面確認用のサンプル問題で動作しています。");
+}
+
+function setupTopicFilter() {
+  const selectedField = fieldSelect.value || "全分野";
+  const currentValue = topicSelect.value || "全トピック";
+  const source = selectedField === "全分野"
+    ? questions
+    : questions.filter((question) => question.field === selectedField);
+  const topics = ["全トピック", ...new Set(source.map((question) => question.topic).filter(Boolean))];
+
+  topicSelect.innerHTML = topics.map((topic) => `<option value="${escapeHtml(topic)}">${escapeHtml(topic)}</option>`).join("");
+  topicSelect.value = topics.includes(currentValue) ? currentValue : "全トピック";
 }
 
 function getQuestionsCsvUrl() {
@@ -750,7 +769,7 @@ function showSlideDetail(slideId) {
   renderSlideSummary(currentSlide);
   renderRelatedQuestionIds(currentSlide);
 
-  document.getElementById("startRelatedQuizBtn").disabled = currentSlide.relatedQuestionIds.length === 0;
+  document.getElementById("startRelatedQuizBtn").disabled = getExistingQuestionsByIds(currentSlide.relatedQuestionIds).length === 0;
   hideMessage();
   showScreen("slideDetail");
 }
@@ -881,10 +900,13 @@ function closeSlideZoom() {
 function startNormalQuiz() {
   reviewMode = false;
   const selectedField = fieldSelect.value;
+  const selectedTopic = topicSelect.value || "全トピック";
   const count = getSelectedCount();
-  const pool = selectedField === "全分野"
-    ? questions
-    : questions.filter((q) => q.field === selectedField);
+  const pool = questions.filter((question) => {
+    const matchesField = selectedField === "全分野" || question.field === selectedField;
+    const matchesTopic = selectedTopic === "全トピック" || question.topic === selectedTopic;
+    return matchesField && matchesTopic;
+  });
 
   if (questions.length === 0) {
     showMessage("問題データが読み込まれていません。questions.csvを確認してください。");
@@ -892,7 +914,8 @@ function startNormalQuiz() {
   }
 
   if (pool.length === 0) {
-    showMessage(`${selectedField}の問題がquestions.csvに登録されていません。`);
+    const targetLabel = selectedTopic === "全トピック" ? selectedField : `${selectedField} / ${selectedTopic}`;
+    showMessage(`${targetLabel}の問題がquestions.csvに登録されていません。`);
     return;
   }
 
