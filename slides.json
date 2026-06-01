@@ -265,7 +265,7 @@
     "topic": "ねじりモーメント",
     "title": "ねじりモーメントとキーに加わる力",
     "description": "ドラム巻上げ問題を例に、ねじりモーメント M = F × r と、キーに加わる力 F = 2M / d の関係を整理するスライド",
-    "image": "slidestorque-key-force.png",
+    "image": "slidetorque-key-force.png",
     "summary": [
       "ねじりモーメントMは、軸を回そうとする力の大きさである",
       "ドラムでは、ロープ張力Fがドラム半径rに作用するため、M = F × r で求める",
@@ -287,7 +287,7 @@
     "topic": "キー",
     "title": "キーのせん断応力と必要長さ",
     "description": "キーに加わるせん断力から、必要なキー長さ l = F / (τ b) を求める流れを整理するスライド",
-    "image": "slideskey-shear-length.png",
+    "image": "slidekey-shear-length.png",
     "summary": [
       "キーは軸とハブの間でトルクを伝える部品であり、せん断力を受ける",
       "キーのせん断応力は、τ = F / A で考える",
