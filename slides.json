@@ -1,1028 +1,306 @@
-:root {
-  --bg: #f3f6f7;
-  --surface: #ffffff;
-  --text: #1d2b2f;
-  --muted: #65777d;
-  --line: #d8e1e4;
-  --primary: #226c73;
-  --primary-dark: #17535a;
-  --accent: #b36b2c;
-  --success-bg: #e6f6ee;
-  --success: #16784c;
-  --error-bg: #fbe9e7;
-  --error: #b3382f;
-  --shadow: 0 18px 45px rgba(26, 48, 54, 0.10);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: linear-gradient(180deg, #edf4f5 0%, var(--bg) 42%, #eef1ef 100%);
-  color: var(--text);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 17px;
-  line-height: 1.7;
-}
-
-button,
-select,
-input,
-textarea {
-  font: inherit;
-}
-
-button {
-  min-height: 48px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--text);
-  cursor: pointer;
-  padding: 12px 16px;
-  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
-}
-
-button:hover {
-  border-color: var(--primary);
-}
-
-button:active {
-  transform: translateY(1px);
-}
-
-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.app-shell {
-  width: min(980px, 100%);
-  margin: 0 auto;
-  padding: 24px 16px 40px;
-}
-
-.app-header {
-  padding: 14px 2px 22px;
-}
-
-.eyebrow {
-  margin: 0 0 6px;
-  color: var(--accent);
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-h1,
-h2,
-h3,
-p {
-  margin-top: 0;
-}
-
-h1 {
-  margin-bottom: 10px;
-  font-size: clamp(1.8rem, 6vw, 3rem);
-  line-height: 1.18;
-}
-
-h2 {
-  margin-bottom: 18px;
-  font-size: 1.35rem;
-}
-
-h3 {
-  margin: 28px 0 12px;
-  font-size: 1.05rem;
-}
-
-.lead {
-  max-width: 760px;
-  margin-bottom: 0;
-  color: var(--muted);
-}
-
-.screen {
-  display: none;
-}
-
-.active-screen {
-  display: block;
-}
-
-.panel,
-.question-card,
-.info-band {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-  padding: 22px;
-}
-
-.info-band {
-  margin-top: 18px;
-  box-shadow: none;
-}
-
-.control-group {
-  margin-bottom: 18px;
-}
-
-label,
-.label-text {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-select {
-  width: 100%;
-  min-height: 50px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fbfdfd;
-  color: var(--text);
-  padding: 10px 12px;
-}
-
-input[type="search"] {
-  width: 100%;
-  min-height: 50px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fbfdfd;
-  color: var(--text);
-  padding: 10px 12px;
-}
-
-input[type="text"],
-textarea {
-  width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fbfdfd;
-  color: var(--text);
-  padding: 10px 12px;
-}
-
-input[type="text"] {
-  min-height: 50px;
-}
-
-textarea {
-  min-height: 160px;
-  line-height: 1.6;
-  resize: vertical;
-}
-
-.segmented {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-
-.segmented label {
-  margin: 0;
-}
-
-.segmented input {
-  position: absolute;
-  opacity: 0;
-}
-
-.segmented span {
-  display: grid;
-  min-height: 48px;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fbfdfd;
-  color: var(--text);
-  cursor: pointer;
-}
-
-.segmented input:checked + span {
-  border-color: var(--primary);
-  background: #e3f1f2;
-  color: var(--primary-dark);
-  font-weight: 700;
-}
-
-.button-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.screen-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.screen-head h2 {
-  margin-bottom: 6px;
-}
-
-.screen-head p {
-  margin-bottom: 0;
-}
-
-.primary-btn {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: #fff;
-  font-weight: 700;
-}
-
-.primary-btn:hover {
-  background: var(--primary-dark);
-  border-color: var(--primary-dark);
-}
-
-.danger-btn {
-  border-color: #d7aaa5;
-  color: var(--error);
-}
-
-.message {
-  margin-bottom: 16px;
-  border: 1px solid #e0bc70;
-  border-radius: 8px;
-  background: #fff8e8;
-  color: #6f4b12;
-  padding: 12px 14px;
-}
-
-.hidden {
-  display: none !important;
-}
-
-.quiz-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-.meta-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.meta-row span {
-  border-radius: 999px;
-  background: #edf4f5;
-  color: var(--primary-dark);
-  font-size: 0.86rem;
-  font-weight: 700;
-  padding: 4px 10px;
-}
-
-#questionText {
-  margin-bottom: 18px;
-}
-
-.choices {
-  display: grid;
-  gap: 10px;
-}
-
-.choice-btn {
-  width: 100%;
-  min-height: 56px;
-  text-align: left;
-  background: #fbfdfd;
-}
-
-.choice-btn.correct {
-  border-color: var(--success);
-  background: var(--success-bg);
-  color: var(--success);
-  font-weight: 700;
-}
-
-.choice-btn.wrong {
-  border-color: var(--error);
-  background: var(--error-bg);
-  color: var(--error);
-  font-weight: 700;
-}
-
-.feedback {
-  margin-top: 16px;
-  border-radius: 8px;
-  padding: 14px;
-}
-
-.feedback.correct {
-  background: var(--success-bg);
-  color: var(--success);
-}
-
-.feedback.wrong {
-  background: var(--error-bg);
-  color: var(--error);
-}
-
-.feedback strong {
-  display: block;
-  margin-bottom: 6px;
-}
-
-.status-area {
-  margin-top: 16px;
-}
-
-.status-title {
-  margin-bottom: 8px;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-.status-buttons {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.status-buttons button {
-  min-height: 56px;
-  font-weight: 800;
-}
-
-.status-buttons [data-status="わかった"] {
-  border-color: #b7dcca;
-}
-
-.status-buttons [data-status="迷った"] {
-  border-color: #dfc17b;
-}
-
-.status-buttons [data-status="間違えた"] {
-  border-color: #d7aaa5;
-}
-
-.status-buttons .selected-status {
-  border-color: var(--primary);
-  background: #e3f1f2;
-  color: var(--primary-dark);
-}
-
-.result-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.stats-summary {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-.result-grid > div,
-.summary-card,
-.stat-row,
-.compact-stat-row,
-.mistake-item,
-.ranking-item {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fbfdfd;
-  padding: 12px;
-}
-
-.stat-label {
-  display: block;
-  color: var(--muted);
-  font-size: 0.88rem;
-}
-
-.result-grid strong {
-  display: block;
-  margin-top: 4px;
-  font-size: 1.35rem;
-}
-
-.summary-card strong {
-  display: block;
-  margin-top: 4px;
-  font-size: 1.45rem;
-  line-height: 1.2;
-}
-
-.stats-tabs {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-  margin-top: 18px;
-}
-
-.tab-btn {
-  min-height: 44px;
-  padding: 9px 8px;
-  font-size: 0.92rem;
-  font-weight: 700;
-}
-
-.tab-btn.active-tab {
-  border-color: var(--primary);
-  background: #e3f1f2;
-  color: var(--primary-dark);
-}
-
-.tab-panel {
-  display: none;
-}
-
-.active-tab-panel {
-  display: block;
-}
-
-.tab-panel-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 28px;
-}
-
-.tab-panel-head h3 {
-  margin: 0;
-}
-
-.compact-primary-btn,
-.more-btn {
-  min-height: 42px;
-  padding: 9px 12px;
-  font-size: 0.92rem;
-  font-weight: 700;
-}
-
-.compact-primary-btn {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: #fff;
-}
-
-.more-btn {
-  width: 100%;
-  margin-top: 10px;
-}
-
-.stats-list,
-.list-area {
-  display: grid;
-  gap: 10px;
-}
-
-.slide-controls {
-  display: grid;
-  grid-template-columns: minmax(180px, 0.45fr) minmax(0, 1fr);
-  gap: 12px;
-  align-items: end;
-}
-
-.slide-list-toolbar {
-  display: grid;
-  gap: 12px;
-  margin: 4px 0 16px;
-}
-
-.compact-segmented {
-  max-width: 520px;
-}
-
-.note-actions {
-  margin-top: 0;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: minmax(160px, 0.42fr) minmax(0, 1fr);
-  gap: 12px;
-}
-
-.note-form .button-row {
-  margin-top: 8px;
-}
-
-.slide-list {
-  display: grid;
-  gap: 10px;
-  margin-top: 6px;
-}
-
-.slide-card {
-  display: grid;
-  width: 100%;
-  min-height: 0;
-  gap: 6px;
-  text-align: left;
-  background: #fbfdfd;
-  padding: 14px;
-}
-
-.slide-card-title {
-  color: var(--text);
-  font-weight: 800;
-  overflow-wrap: anywhere;
-}
-
-.note-open-btn {
-  width: auto;
-  min-height: 0;
-  border: 0;
-  background: transparent;
-  color: var(--text);
-  padding: 0;
-  text-align: left;
-  font-weight: 800;
-  overflow-wrap: anywhere;
-}
-
-.note-open-btn:hover {
-  color: var(--primary);
-  border-color: transparent;
-}
-
-.slide-card-meta {
-  color: var(--primary-dark);
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
-.slide-card-description,
-.slide-card-count {
-  color: var(--muted);
-  font-size: 0.92rem;
-}
-
-.slide-card-count {
-  font-weight: 700;
-}
-
-.note-card {
-  border: 1px solid var(--line);
-  cursor: default;
-}
-
-.note-preview {
-  margin-bottom: 0;
-  color: var(--text);
-  overflow-wrap: anywhere;
-}
-
-.note-card-footer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-  align-items: center;
-}
-
-.note-status {
-  border-radius: 999px;
-  background: #fff8e8;
-  color: #6f4b12;
-  font-size: 0.86rem;
-  font-weight: 800;
-  padding: 4px 10px;
-}
-
-.note-card-buttons {
-  margin-top: 4px;
-}
-
-.empty-state {
-  display: grid;
-  gap: 10px;
-  justify-items: start;
-  border: 1px dashed var(--line);
-  border-radius: 8px;
-  background: #fbfdfd;
-  padding: 16px;
-}
-
-.empty-state p {
-  margin-bottom: 0;
-}
-
-.slide-detail h3 {
-  margin-top: 22px;
-}
-
-.slide-image-button {
-  display: grid;
-  width: 100%;
-  min-height: 170px;
-  place-items: center;
-  border-style: dashed;
-  background: #f8fbfb;
-  padding: 10px;
-}
-
-.slide-image-button:disabled {
-  opacity: 1;
-}
-
-.slide-image-button img {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  max-height: 62vh;
-  object-fit: contain;
-  border-radius: 6px;
-}
-
-.slide-image-error {
-  color: var(--muted);
-  text-align: center;
-}
-
-.summary-list {
-  margin: 0;
-  padding-left: 1.25em;
-}
-
-.summary-list li {
-  margin-bottom: 8px;
-}
-
-.related-question-ids {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.related-question-ids span {
-  border-radius: 999px;
-  background: #edf4f5;
-  color: var(--primary-dark);
-  font-size: 0.9rem;
-  font-weight: 800;
-  padding: 5px 10px;
-}
-
-.related-question-btn {
-  min-height: 42px;
-  padding: 8px 12px;
-  font-size: 0.92rem;
-  font-weight: 700;
-}
-
-.related-question-btn.missing-question {
-  border-color: #d7aaa5;
-  color: var(--error);
-}
-
-.feedback-actions {
-  margin-top: 12px;
-}
-
-.note-link-btn {
-  min-height: 42px;
-  border-color: var(--line);
-  color: var(--primary-dark);
-  padding: 8px 12px;
-  font-size: 0.92rem;
-  font-weight: 700;
-}
-
-.note-source {
-  margin-bottom: 16px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fbfdfd;
-  padding: 14px;
-}
-
-.note-source h3 {
-  margin-top: 0;
-}
-
-.note-detail-memo {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.zoom-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 10px;
-  background: rgba(13, 25, 29, 0.86);
-  padding: 14px;
-}
-
-.zoom-close {
-  justify-self: end;
-  border-color: rgba(255, 255, 255, 0.5);
-  background: #ffffff;
-}
-
-.zoom-scroll {
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.zoom-scroll img {
-  display: block;
-  width: min(1200px, 100%);
-  min-width: min(760px, 100%);
-  margin: 0 auto;
-  border-radius: 8px;
-  background: #fff;
-}
-
-.modal-open {
-  overflow: hidden;
-}
-
-.stat-row {
-  display: grid;
-  gap: 7px;
-}
-
-.stat-row-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  font-weight: 700;
-}
-
-.stat-row-header span:first-child {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.stat-row-header span:last-child {
-  flex: 0 0 auto;
-}
-
-.stat-row-meta {
-  margin-bottom: 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.stat-row.needs-more .bar span {
-  background: var(--accent);
-}
-
-.compact-list {
-  gap: 8px;
-}
-
-.compact-stat-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 6px 12px;
-  align-items: center;
-}
-
-.compact-stat-row strong,
-.compact-stat-row span {
-  display: block;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.compact-stat-row span {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.compact-rate {
-  color: var(--text);
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-.compact-stat-row .bar {
-  grid-column: 1 / -1;
-}
-
-.compact-stat-row.needs-more .bar span {
-  background: var(--accent);
-}
-
-.bar {
-  height: 10px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #e8eef0;
-}
-
-.bar span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--primary);
-}
-
-.mistake-item p {
-  margin-bottom: 6px;
-}
-
-.mistake-details summary {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
-  align-items: start;
-  cursor: pointer;
-}
-
-.mistake-details summary::marker {
-  color: var(--muted);
-}
-
-.mistake-details small {
-  display: block;
-  color: var(--muted);
-  font-size: 0.86rem;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.mistake-details .question-preview {
-  margin-top: 3px;
-  color: var(--text);
-  font-weight: 500;
-}
-
-.mistake-details p {
-  margin: 10px 0 0;
-}
-
-.mistake-counts {
-  color: var(--muted);
-  font-size: 0.88rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.ranking-item {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 12px;
-}
-
-.rank-badge {
-  display: grid;
-  width: 36px;
-  height: 36px;
-  place-items: center;
-  border-radius: 999px;
-  background: #e3f1f2;
-  color: var(--primary-dark);
-  font-weight: 800;
-}
-
-.ranking-body {
-  display: grid;
-  min-width: 0;
-  gap: 8px;
-}
-
-.ranking-title {
-  font-weight: 800;
-  overflow-wrap: anywhere;
-}
-
-.ranking-metrics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 12px;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.muted {
-  color: var(--muted);
-}
-
-.history-tools {
-  margin-top: 26px;
-  border-top: 1px solid var(--line);
-  padding-top: 18px;
-}
-
-.history-tools h3 {
-  margin-top: 0;
-}
-
-@media (max-width: 640px) {
-  body {
-    font-size: 16px;
+[
+  {
+    "id": "SLIDE_C001",
+    "field": "制御・メカトロ",
+    "topic": "PID制御",
+    "title": "PID制御：I動作の強い・弱い",
+    "description": "I動作の強弱とオーバーシュートの関係を確認するスライド",
+    "image": "slides/pid-i-action.png",
+    "summary": [
+      "I動作は偏差の累積を見て補正する働き",
+      "I動作が弱いと定常偏差が残りやすい",
+      "I動作が強すぎるとオーバーシュートや振動が起きやすい",
+      "試験では、I動作を強くしすぎると振動・ハンチングが起きやすいと覚える"
+    ],
+    "relatedQuestionIds": ["C003", "C007"]
+  },
+  {
+    "id": "SLIDE_H001",
+    "field": "熱工学",
+    "topic": "熱力学変化",
+    "title": "定圧・定積・等温・断熱の違い",
+    "description": "代表的な熱力学変化で一定になる量と熱の出入りを整理するスライド",
+    "image": "slides/thermal-processes.png",
+    "summary": [
+      "定圧変化は圧力が一定で、体積変化による仕事を考える",
+      "定積変化は体積が一定で、境界仕事は0になる",
+      "等温変化は温度が一定で、理想気体では内部エネルギー変化が0になる",
+      "断熱変化は熱の出入りがなく、温度・圧力・体積が同時に変化する"
+    ],
+    "relatedQuestionIds": ["T003", "T005", "T006"]
+  },
+  {
+    "id": "SLIDE_F001",
+    "field": "流体工学",
+    "topic": "レイノルズ数",
+    "title": "レイノルズ数：層流と乱流",
+    "description": "慣性力と粘性力の比から流れの状態を判断するスライド",
+    "image": "slides/reynolds-number.png",
+    "summary": [
+      "レイノルズ数は慣性力と粘性力の比を表す無次元数",
+      "値が小さいと粘性の影響が強く、層流になりやすい",
+      "値が大きいと慣性の影響が強く、乱流になりやすい",
+      "代表式 Re = ρVD / μ または Re = VD / ν を押さえる"
+    ],
+    "relatedQuestionIds": ["F003", "F007", "F008"]
+  },
+  {
+    "id": "SLIDE_MDESIGN_CAM_PRESSURE_ANGLE",
+    "field": "機械設計",
+    "topic": "カム",
+    "title": "カムの圧力角β",
+    "description": "ハートカムを例に、圧力角β、接線t、法線n、従動節の運動方向sの関係を確認するスライド",
+    "image": "slides/cam-pressure-angle.png",
+    "summary": [
+      "圧力角βは、法線nと従動節の運動方向sのなす角である",
+      "接線tと法線nは、接触点で必ず90°になる",
+      "法線nは、カムから従動節へ力が伝わる方向と考える",
+      "βが小さいほど力がまっすぐ伝わりやすい",
+      "βが大きいほど横方向の力が増え、摩擦・摩耗・動きにくさの原因になる",
+      "試験では「圧力角＝nとsの角度」「tとnは90°」を必ず押さえる"
+    ],
+    "relatedQuestionIds": ["M_DESIGN_CAM_001", "M_DESIGN_CAM_002", "M_DESIGN_CAM_003", "M_DESIGN_CAM_004", "M_DESIGN_CAM_005", "M_DESIGN_CAM_006"]
+  },
+  {
+    "id": "SLIDE_MATH_TRIG_001",
+    "field": "数学・力学基礎",
+    "topic": "三角関数・力の分解",
+    "title": "三角関数の復習①：力の分解まで",
+    "description": "sin・cos・tan の基本、角度の取り方、力の分解、符号付き成分を復習するスライド",
+    "image": "slides/trigonometry-force-decomposition.png",
+    "summary": [
+      "三角関数は、直角三角形における辺の長さの比を表す",
+      "sinθ = 向かい側 ÷ 斜辺、cosθ = 隣辺 ÷ 斜辺、tanθ = 向かい側 ÷ 隣辺",
+      "力の分解では、角度に近い側が cos、角度の向かい側が sin になる",
+      "角度を水平から取る場合は、水平成分 = F cosθ、鉛直成分 = F sinθ",
+      "角度を鉛直から取る場合は、鉛直成分 = F cosθ、水平成分 = F sinθ",
+      "成分の大きさを求めた後、右向き・上向きはプラス、左向き・下向きはマイナスとして符号を付ける"
+    ],
+    "relatedQuestionIds": [
+      "MATH_TRIG_001",
+      "MATH_TRIG_002",
+      "MATH_TRIG_003",
+      "MATH_TRIG_004",
+      "MATH_TRIG_005",
+      "MATH_TRIG_006",
+      "MATH_TRIG_007",
+      "MATH_TRIG_008"
+    ]
+  },
+  {
+    "id": "SLIDE_MOMENT_001",
+    "field": "数学・力学基礎",
+    "topic": "モーメント",
+    "title": "モーメントの復習①：基本から斜めの力まで",
+    "description": "モーメントの基本式 M=F×L、斜めの力、直角成分、角度による効き方を復習するスライド",
+    "image": "slides/moment-basic-oblique-force.png",
+    "summary": [
+      "モーメントは、物体を支点まわりに回転させようとする働き",
+      "基本式は M = F × L",
+      "力がレバーに直角なら、その力がそのまま回転に効く",
+      "斜めの力では、レバーに対して直角な成分だけが回転に効く",
+      "レバーと力のなす角をθとすると、M = F × L × sinθ",
+      "0°では回らず、90°で最大になる"
+    ],
+    "relatedQuestionIds": [
+      "MOMENT_BASIC_001",
+      "MOMENT_BASIC_002",
+      "MOMENT_BASIC_003",
+      "MOMENT_BASIC_004",
+      "MOMENT_BASIC_005"
+    ]
+  },
+  {
+    "id": "SLIDE_MOMENT_002",
+    "field": "数学・力学基礎",
+    "topic": "作用線と垂直距離",
+    "title": "作用線と垂直距離のイメージ",
+    "description": "作用線、垂直距離h、h=L×sinθ、M=F×h の関係を復習するスライド",
+    "image": "slides/moment-line-of-action-distance.png",
+    "summary": [
+      "作用線は、力の矢印をそのまま延長した線",
+      "垂直距離hは、支点から作用線まで直角に測った最短距離",
+      "モーメントで使う距離は、支点から力点までの長さではなく、支点から作用線までの垂直距離",
+      "レバー長さをL、レバーと力のなす角をθとすると、h = L × sinθ",
+      "モーメントは M = F × h で求められる"
+    ],
+    "relatedQuestionIds": [
+      "MOMENT_LINE_001",
+      "MOMENT_LINE_002",
+      "MOMENT_LINE_003",
+      "MOMENT_LINE_004",
+      "MOMENT_LINE_005"
+    ]
+  },
+  {
+    "id": "SLIDE_MOMENT_003",
+    "field": "数学・力学基礎",
+    "topic": "作用線と垂直距離",
+    "title": "なぜ sin を使うと垂直距離 h が出せるのか",
+    "description": "sinθ = 向かい側 ÷ 斜辺 の関係から、h = L×sinθ になる理由を図で確認するスライド",
+    "image": "slides/moment-sin-perpendicular-distance.png",
+    "summary": [
+      "sinθ は、角度θから見た向かい側の辺 ÷ 斜辺",
+      "モーメントの図では、垂直距離hがθの向かい側、レバー長さLが斜辺になる",
+      "そのため sinθ = h ÷ L となる",
+      "式を変形すると h = L × sinθ になる",
+      "0°ではh=0、30°ではhはLの半分、90°ではh=Lになる"
+    ],
+    "relatedQuestionIds": [
+      "MOMENT_SIN_001",
+      "MOMENT_SIN_002",
+      "MOMENT_SIN_003",
+      "MOMENT_SIN_004"
+    ]
+  },
+  {
+    "id": "SLIDE_MOMENT_004",
+    "field": "数学・力学基礎",
+    "topic": "符号付きモーメント",
+    "title": "符号付きモーメントと合計モーメント",
+    "description": "時計回り・反時計回りの符号、複数の力の合計モーメントを復習するスライド",
+    "image": "slides/moment-sign-and-sum.png",
+    "summary": [
+      "モーメントには、時計回り・反時計回りの向きがある",
+      "ここでは反時計回りをプラス、時計回りをマイナスとする",
+      "右下と左上は時計回りになりやすくマイナス",
+      "右上と左下は反時計回りになりやすくプラス",
+      "複数の力がある場合は、1つずつ M=F×距離 を求め、符号を付けて合計する"
+    ],
+    "relatedQuestionIds": [
+      "MOMENT_SIGN_001",
+      "MOMENT_SIGN_002",
+      "MOMENT_SIGN_003",
+      "MOMENT_SIGN_004",
+      "MOMENT_SIGN_005",
+      "MOMENT_SUM_001",
+      "MOMENT_SUM_002",
+      "MOMENT_SUM_003"
+    ]
+  },
+  {
+    "id": "SLIDE_C_TIME_CONSTANT_001",
+    "field": "制御工学",
+    "topic": "一次遅れ系・時定数",
+    "title": "一次遅れ系と時定数",
+    "description": "一次遅れ系の時定数T、63.2%、Tの大小による応答速度の違いを確認するスライド",
+    "image": "slides/time-constant-first-order.png",
+    "summary": [
+      "時定数Tは、反応の速さを表す目安",
+      "一次遅れ系では、1T後に最終値の約63.2%に到達する",
+      "Tが小さいほど応答は速く、Tが大きいほど応答は遅い",
+      "一次遅れ系は、温度・圧力・流量のように「じわっと目標値へ近づく」応答でよく出る",
+      "PID制御では、反応が遅い対象にI動作を強くしすぎると、行き過ぎや振動が起こりやすい"
+    ],
+    "relatedQuestionIds": [
+      "CONTROL_DELAY_001",
+      "CONTROL_DELAY_002",
+      "CONTROL_DELAY_003",
+      "CONTROL_DELAY_004",
+      "CONTROL_DELAY_005",
+      "CONTROL_DELAY_006",
+      "CONTROL_DELAY_007",
+      "CONTROL_DELAY_008",
+      "CONTROL_DELAY_009",
+      "CONTROL_DELAY_010"
+    ]
+  },
+  {
+    "id": "SLIDE_MATH_RADIAN_ANGULAR_VELOCITY",
+    "field": "数学・基礎",
+    "topic": "ラジアン・角速度",
+    "title": "ラジアンと角速度の基本",
+    "description": "s = rθ を起点に、360° = 2π rad、角速度 rad/s、カム問題での速度計算を整理するスライド",
+    "image": "slides/radian-angular-velocity.png",
+    "summary": [
+      "ラジアンは、弧の長さを使った角度の表し方である",
+      "基本式は s = rθ。弧の長さs = 半径r × 角度θ[rad]",
+      "1 rad は、弧の長さsが半径rと同じになる角度である",
+      "1周の円周は2πrなので、360° = 2π rad",
+      "半周は180° = π rad、90° = π/2 rad",
+      "角速度ωは、1秒あたりに回転する角度で、単位はrad/s",
+      "カム線図では、従動節速度 = カム線図の傾き × 角速度",
+      "例：35mmをπ radで上昇し、ω=2rad/sなら、v=(35/π)×2=22.3mm/s"
+    ],
+    "relatedQuestionIds": [
+      "MATH_RADIAN_001",
+      "MATH_RADIAN_002",
+      "MATH_RADIAN_003",
+      "MATH_RADIAN_004",
+      "MATH_RADIAN_005"
+    ]
+  },
+  {
+    "id": "SLIDE_C_TRANSFER_FEEDBACK_001",
+    "field": "制御工学",
+    "topic": "伝達関数・負帰還",
+    "title": "伝達関数の基本と負帰還",
+    "description": "伝達関数G(s)、ゲインK、時定数T、一次遅れ系、単位負帰還の基本を確認するスライド",
+    "image": "slides/transfer-function-negative-feedback.png",
+    "summary": [
+      "伝達関数は、入力に対して出力がどう反応するかを表す式",
+      "G(s)=K は、入力に対して出力がK倍になる比例要素",
+      "G(s)=K/(Ts+1) は一次遅れ系で、Kは大きさ、Tは反応の速さを表す",
+      "Tが小さいほど応答は速く、Tが大きいほど応答は遅い",
+      "単位負帰還の閉ループ伝達関数は G/(1+G)",
+      "一般の負帰還では G/(1+GH) となる",
+      "負帰還では現在値を戻して比較し、偏差 e = r - y を小さくする",
+      "負帰還なのに分母はプラスになる点を覚える"
+    ],
+    "relatedQuestionIds": [
+      "C_TRANSFER_001",
+      "C_TRANSFER_002",
+      "C_TRANSFER_003",
+      "C_TRANSFER_004",
+      "C_FEEDBACK_001",
+      "C_FEEDBACK_002",
+      "C_FEEDBACK_003",
+      "C_TIME_001",
+      "C_TIME_002"
+    ]
+  },
+  {
+    "id": "SLIDE_MACHINE_ELEMENT_TORQUE_KEY_FORCE",
+    "field": "機械要素",
+    "topic": "ねじりモーメント",
+    "title": "ねじりモーメントとキーに加わる力",
+    "description": "ドラム巻上げ問題を例に、ねじりモーメント M = F × r と、キーに加わる力 F = 2M / d の関係を整理するスライド",
+    "image": "slides/slidetorque-key-force.png",
+    "summary": [
+      "ねじりモーメントMは、軸を回そうとする力の大きさである",
+      "ドラムでは、ロープ張力Fがドラム半径rに作用するため、M = F × r で求める",
+      "直径Dではなく、中心から力の作用位置までの距離である半径rを使う",
+      "キーに加わる力は、軸半径d/2の位置でトルクを伝える力として考える",
+      "M = F × d/2 より、キーに加わる力は F = 2M / d で求められる",
+      "dをmmで使う場合、MはN・mmに直して計算する",
+      "試験では、M = F × r と M = F × d/2 の違いを整理しておく"
+    ],
+    "relatedQuestionIds": [
+      "MACHINE_ELEMENT_TORQUE_KEY_001",
+      "MACHINE_ELEMENT_TORQUE_KEY_002",
+      "MACHINE_ELEMENT_TORQUE_KEY_003"
+    ]
+  },
+  {
+    "id": "SLIDE_MACHINE_ELEMENT_KEY_SHEAR_LENGTH",
+    "field": "機械要素",
+    "topic": "キー",
+    "title": "キーのせん断応力と必要長さ",
+    "description": "キーに加わるせん断力から、必要なキー長さ l = F / (τ b) を求める流れを整理するスライド",
+    "image": "slides/slidekey-shear-length.png",
+    "summary": [
+      "キーは軸とハブの間でトルクを伝える部品であり、せん断力を受ける",
+      "キーのせん断応力は、τ = F / A で考える",
+      "キーのせん断面積は A = b × l である",
+      "したがって、τ = F / (b l) となる",
+      "必要なキー長さは、l = F / (τ b) で求める",
+      "MPaはN/mm2なので、FはN、bとlはmmでそろえる",
+      "計算値より小さい標準長さは選ばず、計算値以上の標準寸法を選ぶ"
+    ],
+    "relatedQuestionIds": [
+      "MACHINE_ELEMENT_KEY_SHEAR_001",
+      "MACHINE_ELEMENT_KEY_SHEAR_002",
+      "MACHINE_ELEMENT_KEY_SHEAR_003"
+    ]
   }
-
-  .app-shell {
-    padding: 18px 12px 32px;
-  }
-
-  .panel,
-  .question-card,
-  .info-band {
-    padding: 18px;
-  }
-
-  .button-row,
-  .result-grid,
-  .status-buttons {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .stats-summary {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .stats-tabs {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .tab-btn {
-    min-height: 46px;
-  }
-
-  .tab-panel-head {
-    display: grid;
-    align-items: stretch;
-  }
-
-  .screen-head,
-  .slide-controls,
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .compact-segmented {
-    max-width: none;
-  }
-
-  .note-card-buttons {
-    grid-template-columns: 1fr;
-  }
-
-  .slide-image-button {
-    min-height: 150px;
-  }
-
-  .slide-image-button img {
-    max-height: 48vh;
-  }
-
-  .zoom-overlay {
-    padding: 10px;
-  }
-
-  .zoom-scroll img {
-    width: 100%;
-    min-width: 620px;
-  }
-
-  button {
-    width: 100%;
-  }
-
-  .stat-row-header {
-    display: grid;
-    gap: 2px;
-  }
-
-  .ranking-item {
-    grid-template-columns: 1fr;
-  }
-
-  .rank-badge {
-    width: 32px;
-    height: 32px;
-  }
-
-  .mistake-details summary,
-  .compact-stat-row {
-    grid-template-columns: 1fr;
-  }
-
-  .mistake-counts {
-    white-space: normal;
-  }
-}
+]
