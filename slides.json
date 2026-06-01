@@ -258,5 +258,49 @@
       "C_TIME_001",
       "C_TIME_002"
     ]
+  },
+  {
+    "id": "SLIDE_MACHINE_ELEMENT_TORQUE_KEY_FORCE",
+    "field": "機械要素",
+    "topic": "ねじりモーメント",
+    "title": "ねじりモーメントとキーに加わる力",
+    "description": "ドラム巻上げ問題を例に、ねじりモーメント M = F × r と、キーに加わる力 F = 2M / d の関係を整理するスライド",
+    "image": "slidestorque-key-force.png",
+    "summary": [
+      "ねじりモーメントMは、軸を回そうとする力の大きさである",
+      "ドラムでは、ロープ張力Fがドラム半径rに作用するため、M = F × r で求める",
+      "直径Dではなく、中心から力の作用位置までの距離である半径rを使う",
+      "キーに加わる力は、軸半径d/2の位置でトルクを伝える力として考える",
+      "M = F × d/2 より、キーに加わる力は F = 2M / d で求められる",
+      "dをmmで使う場合、MはN・mmに直して計算する",
+      "試験では、M = F × r と M = F × d/2 の違いを整理しておく"
+    ],
+    "relatedQuestionIds": [
+      "MACHINE_ELEMENT_TORQUE_KEY_001",
+      "MACHINE_ELEMENT_TORQUE_KEY_002",
+      "MACHINE_ELEMENT_TORQUE_KEY_003"
+    ]
+  },
+  {
+    "id": "SLIDE_MACHINE_ELEMENT_KEY_SHEAR_LENGTH",
+    "field": "機械要素",
+    "topic": "キー",
+    "title": "キーのせん断応力と必要長さ",
+    "description": "キーに加わるせん断力から、必要なキー長さ l = F / (τ b) を求める流れを整理するスライド",
+    "image": "slideskey-shear-length.png",
+    "summary": [
+      "キーは軸とハブの間でトルクを伝える部品であり、せん断力を受ける",
+      "キーのせん断応力は、τ = F / A で考える",
+      "キーのせん断面積は A = b × l である",
+      "したがって、τ = F / (b l) となる",
+      "必要なキー長さは、l = F / (τ b) で求める",
+      "MPaはN/mm2なので、FはN、bとlはmmでそろえる",
+      "計算値より小さい標準長さは選ばず、計算値以上の標準寸法を選ぶ"
+    ],
+    "relatedQuestionIds": [
+      "MACHINE_ELEMENT_KEY_SHEAR_001",
+      "MACHINE_ELEMENT_KEY_SHEAR_002",
+      "MACHINE_ELEMENT_KEY_SHEAR_003"
+    ]
   }
 ]
