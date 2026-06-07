@@ -302,5 +302,22 @@
       "MACHINE_ELEMENT_KEY_SHEAR_002",
       "MACHINE_ELEMENT_KEY_SHEAR_003"
     ]
+  },
+  {
+    "id": "SLIDE_THERMAL_CHILLER_COP_HYDRAULIC",
+    "field": "熱・流体",
+    "topic": "冷凍機COP",
+    "title": "チラーで油圧機器の温度を保つしくみとCOP",
+    "description": "油圧機器の発熱、オイルクーラー、冷却水、チラー、外気への放熱の流れから、冷凍機COPを理解するスライド",
+    "image": "slides/chiller-hydraulic-cop.png",
+    "summary": [
+      "チラーは冷気を作る装置ではなく、熱を外へ運ぶ装置",
+      "油圧機器で発生した熱は、オイルクーラーを介して冷却水へ移る",
+      "冷凍機COPは εr = Qc / L で表される",
+      "外気へ捨てる熱は Qh = Qc + L となる",
+      "低温側を必要以上に低くすると温度差が大きくなり、COPは下がる",
+      "目的はとにかく冷やすことではなく、ちょうどよい油温を保つこと"
+    ],
+    "relatedQuestionIds": []
   }
 ]
