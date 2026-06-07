@@ -304,7 +304,7 @@
     ]
   },
   {
-    "id": "SLIDE_THERMAL_CHILLER_COP_HYDRAULIC",
+    "id": "chiller-hydraulic-cop",
     "field": "熱・流体",
     "topic": "冷凍機COP",
     "title": "チラーで油圧機器の温度を保つしくみとCOP",
@@ -318,6 +318,15 @@
       "低温側を必要以上に低くすると温度差が大きくなり、COPは下がる",
       "目的はとにかく冷やすことではなく、ちょうどよい油温を保つこと"
     ],
-    "relatedQuestionIds": []
+    "relatedQuestionIds": [
+      "T_COP_001",
+      "T_COP_002",
+      "T_COP_003",
+      "T_COP_004",
+      "T_COP_005",
+      "T_COP_006",
+      "T_COP_007",
+      "T_COP_008"
+    ]
   }
 ]
