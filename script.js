@@ -23,6 +23,15 @@ const QUESTION_STATS_STORAGE_KEY = "mechanicalExamQuestionStats";
 const QUESTIONS_CSV = "questions.csv";
 const SLIDES_JSON = "slides.json";
 const WEAK_TOPIC_RATE_LIMIT = 70;
+const WEAKNESS_FIELD_ORDER = [
+  "材料力学",
+  "機械力学",
+  "熱工学",
+  "流体工学",
+  "制御工学",
+  "工作法",
+  "工業材料"
+];
 const FALLBACK_QUESTIONS = [
   {
     id: "C003",
@@ -212,6 +221,8 @@ function bindEvents() {
   addEvent("startFieldReviewBtn", "click", () => startWeaknessReview("field"));
   addEvent("startWrongOnlyReviewBtn", "click", () => startWeaknessReview("wrong"));
   addEvent("startUnsureOnlyReviewBtn", "click", () => startWeaknessReview("unsure"));
+  addEvent("weaknessStatusFilter", "change", renderWeaknessQuestionList);
+  addEvent("weaknessListFieldFilter", "change", renderWeaknessQuestionList);
   addEvent("homeFromSlidesBtn", "click", showHome);
   addEvent("backToSlidesBtn", "click", showSlides);
   addEvent("backToSlidesBottomBtn", "click", showSlides);
@@ -1040,24 +1051,28 @@ function startNormalQuiz() {
 }
 
 function showWeaknessReview() {
-  const reviewItems = getWeaknessReviewItems();
-  const wrongCount = reviewItems.filter((item) => item.stat.status === "wrong").length;
-  const unsureCount = reviewItems.filter((item) => item.stat.status === "unsure").length;
-  const fields = [...new Set(reviewItems.map((item) => item.question.field || item.stat.field || "未分類"))]
-    .sort((a, b) => a.localeCompare(b, "ja"));
+  const listItems = getWeaknessListItems();
+  const reviewItems = listItems.filter((item) => item.question);
+  const wrongCount = listItems.filter((item) => item.stat.status === "wrong").length;
+  const unsureCount = listItems.filter((item) => item.stat.status === "unsure").length;
+  const fields = getWeaknessFields(listItems);
+  const reviewFields = getWeaknessFields(reviewItems);
   const fieldSelect = document.getElementById("weaknessFieldSelect");
 
   document.getElementById("weaknessReviewSummary").innerHTML = `
-    <span>復習対象 <strong>${reviewItems.length}問</strong></span>
     <span>間違えた問題 <strong>${wrongCount}問</strong></span>
     <span>迷った問題 <strong>${unsureCount}問</strong></span>
+    <span>弱点対象合計 <strong>${listItems.length}問</strong></span>
   `;
-  fieldSelect.innerHTML = fields.length > 0
-    ? fields.map((field) => `<option value="${escapeHtml(field)}">${escapeHtml(field)}</option>`).join("")
+  fieldSelect.innerHTML = reviewFields.length > 0
+    ? reviewFields.map((field) => `<option value="${escapeHtml(field)}">${escapeHtml(field)}</option>`).join("")
     : `<option value="">対象なし</option>`;
+  setupWeaknessListFieldFilter(fields);
+  renderWeaknessFieldSummary(listItems);
+  renderWeaknessQuestionList();
 
   document.getElementById("startImmediateReviewBtn").disabled = reviewItems.length === 0;
-  document.getElementById("startFieldReviewBtn").disabled = fields.length === 0;
+  document.getElementById("startFieldReviewBtn").disabled = reviewFields.length === 0;
   document.getElementById("startWrongOnlyReviewBtn").disabled = wrongCount === 0;
   document.getElementById("startUnsureOnlyReviewBtn").disabled = unsureCount === 0;
   hideMessage();
@@ -1065,21 +1080,138 @@ function showWeaknessReview() {
 }
 
 function getWeaknessReviewItems() {
+  return getWeaknessListItems().filter((item) => item.question);
+}
+
+function getWeaknessListItems() {
   const stats = loadQuestionStats();
   return Object.values(stats)
     .filter((stat) => stat.status === "wrong" || stat.status === "unsure")
     .map((stat) => ({
       stat,
-      question: questions.find((question) => question.id === stat.questionId)
+      question: questions.find((question) => question.id === stat.questionId) || null,
+      field: getWeaknessItemField(stat)
     }))
-    .filter((item) => item.question)
     .sort((a, b) => {
+      const fieldDiff = getWeaknessFieldRank(a.field) - getWeaknessFieldRank(b.field)
+        || a.field.localeCompare(b.field, "ja");
+      if (fieldDiff !== 0) {
+        return fieldDiff;
+      }
       const statusDiff = Number(b.stat.status === "wrong") - Number(a.stat.status === "wrong");
       if (statusDiff !== 0) {
         return statusDiff;
       }
-      return new Date(a.stat.lastAnsweredAt || 0) - new Date(b.stat.lastAnsweredAt || 0);
+      const dateDiff = getQuestionStatTimestamp(b.stat.lastAnsweredAt) - getQuestionStatTimestamp(a.stat.lastAnsweredAt);
+      if (dateDiff !== 0) {
+        return dateDiff;
+      }
+      return (b.stat.wrongCount + b.stat.unsureCount) - (a.stat.wrongCount + a.stat.unsureCount);
     });
+}
+
+function getQuestionStatTimestamp(value) {
+  const timestamp = new Date(value || 0).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function getWeaknessItemField(stat) {
+  const question = questions.find((item) => item.id === stat.questionId);
+  return String(question?.field || stat.field || "未分類").trim() || "未分類";
+}
+
+function getWeaknessFieldRank(field) {
+  const index = WEAKNESS_FIELD_ORDER.indexOf(field);
+  if (index >= 0) {
+    return index;
+  }
+  return field === "未分類" ? WEAKNESS_FIELD_ORDER.length + 2 : WEAKNESS_FIELD_ORDER.length + 1;
+}
+
+function getWeaknessFields(items) {
+  return [...new Set(items.map((item) => item.field))]
+    .sort((a, b) => getWeaknessFieldRank(a) - getWeaknessFieldRank(b) || a.localeCompare(b, "ja"));
+}
+
+function setupWeaknessListFieldFilter(fields) {
+  const filter = document.getElementById("weaknessListFieldFilter");
+  const currentValue = filter.value || "all";
+  filter.innerHTML = [
+    `<option value="all">全分野</option>`,
+    ...fields.map((field) => `<option value="${escapeHtml(field)}">${escapeHtml(field)}</option>`)
+  ].join("");
+  filter.value = [...filter.options].some((option) => option.value === currentValue) ? currentValue : "all";
+}
+
+function renderWeaknessFieldSummary(items) {
+  const container = document.getElementById("weaknessFieldSummary");
+  const fields = getWeaknessFields(items);
+  if (fields.length === 0) {
+    container.innerHTML = `<p class="muted">現在、復習対象の問題はありません。</p>`;
+    return;
+  }
+  container.innerHTML = fields.map((field) => {
+    const fieldItems = items.filter((item) => item.field === field);
+    const wrongCount = fieldItems.filter((item) => item.stat.status === "wrong").length;
+    const unsureCount = fieldItems.filter((item) => item.stat.status === "unsure").length;
+    return `
+      <div class="weakness-field-summary-row">
+        <strong>${escapeHtml(field)}</strong>
+        <span>間違い ${wrongCount}問 / 迷い ${unsureCount}問</span>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderWeaknessQuestionList() {
+  const container = document.getElementById("weaknessQuestionList");
+  const statusFilter = document.getElementById("weaknessStatusFilter").value || "all";
+  const fieldFilter = document.getElementById("weaknessListFieldFilter").value || "all";
+  const visibleItems = getWeaknessListItems().filter((item) => {
+    const matchesStatus = statusFilter === "all" || item.stat.status === statusFilter;
+    const matchesField = fieldFilter === "all" || item.field === fieldFilter;
+    return matchesStatus && matchesField;
+  });
+
+  if (visibleItems.length === 0) {
+    container.innerHTML = `<p class="muted">現在、復習対象の問題はありません。</p>`;
+    return;
+  }
+
+  const groups = getWeaknessFields(visibleItems);
+  container.innerHTML = groups.map((field) => `
+    <section class="weakness-question-group">
+      <h4>${escapeHtml(field)}</h4>
+      <div class="weakness-question-group-list">
+        ${visibleItems
+          .filter((item) => item.field === field)
+          .map(renderWeaknessQuestionItem)
+          .join("")}
+      </div>
+    </section>
+  `).join("");
+}
+
+function renderWeaknessQuestionItem(item) {
+  const questionText = item.question
+    ? truncateText(item.question.title || item.question.question || item.stat.questionId, 30)
+    : item.stat.questionId;
+  const statusLabel = item.stat.status === "wrong" ? "間違えた" : "迷った";
+  return `
+    <article class="weakness-question-item ${item.stat.status}">
+      <div class="weakness-question-title">
+        <strong>${escapeHtml(item.stat.questionId)}</strong>
+        <span class="weakness-status-label">${statusLabel}</span>
+      </div>
+      <p>${escapeHtml(questionText)}</p>
+      <div class="weakness-question-counts">
+        <span>間違い ${item.stat.wrongCount}回</span>
+        <span>迷い ${item.stat.unsureCount}回</span>
+        <span>正解 ${item.stat.correctCount}回</span>
+      </div>
+      <time datetime="${escapeHtml(item.stat.lastAnsweredAt)}">最終回答：${escapeHtml(formatDateTime(item.stat.lastAnsweredAt))}</time>
+    </article>
+  `;
 }
 
 function startWeaknessReview(mode) {
@@ -1093,7 +1225,7 @@ function startWeaknessReview(mode) {
         return item.stat.status === "unsure";
       }
       if (mode === "field") {
-        return (item.question.field || item.stat.field || "未分類") === selectedField;
+        return item.field === selectedField;
       }
       return true;
     })
@@ -1250,7 +1382,7 @@ function normalizeQuestionStats(rawStats) {
     if (!item || typeof item !== "object") {
       return;
     }
-    const questionId = String(item.questionId || key || "").trim();
+    const questionId = String(item.questionId || "").trim();
     if (!questionId) {
       return;
     }
