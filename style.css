@@ -270,11 +270,85 @@ textarea {
 
 .quiz-top {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;
   color: var(--muted);
   font-weight: 700;
+}
+
+.quiz-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.calculator-toggle-btn,
+.calculator-close-btn {
+  min-height: 40px;
+  padding: 7px 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.calculator-panel {
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f8fbfb;
+  padding: 14px;
+}
+
+.calculator-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.calculator-display {
+  display: block;
+  width: 100%;
+  min-height: 58px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.3;
+  padding: 13px 14px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.calculator-keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.calculator-keys button {
+  min-height: 50px;
+  padding: 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.calculator-equals-btn {
+  grid-column: 1 / -1;
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.calculator-equals-btn:hover {
+  border-color: var(--primary-dark);
+  background: var(--primary-dark);
 }
 
 .meta-row {
@@ -1174,6 +1248,23 @@ textarea {
   .status-buttons {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .quiz-top-actions {
+    gap: 8px;
+  }
+
+  .calculator-toggle-btn,
+  .calculator-close-btn {
+    width: auto;
+  }
+
+  .calculator-panel {
+    padding: 12px;
+  }
+
+  .calculator-keys button {
+    min-height: 54px;
   }
 
   .stats-summary {
