@@ -130,6 +130,7 @@ let quizAnswers = [];
 let reviewMode = false;
 let statsState = createDefaultStatsState();
 let appInitialized = false;
+let calculatorState = createCalculatorState();
 
 const screens = {
   home: document.getElementById("homeScreen"),
@@ -214,6 +215,9 @@ function bindEvents() {
   addEvent("showSlidesBtn", "click", showSlides);
   addEvent("showStatsBtn", "click", showStats);
   addEvent("showQuestionStatsBtn", "click", showQuestionStatsSummary);
+  addEvent("toggleCalculatorBtn", "click", toggleCalculator);
+  addEvent("closeCalculatorBtn", "click", closeCalculator);
+  addEvent("calculatorKeys", "click", handleCalculatorKey);
   addElementEvent(fieldSelect, "fieldSelect", "change", setupTopicFilter);
   addEvent("homeFromResultBtn", "click", showHome);
   addEvent("homeFromWeaknessBtn", "click", showHome);
@@ -1289,6 +1293,7 @@ function selectNormalQuizQuestions(pool, count) {
 
 function renderQuestion() {
   const question = currentQuiz[currentIndex];
+  closeCalculator();
   document.getElementById("progressText").textContent = `${currentIndex + 1} / ${currentQuiz.length}`;
   document.getElementById("fieldBadge").textContent = question.field;
   document.getElementById("topicBadge").textContent = question.topic;
@@ -1310,6 +1315,212 @@ function renderQuestion() {
     button.addEventListener("click", () => answerQuestion(index + 1));
     choicesArea.appendChild(button);
   });
+}
+
+function createCalculatorState() {
+  return {
+    tokens: [],
+    current: "",
+    justEvaluated: false,
+    error: false
+  };
+}
+
+function toggleCalculator() {
+  const panel = document.getElementById("calculatorPanel");
+  const shouldOpen = panel.classList.contains("hidden");
+  panel.classList.toggle("hidden", !shouldOpen);
+  document.getElementById("toggleCalculatorBtn").setAttribute("aria-expanded", String(shouldOpen));
+  if (shouldOpen) {
+    updateCalculatorDisplay();
+  }
+}
+
+function closeCalculator() {
+  const panel = document.getElementById("calculatorPanel");
+  if (!panel) {
+    return;
+  }
+  panel.classList.add("hidden");
+  document.getElementById("toggleCalculatorBtn").setAttribute("aria-expanded", "false");
+}
+
+function handleCalculatorKey(event) {
+  const button = event.target.closest("button");
+  if (!button) {
+    return;
+  }
+  if (button.dataset.calculatorValue !== undefined) {
+    appendCalculatorValue(button.dataset.calculatorValue);
+  } else if (button.dataset.calculatorOperator) {
+    appendCalculatorOperator(button.dataset.calculatorOperator);
+  } else if (button.dataset.calculatorAction) {
+    runCalculatorAction(button.dataset.calculatorAction);
+  }
+  updateCalculatorDisplay();
+}
+
+function appendCalculatorValue(value) {
+  if (calculatorState.error || calculatorState.justEvaluated) {
+    calculatorState = createCalculatorState();
+  }
+  if (value === ".") {
+    if (calculatorState.current.includes(".")) {
+      return;
+    }
+    calculatorState.current = calculatorState.current || "0";
+  }
+  if (calculatorState.current === "0" && value !== ".") {
+    calculatorState.current = value;
+  } else {
+    calculatorState.current += value;
+  }
+}
+
+function appendCalculatorOperator(operator) {
+  if (calculatorState.error) {
+    return;
+  }
+  if (calculatorState.justEvaluated) {
+    calculatorState.justEvaluated = false;
+  }
+  if (calculatorState.current !== "") {
+    calculatorState.tokens.push(Number(calculatorState.current));
+    calculatorState.current = "";
+  }
+  if (calculatorState.tokens.length === 0) {
+    if (operator === "-") {
+      calculatorState.current = "-";
+    }
+    return;
+  }
+  if (typeof calculatorState.tokens[calculatorState.tokens.length - 1] === "string") {
+    calculatorState.tokens[calculatorState.tokens.length - 1] = operator;
+  } else {
+    calculatorState.tokens.push(operator);
+  }
+}
+
+function runCalculatorAction(action) {
+  if (action === "clear") {
+    calculatorState = createCalculatorState();
+    return;
+  }
+  if (action === "backspace") {
+    if (calculatorState.error || calculatorState.justEvaluated) {
+      calculatorState = createCalculatorState();
+    } else {
+      calculatorState.current = calculatorState.current.slice(0, -1);
+    }
+    return;
+  }
+  if (action === "pi") {
+    if (calculatorState.error || calculatorState.justEvaluated) {
+      calculatorState = createCalculatorState();
+    }
+    calculatorState.current = String(Math.PI);
+    return;
+  }
+  if (action === "sqrt" || action === "square") {
+    applyCalculatorUnaryAction(action);
+    return;
+  }
+  if (action === "equals") {
+    calculateCalculatorResult();
+  }
+}
+
+function applyCalculatorUnaryAction(action) {
+  if (calculatorState.error) {
+    return;
+  }
+  let value;
+  if (calculatorState.current !== "") {
+    value = Number(calculatorState.current);
+  } else if (calculatorState.justEvaluated && calculatorState.tokens.length === 1) {
+    value = calculatorState.tokens[0];
+  } else {
+    return;
+  }
+  const result = action === "sqrt" ? Math.sqrt(value) : value ** 2;
+  if (!Number.isFinite(result)) {
+    setCalculatorError();
+    return;
+  }
+  calculatorState.tokens = [];
+  calculatorState.current = formatCalculatorNumber(result);
+  calculatorState.justEvaluated = false;
+}
+
+function calculateCalculatorResult() {
+  if (calculatorState.error) {
+    return;
+  }
+  const tokens = [...calculatorState.tokens];
+  if (calculatorState.current !== "") {
+    tokens.push(Number(calculatorState.current));
+  }
+  if (tokens.length === 0 || typeof tokens[tokens.length - 1] === "string") {
+    setCalculatorError();
+    return;
+  }
+  const result = evaluateCalculatorTokens(tokens);
+  if (!Number.isFinite(result)) {
+    setCalculatorError();
+    return;
+  }
+  calculatorState.tokens = [result];
+  calculatorState.current = "";
+  calculatorState.justEvaluated = true;
+}
+
+function evaluateCalculatorTokens(tokens) {
+  const values = [...tokens];
+  for (let index = 1; index < values.length - 1;) {
+    const operator = values[index];
+    if (operator !== "*" && operator !== "/") {
+      index += 2;
+      continue;
+    }
+    const left = values[index - 1];
+    const right = values[index + 1];
+    if (operator === "/" && right === 0) {
+      return NaN;
+    }
+    values.splice(index - 1, 3, operator === "*" ? left * right : left / right);
+    index = 1;
+  }
+  let result = values[0];
+  for (let index = 1; index < values.length; index += 2) {
+    result = values[index] === "+" ? result + values[index + 1] : result - values[index + 1];
+  }
+  return result;
+}
+
+function setCalculatorError() {
+  calculatorState = createCalculatorState();
+  calculatorState.error = true;
+}
+
+function formatCalculatorNumber(value) {
+  return String(Number(value.toPrecision(12)));
+}
+
+function updateCalculatorDisplay() {
+  const display = document.getElementById("calculatorDisplay");
+  if (calculatorState.error) {
+    display.textContent = "エラー";
+    return;
+  }
+  if (calculatorState.justEvaluated && calculatorState.tokens.length === 1) {
+    display.textContent = formatCalculatorNumber(calculatorState.tokens[0]);
+    return;
+  }
+  const expression = [...calculatorState.tokens, calculatorState.current]
+    .filter((item) => item !== "")
+    .map((item) => ({ "*": "×", "/": "÷", "-": "−", "+": "＋" }[item] || item))
+    .join(" ");
+  display.textContent = expression || "0";
 }
 
 function answerQuestion(selectedNumber) {
@@ -2334,6 +2545,9 @@ function escapeHtml(value) {
 }
 
 function showScreen(screenName) {
+  if (screenName !== "quiz") {
+    closeCalculator();
+  }
   Object.values(screens).forEach((screen) => screen.classList.remove("active-screen"));
   screens[screenName].classList.add("active-screen");
   window.scrollTo({ top: 0, behavior: "smooth" });
