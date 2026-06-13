@@ -132,7 +132,10 @@
       <section id="quizScreen" class="screen">
         <div class="quiz-top">
           <span id="progressText">1 / 5</span>
-          <span id="timerText">00:00</span>
+          <div class="quiz-top-actions">
+            <span id="timerText">00:00</span>
+            <button id="toggleCalculatorBtn" class="calculator-toggle-btn" type="button" aria-expanded="false">電卓</button>
+          </div>
         </div>
 
         <article class="question-card">
@@ -142,6 +145,43 @@
             <span id="levelBadge"></span>
           </div>
           <h2 id="questionText"></h2>
+
+          <section id="calculatorPanel" class="calculator-panel hidden" aria-label="簡易電卓">
+            <div class="calculator-head">
+              <strong>簡易電卓</strong>
+              <button id="closeCalculatorBtn" class="calculator-close-btn" type="button">閉じる</button>
+            </div>
+            <output id="calculatorDisplay" class="calculator-display" aria-live="polite">0</output>
+            <div id="calculatorKeys" class="calculator-keys">
+              <button type="button" data-calculator-action="clear">C</button>
+              <button type="button" data-calculator-action="backspace" aria-label="1文字削除">←</button>
+              <button type="button" data-calculator-action="sqrt">√</button>
+              <button type="button" data-calculator-action="square">x²</button>
+
+              <button type="button" data-calculator-value="7">7</button>
+              <button type="button" data-calculator-value="8">8</button>
+              <button type="button" data-calculator-value="9">9</button>
+              <button type="button" data-calculator-operator="/">÷</button>
+
+              <button type="button" data-calculator-value="4">4</button>
+              <button type="button" data-calculator-value="5">5</button>
+              <button type="button" data-calculator-value="6">6</button>
+              <button type="button" data-calculator-operator="*">×</button>
+
+              <button type="button" data-calculator-value="1">1</button>
+              <button type="button" data-calculator-value="2">2</button>
+              <button type="button" data-calculator-value="3">3</button>
+              <button type="button" data-calculator-operator="-">−</button>
+
+              <button type="button" data-calculator-action="pi">π</button>
+              <button type="button" data-calculator-value="0">0</button>
+              <button type="button" data-calculator-value=".">.</button>
+              <button type="button" data-calculator-operator="+">＋</button>
+
+              <button type="button" class="calculator-equals-btn" data-calculator-action="equals">=</button>
+            </div>
+          </section>
+
           <div id="choicesArea" class="choices"></div>
           <div id="feedbackArea" class="feedback hidden"></div>
           <div id="statusArea" class="status-area hidden" aria-live="polite"></div>
