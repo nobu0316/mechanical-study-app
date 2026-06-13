@@ -491,6 +491,60 @@ textarea {
   gap: 10px;
 }
 
+.weakness-review-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.weakness-review-summary span {
+  border-radius: 999px;
+  background: #edf4f5;
+  color: var(--primary-dark);
+  padding: 6px 12px;
+}
+
+.weakness-review-options {
+  display: grid;
+  gap: 12px;
+}
+
+.weakness-review-option {
+  display: grid;
+  width: 100%;
+  gap: 3px;
+  text-align: left;
+}
+
+.weakness-review-option strong,
+.weakness-review-option span {
+  display: block;
+}
+
+.weakness-review-option span {
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.weakness-review-option.primary-btn span {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.weakness-field-option {
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 0.7fr) auto;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfd;
+  padding: 14px;
+}
+
+.weakness-field-option select {
+  min-width: 0;
+}
+
 .slide-controls {
   display: grid;
   grid-template-columns: minmax(180px, 0.45fr) minmax(0, 1fr);
@@ -1026,7 +1080,8 @@ textarea {
 
   .screen-head,
   .slide-controls,
-  .form-grid {
+  .form-grid,
+  .weakness-field-option {
     display: grid;
     grid-template-columns: 1fr;
   }
