@@ -19,6 +19,7 @@ const STORAGE_KEY = "mechanicalStudyHistory";
 const LEGACY_STORAGE_KEY = "mechanicalStudyHistoryV1";
 const NOTE_CARDS_STORAGE_KEY = "mechanicalStudyNoteCards";
 const IMPORTANT_SLIDES_STORAGE_KEY = "mechanicalExamImportantSlides";
+const QUESTION_STATS_STORAGE_KEY = "mechanicalExamQuestionStats";
 const QUESTIONS_CSV = "questions.csv";
 const SLIDES_JSON = "slides.json";
 const WEAK_TOPIC_RATE_LIMIT = 70;
@@ -209,6 +210,7 @@ function bindEvents() {
   addEvent("reviewStatusBtn", "click", startStatusReview);
   addEvent("showSlidesBtn", "click", showSlides);
   addEvent("showStatsBtn", "click", showStats);
+  addEvent("showQuestionStatsBtn", "click", showQuestionStatsSummary);
   addElementEvent(fieldSelect, "fieldSelect", "change", setupTopicFilter);
   addEvent("homeFromResultBtn", "click", showHome);
   addEvent("homeFromSlidesBtn", "click", showHome);
@@ -1173,7 +1175,8 @@ function answerQuestion(selectedNumber) {
     }
   });
 
-  quizAnswers.push({ question, selectedNumber, isCorrect, status: "" });
+  recordQuestionResult(question, isCorrect);
+  quizAnswers.push({ question, selectedNumber, isCorrect, status: "", unsureRecorded: false });
 
   feedbackArea.className = `feedback ${isCorrect ? "correct" : "wrong"}`;
   feedbackArea.innerHTML = `
@@ -1181,11 +1184,134 @@ function answerQuestion(selectedNumber) {
     <div>正解：${question.answer}. ${question.choices[question.answer - 1]}</div>
     <div>${question.explanation}</div>
     <div class="feedback-actions">
+      <button class="unsure-review-btn" type="button" data-mark-unsure>迷ったので復習</button>
       <button class="note-link-btn" type="button" data-add-note-from-current>この問題の要点カードを追加</button>
+      <span class="unsure-review-message hidden" data-unsure-message aria-live="polite"></span>
     </div>
   `;
   feedbackArea.querySelector("[data-add-note-from-current]").addEventListener("click", () => showNoteForm(null, question));
+  feedbackArea.querySelector("[data-mark-unsure]").addEventListener("click", (event) => {
+    const latestAnswer = quizAnswers[quizAnswers.length - 1];
+    if (!latestAnswer || latestAnswer.question.id !== question.id || latestAnswer.unsureRecorded) {
+      return;
+    }
+
+    recordQuestionUnsure(question);
+    latestAnswer.unsureRecorded = true;
+    event.currentTarget.disabled = true;
+    event.currentTarget.textContent = "復習対象に登録済み";
+    const message = feedbackArea.querySelector("[data-unsure-message]");
+    message.textContent = "復習対象に登録しました";
+    message.classList.remove("hidden");
+  });
   renderStatusButtons(question, isCorrect, selectedNumber);
+}
+
+function loadQuestionStats() {
+  try {
+    return normalizeQuestionStats(JSON.parse(localStorage.getItem(QUESTION_STATS_STORAGE_KEY)));
+  } catch {
+    return {};
+  }
+}
+
+function saveQuestionStats(stats) {
+  localStorage.setItem(QUESTION_STATS_STORAGE_KEY, JSON.stringify(normalizeQuestionStats(stats)));
+}
+
+function normalizeQuestionStats(rawStats) {
+  const normalized = {};
+  if (!rawStats || typeof rawStats !== "object" || Array.isArray(rawStats)) {
+    return normalized;
+  }
+
+  Object.entries(rawStats).forEach(([key, item]) => {
+    if (!item || typeof item !== "object") {
+      return;
+    }
+    const questionId = String(item.questionId || key || "").trim();
+    if (!questionId) {
+      return;
+    }
+    const status = ["wrong", "unsure", "correct", "mastered"].includes(item.status)
+      ? item.status
+      : "";
+    normalized[questionId] = {
+      questionId,
+      field: String(item.field || "未分類"),
+      status,
+      wrongCount: normalizeQuestionStatCount(item.wrongCount),
+      unsureCount: normalizeQuestionStatCount(item.unsureCount),
+      correctCount: normalizeQuestionStatCount(item.correctCount),
+      lastAnsweredAt: String(item.lastAnsweredAt || "")
+    };
+  });
+  return normalized;
+}
+
+function normalizeQuestionStatCount(value) {
+  const count = Number(value);
+  return Number.isFinite(count) && count >= 0 ? Math.floor(count) : 0;
+}
+
+function getOrCreateQuestionStat(stats, question) {
+  const questionId = String(question?.id || "").trim();
+  if (!stats[questionId]) {
+    stats[questionId] = {
+      questionId,
+      field: String(question?.field || "未分類"),
+      status: "",
+      wrongCount: 0,
+      unsureCount: 0,
+      correctCount: 0,
+      lastAnsweredAt: ""
+    };
+  }
+  stats[questionId].field = String(question?.field || stats[questionId].field || "未分類");
+  return stats[questionId];
+}
+
+function recordQuestionResult(question, isCorrect) {
+  if (!question?.id) {
+    return;
+  }
+  const stats = loadQuestionStats();
+  const stat = getOrCreateQuestionStat(stats, question);
+
+  if (isCorrect) {
+    stat.correctCount += 1;
+    if (!stat.status) {
+      stat.status = "correct";
+    }
+  } else {
+    stat.wrongCount += 1;
+    stat.status = "wrong";
+  }
+
+  stat.lastAnsweredAt = new Date().toISOString();
+  saveQuestionStats(stats);
+}
+
+function recordQuestionUnsure(question) {
+  if (!question?.id) {
+    return;
+  }
+  const stats = loadQuestionStats();
+  const stat = getOrCreateQuestionStat(stats, question);
+  stat.unsureCount += 1;
+  if (stat.status !== "wrong") {
+    stat.status = "unsure";
+  }
+  stat.lastAnsweredAt = new Date().toISOString();
+  saveQuestionStats(stats);
+}
+
+function showQuestionStatsSummary() {
+  const stats = Object.values(loadQuestionStats());
+  const wrongCount = stats.filter((stat) => stat.status === "wrong").length;
+  const unsureCount = stats.filter((stat) => stat.status === "unsure").length;
+  const correctCount = stats.filter((stat) => stat.correctCount > 0).length;
+  showMessage(`間違えた問題：${wrongCount}問 / 迷った問題：${unsureCount}問 / 正解記録あり：${correctCount}問`);
 }
 
 function renderStatusButtons(question, isCorrect, selectedNumber) {
