@@ -23,12 +23,6 @@ const QUESTION_STATS_STORAGE_KEY = "mechanicalExamQuestionStats";
 const QUESTIONS_CSV = "questions.csv";
 const SLIDES_JSON = "slides.json";
 const WEAK_TOPIC_RATE_LIMIT = 70;
-const REVIEW_STATUSES = ["迷った", "間違えた"];
-const STATUS_PRIORITY = {
-  "間違えた": 2,
-  "迷った": 1,
-  "わかった": 0
-};
 const FALLBACK_QUESTIONS = [
   {
     id: "C003",
@@ -130,6 +124,7 @@ let appInitialized = false;
 
 const screens = {
   home: document.getElementById("homeScreen"),
+  weaknessReview: document.getElementById("weaknessReviewScreen"),
   quiz: document.getElementById("quizScreen"),
   result: document.getElementById("resultScreen"),
   slides: document.getElementById("slidesScreen"),
@@ -206,13 +201,17 @@ function setupNoteFormFields() {
 
 function bindEvents() {
   addEvent("startQuizBtn", "click", startNormalQuiz);
-  addEvent("reviewMistakesBtn", "click", startMistakeReview);
-  addEvent("reviewStatusBtn", "click", startStatusReview);
+  addEvent("reviewMistakesBtn", "click", showWeaknessReview);
   addEvent("showSlidesBtn", "click", showSlides);
   addEvent("showStatsBtn", "click", showStats);
   addEvent("showQuestionStatsBtn", "click", showQuestionStatsSummary);
   addElementEvent(fieldSelect, "fieldSelect", "change", setupTopicFilter);
   addEvent("homeFromResultBtn", "click", showHome);
+  addEvent("homeFromWeaknessBtn", "click", showHome);
+  addEvent("startImmediateReviewBtn", "click", () => startWeaknessReview("all"));
+  addEvent("startFieldReviewBtn", "click", () => startWeaknessReview("field"));
+  addEvent("startWrongOnlyReviewBtn", "click", () => startWeaknessReview("wrong"));
+  addEvent("startUnsureOnlyReviewBtn", "click", () => startWeaknessReview("unsure"));
   addEvent("homeFromSlidesBtn", "click", showHome);
   addEvent("backToSlidesBtn", "click", showSlides);
   addEvent("backToSlidesBottomBtn", "click", showSlides);
@@ -267,7 +266,7 @@ function bindEvents() {
   });
   addElementEvent(noteCardImportInput, "noteCardImportInput", "change", importNoteCards);
   addElementEvent(noteCardForm, "noteCardForm", "submit", saveNoteCardFromForm);
-  addEvent("reviewFromResultBtn", "click", startMistakeReview);
+  addEvent("reviewFromResultBtn", "click", showWeaknessReview);
   addEvent("homeFromStatsBtn", "click", showHome);
   addEvent("resetHistoryBtn", "click", resetHistory);
   document.querySelectorAll("[data-stats-tab]").forEach((button) => {
@@ -1040,51 +1039,73 @@ function startNormalQuiz() {
   startQuiz(selectNormalQuizQuestions(pool, count));
 }
 
-function startMistakeReview() {
-  reviewMode = true;
-  const history = getHistory();
-  const mistakeIds = Object.keys(history.byQuestion).filter((id) => history.byQuestion[id].wrongCount > 0);
-  const pool = mistakeIds
-    .map((id) => questions.find((q) => q.id === id))
-    .filter(Boolean)
-    .sort((a, b) => history.byQuestion[b.id].wrongCount - history.byQuestion[a.id].wrongCount);
+function showWeaknessReview() {
+  const reviewItems = getWeaknessReviewItems();
+  const wrongCount = reviewItems.filter((item) => item.stat.status === "wrong").length;
+  const unsureCount = reviewItems.filter((item) => item.stat.status === "unsure").length;
+  const fields = [...new Set(reviewItems.map((item) => item.question.field || item.stat.field || "未分類"))]
+    .sort((a, b) => a.localeCompare(b, "ja"));
+  const fieldSelect = document.getElementById("weaknessFieldSelect");
 
-  if (pool.length === 0) {
-    showMessage("まだ弱点復習に使える間違い問題がありません。まずは通常のクイズを解いてみてください。");
-    showHome();
-    return;
-  }
+  document.getElementById("weaknessReviewSummary").innerHTML = `
+    <span>復習対象 <strong>${reviewItems.length}問</strong></span>
+    <span>間違えた問題 <strong>${wrongCount}問</strong></span>
+    <span>迷った問題 <strong>${unsureCount}問</strong></span>
+  `;
+  fieldSelect.innerHTML = fields.length > 0
+    ? fields.map((field) => `<option value="${escapeHtml(field)}">${escapeHtml(field)}</option>`).join("")
+    : `<option value="">対象なし</option>`;
 
-  startQuiz(pool.slice(0, Math.min(getSelectedCount(), pool.length)));
+  document.getElementById("startImmediateReviewBtn").disabled = reviewItems.length === 0;
+  document.getElementById("startFieldReviewBtn").disabled = fields.length === 0;
+  document.getElementById("startWrongOnlyReviewBtn").disabled = wrongCount === 0;
+  document.getElementById("startUnsureOnlyReviewBtn").disabled = unsureCount === 0;
+  hideMessage();
+  showScreen("weaknessReview");
 }
 
-function startStatusReview() {
-  reviewMode = true;
-  const studyHistory = getStudyHistory();
-  // 復習モードでは「間違えた」を先に、同じ状態なら古い回答から出します。
-  const pool = Object.values(studyHistory)
-    .filter((item) => REVIEW_STATUSES.includes(item.status))
-    .map((item) => ({
-      record: item,
-      question: questions.find((q) => q.id === item.id)
+function getWeaknessReviewItems() {
+  const stats = loadQuestionStats();
+  return Object.values(stats)
+    .filter((stat) => stat.status === "wrong" || stat.status === "unsure")
+    .map((stat) => ({
+      stat,
+      question: questions.find((question) => question.id === stat.questionId)
     }))
     .filter((item) => item.question)
     .sort((a, b) => {
-      const priorityDiff = STATUS_PRIORITY[b.record.status] - STATUS_PRIORITY[a.record.status];
-      if (priorityDiff !== 0) {
-        return priorityDiff;
+      const statusDiff = Number(b.stat.status === "wrong") - Number(a.stat.status === "wrong");
+      if (statusDiff !== 0) {
+        return statusDiff;
       }
-      return new Date(a.record.lastAnsweredAt || 0) - new Date(b.record.lastAnsweredAt || 0);
+      return new Date(a.stat.lastAnsweredAt || 0) - new Date(b.stat.lastAnsweredAt || 0);
+    });
+}
+
+function startWeaknessReview(mode) {
+  const selectedField = document.getElementById("weaknessFieldSelect").value;
+  const pool = getWeaknessReviewItems()
+    .filter((item) => {
+      if (mode === "wrong") {
+        return item.stat.status === "wrong";
+      }
+      if (mode === "unsure") {
+        return item.stat.status === "unsure";
+      }
+      if (mode === "field") {
+        return (item.question.field || item.stat.field || "未分類") === selectedField;
+      }
+      return true;
     })
     .map((item) => item.question);
 
   if (pool.length === 0) {
-    showMessage("復習対象の問題はありません。");
-    showHome();
+    showMessage("選択した条件に該当する復習問題がありません。");
     return;
   }
 
-  startQuiz(pool.slice(0, Math.min(getSelectedCount(), pool.length)));
+  reviewMode = true;
+  startQuiz(pool);
 }
 
 function startVisibleWeaknessReview() {
@@ -1367,7 +1388,7 @@ function showResult() {
   document.getElementById("resultRate").textContent = formatRate(correct, total);
   document.getElementById("resultTime").textContent = formatTime(elapsedSeconds);
   renderWrongList(wrongAnswers);
-  document.getElementById("reviewFromResultBtn").disabled = !hasMistakes();
+  document.getElementById("reviewFromResultBtn").disabled = getWeaknessReviewItems().length === 0;
 
   showScreen("result");
 }
