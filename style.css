@@ -505,6 +505,121 @@ textarea {
   padding: 6px 12px;
 }
 
+.weakness-field-summary-section,
+.weakness-list-section {
+  margin-top: 24px;
+}
+
+.weakness-field-summary {
+  display: grid;
+  gap: 8px;
+}
+
+.weakness-field-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfd;
+  padding: 10px 12px;
+}
+
+.weakness-field-summary-row span {
+  color: var(--muted);
+}
+
+.weakness-list-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.weakness-list-head h3 {
+  margin-bottom: 8px;
+}
+
+.weakness-list-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.weakness-list-filters label {
+  margin-bottom: 0;
+  font-size: 0.88rem;
+}
+
+.weakness-list-filters select {
+  min-height: 44px;
+}
+
+.weakness-question-list,
+.weakness-question-group-list {
+  display: grid;
+  gap: 10px;
+}
+
+.weakness-question-group {
+  margin-top: 18px;
+}
+
+.weakness-question-group h4 {
+  margin: 0 0 8px;
+  color: var(--primary-dark);
+}
+
+.weakness-question-item {
+  border: 1px solid var(--line);
+  border-left: 5px solid #dfc17b;
+  border-radius: 8px;
+  background: #fffdf7;
+  padding: 12px;
+}
+
+.weakness-question-item.wrong {
+  border-left-color: var(--error);
+  background: #fff8f7;
+}
+
+.weakness-question-title,
+.weakness-question-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.weakness-question-item p {
+  margin: 6px 0;
+}
+
+.weakness-status-label {
+  border-radius: 999px;
+  background: #fff1cf;
+  color: #6f4b12;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 3px 8px;
+}
+
+.weakness-question-item.wrong .weakness-status-label {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.weakness-question-counts,
+.weakness-question-item time {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.weakness-question-item time {
+  display: block;
+  margin-top: 5px;
+}
+
 .weakness-review-options {
   display: grid;
   gap: 12px;
@@ -1081,9 +1196,16 @@ textarea {
   .screen-head,
   .slide-controls,
   .form-grid,
-  .weakness-field-option {
+  .weakness-field-option,
+  .weakness-list-head,
+  .weakness-list-filters {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .weakness-field-summary-row {
+    display: grid;
+    gap: 2px;
   }
 
   .compact-segmented {
