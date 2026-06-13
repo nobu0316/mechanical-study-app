@@ -66,14 +66,41 @@
         <div class="panel">
           <div class="screen-head">
             <div>
-              <h2>弱点復習</h2>
-              <p class="muted">記録した「間違えた」「迷った」問題から復習方法を選びます。</p>
+              <h2>弱点問題一覧</h2>
+              <p class="muted">記録した「間違えた」「迷った」問題を確認し、そのまま復習できます。</p>
             </div>
             <button id="homeFromWeaknessBtn" type="button">ホームへ戻る</button>
           </div>
 
           <div id="weaknessReviewSummary" class="weakness-review-summary"></div>
 
+          <section class="weakness-field-summary-section">
+            <h3>分野別集計</h3>
+            <div id="weaknessFieldSummary" class="weakness-field-summary"></div>
+          </section>
+
+          <section class="weakness-list-section">
+            <div class="weakness-list-head">
+              <h3>復習対象の問題</h3>
+              <div class="weakness-list-filters">
+                <label>
+                  状態
+                  <select id="weaknessStatusFilter">
+                    <option value="all">全て</option>
+                    <option value="wrong">間違えた問題のみ</option>
+                    <option value="unsure">迷った問題のみ</option>
+                  </select>
+                </label>
+                <label>
+                  分野
+                  <select id="weaknessListFieldFilter"></select>
+                </label>
+              </div>
+            </div>
+            <div id="weaknessQuestionList" class="weakness-question-list"></div>
+          </section>
+
+          <h3>復習を始める</h3>
           <div class="weakness-review-options">
             <button id="startImmediateReviewBtn" class="weakness-review-option primary-btn" type="button">
               <strong>すぐ復習</strong>
