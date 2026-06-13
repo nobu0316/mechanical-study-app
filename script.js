@@ -436,6 +436,7 @@ function normalizeSlides(rawSlides) {
       title: String(slide.title || "無題のスライド"),
       description: String(slide.description || ""),
       image: String(slide.image || ""),
+      priority: slide.priority === "high" ? "high" : "normal",
       summary: Array.isArray(slide.summary) ? slide.summary.map((item) => String(item)) : [],
       relatedQuestionIds: Array.isArray(slide.relatedQuestionIds)
         ? slide.relatedQuestionIds.map((id) => String(id)).filter(Boolean)
@@ -489,8 +490,11 @@ function renderSlideList() {
   }
 
   slideList.innerHTML = visibleSlides.map((slide) => `
-    <button class="slide-card" type="button" data-slide-id="${escapeHtml(slide.id)}">
-      <span class="slide-card-title">${escapeHtml(slide.title)}</span>
+    <button class="slide-card${slide.priority === "high" ? " priority-high" : ""}" type="button" data-slide-id="${escapeHtml(slide.id)}">
+      <span class="slide-card-heading">
+        <span class="slide-card-title">${escapeHtml(slide.title)}</span>
+        ${slide.priority === "high" ? '<span class="priority-label">要注意</span>' : ""}
+      </span>
       <span class="slide-card-meta">${escapeHtml(slide.field)} / ${escapeHtml(slide.topic)}</span>
       <span class="slide-card-description">${escapeHtml(slide.description)}</span>
       <span class="slide-card-count">関連問題 ${slide.relatedQuestionIds.length}件</span>
@@ -817,6 +821,7 @@ function showSlideDetail(slideId) {
   document.getElementById("slideDetailTitle").textContent = currentSlide.title;
   document.getElementById("slideDetailField").textContent = currentSlide.field;
   document.getElementById("slideDetailTopic").textContent = currentSlide.topic;
+  document.getElementById("slideDetailPriority").classList.toggle("hidden", currentSlide.priority !== "high");
   renderSlideImage(currentSlide);
   renderSlideSummary(currentSlide);
   renderRelatedQuestionIds(currentSlide);
