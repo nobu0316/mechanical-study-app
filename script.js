@@ -18,6 +18,7 @@ const FIELDS = [
 const STORAGE_KEY = "mechanicalStudyHistory";
 const LEGACY_STORAGE_KEY = "mechanicalStudyHistoryV1";
 const NOTE_CARDS_STORAGE_KEY = "mechanicalStudyNoteCards";
+const IMPORTANT_SLIDES_STORAGE_KEY = "mechanicalExamImportantSlides";
 const QUESTIONS_CSV = "questions.csv";
 const SLIDES_JSON = "slides.json";
 const WEAK_TOPIC_RATE_LIMIT = 70;
@@ -110,6 +111,7 @@ const FALLBACK_SLIDES = [
 let questions = [];
 let slides = [];
 let noteCards = [];
+let importantSlideIds = new Set();
 let currentSlide = null;
 let currentNoteCard = null;
 let slideViewMode = "official";
@@ -180,6 +182,7 @@ function initApp() {
     setupFields();
     setupNoteFormFields();
     noteCards = loadNoteCards();
+    importantSlideIds = loadImportantSlideIds();
     loadQuestions();
     loadSlides();
   } catch (error) {
@@ -212,6 +215,7 @@ function bindEvents() {
   addEvent("backToSlidesBtn", "click", showSlides);
   addEvent("backToSlidesBottomBtn", "click", showSlides);
   addEvent("startRelatedQuizBtn", "click", startCurrentSlideQuiz);
+  addEvent("toggleSlidePriorityBtn", "click", toggleCurrentSlidePriority);
   addEvent("slideImageButton", "click", openSlideZoom);
   addEvent("closeSlideZoomBtn", "click", closeSlideZoom);
   addEvent("slideZoomOverlay", "click", (event) => {
@@ -490,10 +494,10 @@ function renderSlideList() {
   }
 
   slideList.innerHTML = visibleSlides.map((slide) => `
-    <button class="slide-card${slide.priority === "high" ? " priority-high" : ""}" type="button" data-slide-id="${escapeHtml(slide.id)}">
+    <button class="slide-card${isImportantSlide(slide) ? " priority-high" : ""}" type="button" data-slide-id="${escapeHtml(slide.id)}">
       <span class="slide-card-heading">
         <span class="slide-card-title">${escapeHtml(slide.title)}</span>
-        ${slide.priority === "high" ? '<span class="priority-label">要注意</span>' : ""}
+        ${isImportantSlide(slide) ? '<span class="priority-label">要注意</span>' : ""}
       </span>
       <span class="slide-card-meta">${escapeHtml(slide.field)} / ${escapeHtml(slide.topic)}</span>
       <span class="slide-card-description">${escapeHtml(slide.description)}</span>
@@ -821,7 +825,7 @@ function showSlideDetail(slideId) {
   document.getElementById("slideDetailTitle").textContent = currentSlide.title;
   document.getElementById("slideDetailField").textContent = currentSlide.field;
   document.getElementById("slideDetailTopic").textContent = currentSlide.topic;
-  document.getElementById("slideDetailPriority").classList.toggle("hidden", currentSlide.priority !== "high");
+  renderSlidePriorityControls(currentSlide);
   renderSlideImage(currentSlide);
   renderSlideSummary(currentSlide);
   renderRelatedQuestionIds(currentSlide);
@@ -829,6 +833,61 @@ function showSlideDetail(slideId) {
   document.getElementById("startRelatedQuizBtn").disabled = getExistingQuestionsByIds(currentSlide.relatedQuestionIds).length === 0;
   hideMessage();
   showScreen("slideDetail");
+}
+
+function loadImportantSlideIds() {
+  try {
+    const storedIds = JSON.parse(localStorage.getItem(IMPORTANT_SLIDES_STORAGE_KEY));
+    if (!Array.isArray(storedIds)) {
+      return new Set();
+    }
+    return new Set(storedIds.map((id) => String(id)).filter(Boolean));
+  } catch {
+    return new Set();
+  }
+}
+
+function saveImportantSlideIds() {
+  localStorage.setItem(IMPORTANT_SLIDES_STORAGE_KEY, JSON.stringify([...importantSlideIds]));
+}
+
+function isImportantSlide(slide) {
+  return Boolean(slide) && (slide.priority === "high" || importantSlideIds.has(slide.id));
+}
+
+function renderSlidePriorityControls(slide) {
+  const isFixedPriority = slide.priority === "high";
+  const isUserPriority = importantSlideIds.has(slide.id);
+  const priorityLabel = document.getElementById("slideDetailPriority");
+  const toggleButton = document.getElementById("toggleSlidePriorityBtn");
+
+  priorityLabel.classList.toggle("hidden", !isImportantSlide(slide));
+  toggleButton.disabled = isFixedPriority;
+  toggleButton.classList.toggle("danger-btn", isUserPriority && !isFixedPriority);
+
+  if (isFixedPriority) {
+    toggleButton.textContent = "教材側で要注意設定済み";
+  } else if (isUserPriority) {
+    toggleButton.textContent = "要注意を解除";
+  } else {
+    toggleButton.textContent = "要注意にする";
+  }
+}
+
+function toggleCurrentSlidePriority() {
+  if (!currentSlide || currentSlide.priority === "high") {
+    return;
+  }
+
+  if (importantSlideIds.has(currentSlide.id)) {
+    importantSlideIds.delete(currentSlide.id);
+  } else {
+    importantSlideIds.add(currentSlide.id);
+  }
+
+  saveImportantSlideIds();
+  renderSlidePriorityControls(currentSlide);
+  renderSlideList();
 }
 
 function renderSlideImage(slide) {
