@@ -50,7 +50,6 @@
           <div class="button-row">
             <button id="startQuizBtn" class="primary-btn" type="button">クイズ開始</button>
             <button id="reviewMistakesBtn" type="button">弱点復習</button>
-            <button id="reviewStatusBtn" type="button">迷った・間違えた復習</button>
             <button id="showSlidesBtn" type="button">要点スライド</button>
             <button id="showStatsBtn" type="button">成績確認</button>
             <button id="showQuestionStatsBtn" type="button">学習記録を確認</button>
@@ -59,7 +58,47 @@
 
         <div class="info-band">
           <h2>使い方</h2>
-          <p>5〜10問だけ解き、解説で要点を確認します。間違えた問題は自動で保存され、あとから弱点復習で再出題できます。</p>
+          <p>5〜10問だけ解き、解説で要点を確認します。間違えた問題や「迷ったので復習」に登録した問題は、弱点復習から条件を選んで再出題できます。</p>
+        </div>
+      </section>
+
+      <section id="weaknessReviewScreen" class="screen">
+        <div class="panel">
+          <div class="screen-head">
+            <div>
+              <h2>弱点復習</h2>
+              <p class="muted">記録した「間違えた」「迷った」問題から復習方法を選びます。</p>
+            </div>
+            <button id="homeFromWeaknessBtn" type="button">ホームへ戻る</button>
+          </div>
+
+          <div id="weaknessReviewSummary" class="weakness-review-summary"></div>
+
+          <div class="weakness-review-options">
+            <button id="startImmediateReviewBtn" class="weakness-review-option primary-btn" type="button">
+              <strong>すぐ復習</strong>
+              <span>間違えた問題＋迷った問題をすべて出題</span>
+            </button>
+
+            <div class="weakness-review-option weakness-field-option">
+              <div>
+                <strong>分野別復習</strong>
+                <span>分野を選んで弱点問題を出題</span>
+              </div>
+              <select id="weaknessFieldSelect" aria-label="弱点復習の分野"></select>
+              <button id="startFieldReviewBtn" type="button">この分野を復習</button>
+            </div>
+
+            <button id="startWrongOnlyReviewBtn" class="weakness-review-option" type="button">
+              <strong>間違えた問題のみ</strong>
+              <span>現在「間違えた」になっている問題を出題</span>
+            </button>
+
+            <button id="startUnsureOnlyReviewBtn" class="weakness-review-option" type="button">
+              <strong>迷った問題のみ</strong>
+              <span>現在「迷った」になっている問題を出題</span>
+            </button>
+          </div>
         </div>
       </section>
 
