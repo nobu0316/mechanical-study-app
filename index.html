@@ -22,7 +22,26 @@
 
       <section id="homeScreen" class="screen active-screen">
         <div class="panel">
-          <h2>今日の復習</h2>
+          <section id="dailyReviewCard" class="daily-review-card" aria-labelledby="dailyReviewTitle">
+            <div id="dailyReviewPending">
+              <p class="eyebrow">TODAY'S REVIEW</p>
+              <h2 id="dailyReviewTitle">今日の復習</h2>
+              <div class="daily-review-breakdown">
+                <span>定着確認 <strong id="dailyReviewRetentionCount">－</strong></span>
+                <span>優先弱点 <strong id="dailyReviewPriorityCount">－</strong></span>
+                <span class="daily-review-total">合計 <strong id="dailyReviewTotalCount">－</strong></span>
+              </div>
+              <p id="dailyReviewEmptyMessage" class="muted hidden">現在、優先して復習する弱点はありません。</p>
+              <button id="startDailyReviewBtn" class="primary-btn daily-review-start-btn" type="button" disabled>今日の復習を開始</button>
+            </div>
+
+            <div id="dailyReviewCompleted" class="hidden">
+              <p class="eyebrow">TODAY'S REVIEW</p>
+              <h2>今日の復習は完了しました</h2>
+              <p class="daily-review-completed-count">✓ <strong id="dailyReviewCompletedCount">0問</strong>完了</p>
+              <button id="startExtraQuickReviewBtn" type="button">さらに5分復習</button>
+            </div>
+          </section>
 
           <button id="startQuickReviewBtn" class="quick-review-btn" type="button">
             <strong>5分だけ復習</strong>
@@ -464,6 +483,29 @@
             </div>
           </div>
 
+          <div id="dailyReviewResultSummary" class="result-grid daily-review-result-grid hidden">
+            <div>
+              <span class="stat-label">完了</span>
+              <strong id="dailyReviewResultTotal"></strong>
+            </div>
+            <div>
+              <span class="stat-label">正解</span>
+              <strong id="dailyReviewResultCorrect"></strong>
+            </div>
+            <div>
+              <span class="stat-label">不正解</span>
+              <strong id="dailyReviewResultWrong"></strong>
+            </div>
+            <div>
+              <span class="stat-label">定着確認完了</span>
+              <strong id="dailyReviewResultRetention"></strong>
+            </div>
+            <div>
+              <span class="stat-label">弱点卒業</span>
+              <strong id="dailyReviewResultMastered"></strong>
+            </div>
+          </div>
+
           <h3>間違えた問題</h3>
           <div id="wrongList" class="list-area"></div>
 
@@ -471,6 +513,7 @@
             <button id="homeFromResultBtn" type="button">ホームへ戻る</button>
             <button id="reviewFromResultBtn" class="primary-btn" type="button">弱点復習へ進む</button>
             <button id="retryQuickReviewBtn" class="primary-btn hidden" type="button">もう一度5分復習</button>
+            <button id="quickReviewFromDailyResultBtn" class="primary-btn hidden" type="button">さらに5分復習</button>
           </div>
         </div>
       </section>

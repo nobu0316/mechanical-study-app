@@ -257,6 +257,54 @@ textarea {
   border-color: var(--primary-dark);
 }
 
+.daily-review-card {
+  margin-bottom: 22px;
+  border: 1px solid #b7d7d9;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f3fbfb, #ffffff);
+  padding: 18px;
+}
+
+.daily-review-card .eyebrow,
+.daily-review-card h2 {
+  margin-bottom: 8px;
+}
+
+.daily-review-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 12px 0 16px;
+}
+
+.daily-review-breakdown span {
+  color: var(--muted);
+}
+
+.daily-review-breakdown strong {
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.daily-review-breakdown .daily-review-total {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.daily-review-start-btn {
+  width: 100%;
+  min-height: 54px;
+}
+
+.daily-review-completed-count {
+  margin: 12px 0 16px;
+  color: var(--primary-dark);
+}
+
+.daily-review-result-grid {
+  grid-template-columns: repeat(5, 1fr);
+}
+
 .quick-review-btn {
   display: grid;
   width: 100%;
@@ -1576,6 +1624,15 @@ textarea {
   .status-buttons {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .daily-review-breakdown {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .daily-review-breakdown .daily-review-total {
+    grid-column: 1 / -1;
   }
 
   .quiz-top-actions {

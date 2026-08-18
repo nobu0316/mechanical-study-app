@@ -20,6 +20,7 @@ const LEGACY_STORAGE_KEY = "mechanicalStudyHistoryV1";
 const NOTE_CARDS_STORAGE_KEY = "mechanicalStudyNoteCards";
 const IMPORTANT_SLIDES_STORAGE_KEY = "mechanicalExamImportantSlides";
 const QUESTION_STATS_STORAGE_KEY = "mechanicalExamQuestionStats";
+const DAILY_REVIEW_STORAGE_KEY = "mechanicalExamDailyReview";
 const BACKUP_APP_ID = "mechanical-design-exam";
 const BACKUP_VERSION = 1;
 const BACKUP_STORAGE_ITEMS = [
@@ -27,13 +28,15 @@ const BACKUP_STORAGE_ITEMS = [
   { key: LEGACY_STORAGE_KEY, emptyValue: {}, type: "object" },
   { key: NOTE_CARDS_STORAGE_KEY, emptyValue: [], type: "objectArray" },
   { key: IMPORTANT_SLIDES_STORAGE_KEY, emptyValue: [], type: "stringArray" },
-  { key: QUESTION_STATS_STORAGE_KEY, emptyValue: {}, type: "record" }
+  { key: QUESTION_STATS_STORAGE_KEY, emptyValue: {}, type: "record" },
+  { key: DAILY_REVIEW_STORAGE_KEY, emptyValue: {}, type: "object" }
 ];
 const BACKUP_STORAGE_KEYS = BACKUP_STORAGE_ITEMS.map((item) => item.key);
 const QUESTIONS_CSV = "questions.csv";
 const SLIDES_JSON = "slides.json";
 const WEAK_TOPIC_RATE_LIMIT = 70;
 const QUICK_REVIEW_QUESTION_LIMIT = 5;
+const DAILY_REVIEW_QUESTION_LIMIT = 5;
 const WEAKNESS_REASONS = [
   { key: "formula", label: "公式忘れ" },
   { key: "understanding", label: "理解不足" },
@@ -170,6 +173,7 @@ let statsState = createDefaultStatsState();
 let appInitialized = false;
 let calculatorState = createCalculatorState();
 let selectedWeaknessAnalysis = null;
+let currentDailyReviewDueIds = new Set();
 
 const screens = {
   home: document.getElementById("homeScreen"),
@@ -254,6 +258,8 @@ function setupNoteFormFields() {
 
 function bindEvents() {
   addEvent("startQuizBtn", "click", startNormalQuiz);
+  addEvent("startDailyReviewBtn", "click", startDailyReview);
+  addEvent("startExtraQuickReviewBtn", "click", startQuickReview);
   addEvent("startQuickReviewBtn", "click", startQuickReview);
   addEvent("reviewMistakesBtn", "click", showWeaknessReview);
   addEvent("showSlidesBtn", "click", showSlides);
@@ -334,6 +340,7 @@ function bindEvents() {
   addElementEvent(noteCardForm, "noteCardForm", "submit", saveNoteCardFromForm);
   addEvent("reviewFromResultBtn", "click", showWeaknessReview);
   addEvent("retryQuickReviewBtn", "click", startQuickReview);
+  addEvent("quickReviewFromDailyResultBtn", "click", startQuickReview);
   addEvent("homeFromStatsBtn", "click", showHome);
   addEvent("resetHistoryBtn", "click", resetHistory);
   document.querySelectorAll("[data-stats-tab]").forEach((button) => {
@@ -387,6 +394,7 @@ function loadQuestions() {
         showMessage("questions.csvに問題がありません。ヘッダー行と問題データを確認してください。");
       } else {
         setupTopicFilter();
+        renderDailyReviewCard();
         hideMessage();
       }
     })
@@ -410,6 +418,7 @@ function loadQuestionsWithXhr() {
         showMessage("questions.csvに問題がありません。ヘッダー行と問題データを確認してください。");
       } else {
         setupTopicFilter();
+        renderDailyReviewCard();
         hideMessage();
       }
       return;
@@ -428,6 +437,7 @@ function showCsvError() {
   questions = FALLBACK_QUESTIONS;
   questionsLoadedFromFallback = true;
   setupTopicFilter();
+  renderDailyReviewCard();
   showMessage("questions.csvを読み込めませんでした。ローカルで確認する場合は VS Code の Live Server などを使用してください。現在は画面確認用のサンプル問題で動作しています。");
 }
 
@@ -1135,6 +1145,159 @@ function startQuickReview() {
   startQuiz(selectedQuestions, "quickReview");
 }
 
+function startDailyReview() {
+  if (questions.length === 0) {
+    showMessage("問題データがまだ読み込まれていません。少し待ってからもう一度お試しください。");
+    return;
+  }
+  const today = getLocalDateKey();
+  if (isDailyReviewCompleted(loadDailyReviewState(), today)) {
+    renderDailyReviewCard(today);
+    return;
+  }
+  const plan = selectDailyReviewItems(getWeaknessReviewItems(), today);
+  if (plan.items.length === 0) {
+    renderDailyReviewCard(today);
+    return;
+  }
+
+  // 開始後はcurrentQuizへ固定し、回答による統計変化では組み替えません。
+  currentDailyReviewDueIds = new Set(plan.retentionItems.map((item) => item.stat.questionId));
+  reviewMode = true;
+  startQuiz(plan.items.map((item) => item.question), "dailyReview");
+}
+
+function selectDailyReviewItems(items, today = getLocalDateKey()) {
+  const uniqueItems = [];
+  const seenQuestionIds = new Set();
+  (Array.isArray(items) ? items : []).forEach((item) => {
+    const questionId = String(item?.stat?.questionId || item?.question?.id || "").trim();
+    if (!questionId || !item?.question || seenQuestionIds.has(questionId)) {
+      return;
+    }
+    if (item.stat.status !== "wrong" && item.stat.status !== "unsure") {
+      return;
+    }
+    seenQuestionIds.add(questionId);
+    uniqueItems.push(item);
+  });
+
+  const retentionItems = uniqueItems
+    .filter((item) => isRetentionReviewDue(item.stat, today))
+    .sort(compareDailyRetentionItems)
+    .slice(0, DAILY_REVIEW_QUESTION_LIMIT);
+  const selectedIds = new Set(retentionItems.map((item) => item.stat.questionId));
+  const priorityItems = uniqueItems
+    .filter((item) => !selectedIds.has(item.stat.questionId))
+    .filter((item) => !isWaitingForRetentionReview(item.stat, today))
+    .sort(compareDailyPriorityItems)
+    .slice(0, DAILY_REVIEW_QUESTION_LIMIT - retentionItems.length);
+
+  return {
+    retentionItems,
+    priorityItems,
+    items: [...retentionItems, ...priorityItems]
+  };
+}
+
+function isWaitingForRetentionReview(stat, today = getLocalDateKey()) {
+  const nextReviewAt = normalizeQuestionStatDate(stat?.nextReviewAt);
+  return stat?.consecutiveCorrect === 1 && Boolean(nextReviewAt) && today < nextReviewAt;
+}
+
+function compareDailyRetentionItems(a, b) {
+  return String(a.stat.nextReviewAt).localeCompare(String(b.stat.nextReviewAt))
+    || Number(b.stat.status === "wrong") - Number(a.stat.status === "wrong")
+    || getWeaknessAttemptCount(b.stat) - getWeaknessAttemptCount(a.stat)
+    || getQuestionStatTimestamp(a.stat.lastAnsweredAt) - getQuestionStatTimestamp(b.stat.lastAnsweredAt)
+    || String(a.stat.questionId).localeCompare(String(b.stat.questionId));
+}
+
+function compareDailyPriorityItems(a, b) {
+  return Number(b.stat.status === "wrong") - Number(a.stat.status === "wrong")
+    || getDailyReasonPriority(a.stat.reasonCounts) - getDailyReasonPriority(b.stat.reasonCounts)
+    || getWeaknessAttemptCount(b.stat) - getWeaknessAttemptCount(a.stat)
+    || getQuestionStatTimestamp(a.stat.lastAnsweredAt) - getQuestionStatTimestamp(b.stat.lastAnsweredAt)
+    || String(a.stat.questionId).localeCompare(String(b.stat.questionId));
+}
+
+function getWeaknessAttemptCount(stat) {
+  return normalizeQuestionStatCount(stat?.wrongCount) + normalizeQuestionStatCount(stat?.unsureCount);
+}
+
+function getDailyReasonPriority(reasonCounts) {
+  const primaryReason = getPrimaryWeaknessReason(reasonCounts);
+  if (primaryReason === "understanding" || primaryReason === "formula") {
+    return 0;
+  }
+  return primaryReason === "unit" ? 1 : 2;
+}
+
+function renderDailyReviewCard(today = getLocalDateKey()) {
+  const pending = document.getElementById("dailyReviewPending");
+  const completed = document.getElementById("dailyReviewCompleted");
+  if (!pending || !completed) {
+    return;
+  }
+  const state = loadDailyReviewState();
+  const completedToday = isDailyReviewCompleted(state, today);
+  pending.classList.toggle("hidden", completedToday);
+  completed.classList.toggle("hidden", !completedToday);
+
+  if (completedToday) {
+    document.getElementById("dailyReviewCompletedCount").textContent = `${state.questionIds.length}問`;
+    return;
+  }
+
+  const plan = selectDailyReviewItems(getWeaknessReviewItems(), today);
+  document.getElementById("dailyReviewRetentionCount").textContent = `${plan.retentionItems.length}問`;
+  document.getElementById("dailyReviewPriorityCount").textContent = `${plan.priorityItems.length}問`;
+  document.getElementById("dailyReviewTotalCount").textContent = `${plan.items.length}問`;
+  const empty = plan.items.length === 0;
+  document.getElementById("dailyReviewEmptyMessage").classList.toggle("hidden", !empty);
+  const startButton = document.getElementById("startDailyReviewBtn");
+  startButton.disabled = empty || questions.length === 0;
+  startButton.classList.toggle("hidden", empty);
+}
+
+function normalizeDailyReviewState(rawState) {
+  if (!isPlainObject(rawState)) {
+    return { date: "", completed: false, completedAt: null, questionIds: [] };
+  }
+  return {
+    date: normalizeQuestionStatDate(rawState.date) || "",
+    completed: rawState.completed === true,
+    completedAt: normalizeQuestionStatDateTime(rawState.completedAt),
+    questionIds: [...new Set((Array.isArray(rawState.questionIds) ? rawState.questionIds : [])
+      .map((id) => String(id || "").trim()).filter(Boolean))]
+  };
+}
+
+function loadDailyReviewState(storage = localStorage) {
+  try {
+    return normalizeDailyReviewState(JSON.parse(storage.getItem(DAILY_REVIEW_STORAGE_KEY)));
+  } catch (error) {
+    console.error("今日の復習状態を読み込めませんでした。", error);
+    return normalizeDailyReviewState({});
+  }
+}
+
+function isDailyReviewCompleted(state, today = getLocalDateKey()) {
+  const normalized = normalizeDailyReviewState(state);
+  return normalized.completed && normalized.date === today;
+}
+
+function saveDailyReviewCompletion(questionIds, completedAt = new Date(), storage = localStorage) {
+  const state = normalizeDailyReviewState({
+    date: getLocalDateKey(completedAt),
+    completed: true,
+    completedAt: formatLocalIsoDateTime(completedAt),
+    questionIds
+  });
+  storage.setItem(DAILY_REVIEW_STORAGE_KEY, JSON.stringify(state));
+  return state;
+}
+
 function selectQuickReviewQuestions(items) {
   const today = getLocalDateKey();
   return items
@@ -1616,8 +1779,9 @@ function startQuiz(selectedQuestions, mode = "normal") {
   currentIndex = 0;
   quizAnswers = [];
   quizStartTime = Date.now();
-  document.getElementById("timerText").classList.toggle("hidden", quizMode === "quickReview");
-  if (quizMode === "quickReview") {
+  const isShortReview = quizMode === "quickReview" || quizMode === "dailyReview";
+  document.getElementById("timerText").classList.toggle("hidden", isShortReview);
+  if (isShortReview) {
     stopTimer();
   } else {
     startTimer();
@@ -1890,7 +2054,7 @@ function answerQuestion(selectedNumber) {
   });
 
   const questionResult = recordQuestionResult(question, isCorrect);
-  quizAnswers.push({ question, selectedNumber, isCorrect, status: "", unsureRecorded: false });
+  quizAnswers.push({ question, selectedNumber, isCorrect, status: "", unsureRecorded: false, questionResult });
 
   feedbackArea.className = `feedback ${isCorrect ? "correct" : "wrong"}`;
   feedbackArea.innerHTML = `
@@ -2316,16 +2480,34 @@ function showResult() {
   const wrongAnswers = quizAnswers.filter((item) => !item.isCorrect);
 
   const isQuickReview = quizMode === "quickReview";
-  document.getElementById("resultTitle").textContent = isQuickReview ? "5分復習 完了" : "結果";
-  document.getElementById("standardResultSummary").classList.toggle("hidden", isQuickReview);
+  const isDailyReview = quizMode === "dailyReview";
+  document.getElementById("resultTitle").textContent = isDailyReview
+    ? "今日の復習 完了"
+    : isQuickReview ? "5分復習 完了" : "結果";
+  document.getElementById("standardResultSummary").classList.toggle("hidden", isQuickReview || isDailyReview);
   document.getElementById("quickReviewResultSummary").classList.toggle("hidden", !isQuickReview);
-  document.getElementById("reviewFromResultBtn").classList.toggle("hidden", isQuickReview);
+  document.getElementById("dailyReviewResultSummary").classList.toggle("hidden", !isDailyReview);
+  document.getElementById("reviewFromResultBtn").classList.toggle("hidden", isQuickReview || isDailyReview);
   document.getElementById("retryQuickReviewBtn").classList.toggle("hidden", !isQuickReview);
+  document.getElementById("quickReviewFromDailyResultBtn").classList.toggle("hidden", !isDailyReview);
 
   if (isQuickReview) {
     document.getElementById("quickReviewResultTotal").textContent = `${total}問`;
     document.getElementById("quickReviewResultCorrect").textContent = `${correct}問`;
     document.getElementById("quickReviewResultWrong").textContent = `${wrongAnswers.length}問`;
+  }
+
+  if (isDailyReview) {
+    const retentionCompleted = quizAnswers.filter((answer) =>
+      currentDailyReviewDueIds.has(answer.question.id) && answer.isCorrect && !answer.unsureRecorded).length;
+    const mastered = quizAnswers.filter((answer) =>
+      answer.questionResult?.status === "mastered" && !answer.unsureRecorded).length;
+    document.getElementById("dailyReviewResultTotal").textContent = `${total} / ${currentQuiz.length}問`;
+    document.getElementById("dailyReviewResultCorrect").textContent = `${correct}問`;
+    document.getElementById("dailyReviewResultWrong").textContent = `${wrongAnswers.length}問`;
+    document.getElementById("dailyReviewResultRetention").textContent = `${retentionCompleted}問`;
+    document.getElementById("dailyReviewResultMastered").textContent = `${mastered}問`;
+    saveDailyReviewCompletion(currentQuiz.map((question) => question.id));
   }
 
   document.getElementById("resultScore").textContent = `${correct} / ${total}`;
@@ -3378,6 +3560,7 @@ function showScreen(screenName) {
 
 function showHome() {
   stopTimer();
+  renderDailyReviewCard();
   showScreen("home");
 }
 
