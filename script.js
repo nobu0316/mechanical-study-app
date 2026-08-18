@@ -1080,9 +1080,17 @@ function startQuickReview() {
 }
 
 function selectQuickReviewQuestions(items) {
+  const today = getLocalDateKey();
   return items
+    .filter((item) => isQuickReviewEligible(item.stat, today))
     .map((item) => ({ ...item, randomOrder: Math.random() }))
     .sort((a, b) => {
+      const dueDiff = Number(isRetentionReviewDue(b.stat, today))
+        - Number(isRetentionReviewDue(a.stat, today));
+      if (dueDiff !== 0) {
+        return dueDiff;
+      }
+
       const statusDiff = Number(b.stat.status === "wrong") - Number(a.stat.status === "wrong");
       if (statusDiff !== 0) {
         return statusDiff;
@@ -1254,10 +1262,17 @@ function renderWeaknessQuestionItem(item) {
   const questionText = item.question
     ? truncateText(item.question.title || item.question.question || item.stat.questionId, 30)
     : item.stat.questionId;
-  const isConfirmingRetention = item.stat.consecutiveCorrect === 1;
-  const statusLabel = isConfirmingRetention
-    ? "定着確認中"
+  const today = getLocalDateKey();
+  const isWaitingForRetention = item.stat.consecutiveCorrect === 1;
+  const isRetentionDue = isRetentionReviewDue(item.stat, today);
+  const statusLabel = isWaitingForRetention
+    ? isRetentionDue ? "定着確認可能" : "定着確認待ち"
     : item.stat.status === "wrong" ? "間違えた" : "迷った";
+  const retentionProgress = isWaitingForRetention
+    ? isRetentionDue
+      ? `<p class="retention-list-progress">定着確認できます　もう一度正解で弱点卒業</p>`
+      : `<p class="retention-list-progress">次回：${escapeHtml(formatLocalDate(item.stat.nextReviewAt))}以降</p>`
+    : "";
   return `
     <article class="weakness-question-item ${item.stat.status}">
       <div class="weakness-question-title">
@@ -1270,7 +1285,7 @@ function renderWeaknessQuestionItem(item) {
         <span>迷い ${item.stat.unsureCount}回</span>
         <span>正解 ${item.stat.correctCount}回</span>
       </div>
-      ${isConfirmingRetention ? `<p class="retention-list-progress">定着確認中 ●○　あと1回正解で弱点卒業</p>` : ""}
+      ${retentionProgress}
       <time datetime="${escapeHtml(item.stat.lastAnsweredAt)}">最終回答：${escapeHtml(formatDateTime(item.stat.lastAnsweredAt))}</time>
     </article>
   `;
@@ -1674,8 +1689,20 @@ function normalizeQuestionStats(rawStats) {
       unsureCount: normalizeQuestionStatCount(item.unsureCount),
       correctCount: normalizeQuestionStatCount(item.correctCount),
       consecutiveCorrect: normalizeQuestionStatCount(item.consecutiveCorrect),
+      lastCorrectAt: normalizeQuestionStatDateTime(item.lastCorrectAt),
+      nextReviewAt: normalizeQuestionStatDate(item.nextReviewAt),
       lastAnsweredAt: String(item.lastAnsweredAt || "")
     };
+
+    const stat = normalized[questionId];
+    if (stat.consecutiveCorrect === 1 && !stat.nextReviewAt) {
+      const inferredFrom = stat.lastCorrectAt || stat.lastAnsweredAt;
+      const inferredDate = parseStoredDate(inferredFrom);
+      if (inferredDate) {
+        stat.lastCorrectAt ||= inferredDate.toISOString();
+        stat.nextReviewAt = getNextLocalDateKey(inferredDate);
+      }
+    }
   });
   return normalized;
 }
@@ -1683,6 +1710,61 @@ function normalizeQuestionStats(rawStats) {
 function normalizeQuestionStatCount(value) {
   const count = Number(value);
   return Number.isFinite(count) && count >= 0 ? Math.floor(count) : 0;
+}
+
+function normalizeQuestionStatDateTime(value) {
+  return parseStoredDate(value) ? String(value) : null;
+}
+
+function normalizeQuestionStatDate(value) {
+  const date = String(value || "");
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null;
+}
+
+function parseStoredDate(value) {
+  if (!value) {
+    return null;
+  }
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function getLocalDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getNextLocalDateKey(date = new Date()) {
+  const nextDate = new Date(date.getTime());
+  nextDate.setDate(nextDate.getDate() + 1);
+  return getLocalDateKey(nextDate);
+}
+
+function isRetentionReviewDue(stat, today = getLocalDateKey()) {
+  return stat?.consecutiveCorrect === 1
+    && Boolean(normalizeQuestionStatDate(stat.nextReviewAt))
+    && today >= stat.nextReviewAt;
+}
+
+function isQuickReviewEligible(stat, today = getLocalDateKey()) {
+  if (stat?.status !== "wrong" && stat?.status !== "unsure") {
+    return false;
+  }
+  if (stat.consecutiveCorrect === 0) {
+    return true;
+  }
+  return isRetentionReviewDue(stat, today);
+}
+
+function formatLocalDate(value) {
+  const date = normalizeQuestionStatDate(value);
+  if (!date) {
+    return "日付未設定";
+  }
+  const [, month, day] = date.split("-");
+  return `${Number(month)}/${Number(day)}`;
 }
 
 function getOrCreateQuestionStat(stats, question) {
@@ -1696,6 +1778,8 @@ function getOrCreateQuestionStat(stats, question) {
       unsureCount: 0,
       correctCount: 0,
       consecutiveCorrect: 0,
+      lastCorrectAt: null,
+      nextReviewAt: null,
       lastAnsweredAt: ""
     };
   }
@@ -1709,23 +1793,34 @@ function recordQuestionResult(question, isCorrect) {
   }
   const stats = loadQuestionStats();
   const stat = getOrCreateQuestionStat(stats, question);
-  const result = applyQuestionResult(stat, isCorrect);
+  const answeredAt = new Date();
+  const result = applyQuestionResult(stat, isCorrect, answeredAt);
 
-  stat.lastAnsweredAt = new Date().toISOString();
+  stat.lastAnsweredAt = answeredAt.toISOString();
   saveQuestionStats(stats);
   return result;
 }
 
-function applyQuestionResult(stat, isCorrect) {
+function applyQuestionResult(stat, isCorrect, answeredAt = new Date()) {
   const previousStatus = stat.status;
   const wasWeakness = previousStatus === "wrong" || previousStatus === "unsure";
+  const today = getLocalDateKey(answeredAt);
+  let retentionState = "";
 
   if (isCorrect) {
     stat.correctCount += 1;
     if (wasWeakness) {
-      stat.consecutiveCorrect = normalizeQuestionStatCount(stat.consecutiveCorrect) + 1;
-      if (stat.consecutiveCorrect >= 2) {
+      if (isRetentionReviewDue(stat, today)) {
+        stat.consecutiveCorrect = 2;
         stat.status = "mastered";
+        retentionState = "mastered";
+      } else if (stat.consecutiveCorrect !== 1 || !normalizeQuestionStatDate(stat.nextReviewAt)) {
+        stat.consecutiveCorrect = 1;
+        stat.lastCorrectAt = answeredAt.toISOString();
+        stat.nextReviewAt = getNextLocalDateKey(answeredAt);
+        retentionState = "scheduled";
+      } else {
+        retentionState = "waiting";
       }
     } else if (!stat.status) {
       stat.status = "correct";
@@ -1733,6 +1828,8 @@ function applyQuestionResult(stat, isCorrect) {
   } else {
     stat.wrongCount += 1;
     stat.consecutiveCorrect = 0;
+    stat.lastCorrectAt = null;
+    stat.nextReviewAt = null;
     stat.status = "wrong";
   }
 
@@ -1740,7 +1837,9 @@ function applyQuestionResult(stat, isCorrect) {
     previousStatus,
     status: stat.status,
     consecutiveCorrect: stat.consecutiveCorrect,
-    weaknessCorrect: isCorrect && wasWeakness
+    weaknessCorrect: isCorrect && wasWeakness,
+    nextReviewAt: stat.nextReviewAt,
+    retentionState
   };
 }
 
@@ -1758,8 +1857,8 @@ function renderRetentionFeedback(result) {
   }
   return `
     <div class="retention-feedback confirming" data-retention-feedback>
-      <strong>定着確認中　●○</strong>
-      <span>あと1回正解で弱点卒業</span>
+      <strong>${result.retentionState === "waiting" ? "今日は定着確認済みです" : "1回目の定着確認OK"}</strong>
+      <span>次回は${escapeHtml(formatLocalDate(result.nextReviewAt))}以降に再確認します</span>
     </div>
   `;
 }
@@ -1778,6 +1877,8 @@ function recordQuestionUnsure(question) {
 function applyQuestionUnsure(stat) {
   stat.unsureCount += 1;
   stat.consecutiveCorrect = 0;
+  stat.lastCorrectAt = null;
+  stat.nextReviewAt = null;
   if (stat.status !== "wrong") {
     stat.status = "unsure";
   }
