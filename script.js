@@ -20,6 +20,16 @@ const LEGACY_STORAGE_KEY = "mechanicalStudyHistoryV1";
 const NOTE_CARDS_STORAGE_KEY = "mechanicalStudyNoteCards";
 const IMPORTANT_SLIDES_STORAGE_KEY = "mechanicalExamImportantSlides";
 const QUESTION_STATS_STORAGE_KEY = "mechanicalExamQuestionStats";
+const BACKUP_APP_ID = "mechanical-design-exam";
+const BACKUP_VERSION = 1;
+const BACKUP_STORAGE_ITEMS = [
+  { key: STORAGE_KEY, emptyValue: {}, type: "record" },
+  { key: LEGACY_STORAGE_KEY, emptyValue: {}, type: "object" },
+  { key: NOTE_CARDS_STORAGE_KEY, emptyValue: [], type: "objectArray" },
+  { key: IMPORTANT_SLIDES_STORAGE_KEY, emptyValue: [], type: "stringArray" },
+  { key: QUESTION_STATS_STORAGE_KEY, emptyValue: {}, type: "record" }
+];
+const BACKUP_STORAGE_KEYS = BACKUP_STORAGE_ITEMS.map((item) => item.key);
 const QUESTIONS_CSV = "questions.csv";
 const SLIDES_JSON = "slides.json";
 const WEAK_TOPIC_RATE_LIMIT = 70;
@@ -190,7 +200,9 @@ const feedbackArea = document.getElementById("feedbackArea");
 const statusArea = document.getElementById("statusArea");
 const nextQuestionBtn = document.getElementById("nextQuestionBtn");
 const historyImportInput = document.getElementById("historyImportInput");
+const backupRestoreInput = document.getElementById("backupRestoreInput");
 let importMode = "merge";
+let pendingBackupRestore = null;
 
 window.addEventListener("error", (event) => {
   console.error("JavaScript error:", event.error || event.message);
@@ -336,6 +348,16 @@ function bindEvents() {
   addEvent("importMergeBtn", "click", () => chooseImportFile("merge"));
   addEvent("importReplaceBtn", "click", () => chooseImportFile("replace"));
   addElementEvent(historyImportInput, "historyImportInput", "change", importHistoryFromFile);
+  addEvent("exportBackupBtn", "click", exportLearningDataBackup);
+  addEvent("restoreBackupBtn", "click", chooseBackupRestoreFile);
+  addElementEvent(backupRestoreInput, "backupRestoreInput", "change", readBackupRestoreFile);
+  addEvent("confirmRestoreBackupBtn", "click", confirmBackupRestore);
+  addEvent("cancelRestoreBackupBtn", "click", closeBackupPreview);
+  addEvent("backupPreviewOverlay", "click", (event) => {
+    if (event.target.id === "backupPreviewOverlay") {
+      closeBackupPreview();
+    }
+  });
   addElementEvent(nextQuestionBtn, "nextQuestionBtn", "click", goNextQuestion);
 }
 
@@ -2911,6 +2933,228 @@ function resetHistory() {
 function hasMistakes() {
   const history = getHistory();
   return Object.values(history.byQuestion).some((item) => item.wrongCount > 0);
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function isValidBackupItem(value, type) {
+  if (type === "object") {
+    return isPlainObject(value);
+  }
+  if (type === "record") {
+    return isPlainObject(value) && Object.values(value).every(isPlainObject);
+  }
+  if (type === "objectArray") {
+    return Array.isArray(value) && value.every(isPlainObject);
+  }
+  if (type === "stringArray") {
+    return Array.isArray(value) && value.every((item) => typeof item === "string");
+  }
+  return false;
+}
+
+function cloneJsonValue(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function formatLocalIsoDateTime(date) {
+  const pad = (value) => String(value).padStart(2, "0");
+  const offsetMinutes = -date.getTimezoneOffset();
+  const offsetSign = offsetMinutes >= 0 ? "+" : "-";
+  const absoluteOffset = Math.abs(offsetMinutes);
+  const offset = `${offsetSign}${pad(Math.floor(absoluteOffset / 60))}:${pad(absoluteOffset % 60)}`;
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+    + `T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}${offset}`;
+}
+
+function createBackupFileName(date) {
+  const pad = (value) => String(value).padStart(2, "0");
+  return `mechanical-exam-backup-${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}`
+    + `-${pad(date.getHours())}${pad(date.getMinutes())}.json`;
+}
+
+function createLearningDataBackup(storage = localStorage, date = new Date()) {
+  const data = {};
+  BACKUP_STORAGE_ITEMS.forEach((item) => {
+    const storedValue = storage.getItem(item.key);
+    const value = storedValue === null ? cloneJsonValue(item.emptyValue) : JSON.parse(storedValue);
+    if (!isValidBackupItem(value, item.type)) {
+      throw new Error(`保存データの形式が不正です: ${item.key}`);
+    }
+    data[item.key] = value;
+  });
+  return {
+    app: BACKUP_APP_ID,
+    backupVersion: BACKUP_VERSION,
+    exportedAt: formatLocalIsoDateTime(date),
+    data
+  };
+}
+
+function exportLearningDataBackup() {
+  try {
+    const now = new Date();
+    const backup = createLearningDataBackup(localStorage, now);
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = createBackupFileName(now);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(downloadUrl);
+    showMessage("学習データをバックアップしました");
+  } catch (error) {
+    console.error("バックアップの作成に失敗しました。", error);
+    showMessage("学習データをバックアップできませんでした。保存データを確認してください。");
+  }
+}
+
+function createBackupValidationError(message) {
+  const error = new Error(message);
+  error.userMessage = message;
+  return error;
+}
+
+function validateLearningDataBackup(backup) {
+  if (!isPlainObject(backup) || backup.app !== BACKUP_APP_ID) {
+    throw createBackupValidationError("このアプリのバックアップファイルではありません");
+  }
+  if (!Object.prototype.hasOwnProperty.call(backup, "backupVersion")) {
+    throw createBackupValidationError("このアプリのバックアップファイルではありません");
+  }
+  if (backup.backupVersion !== BACKUP_VERSION) {
+    throw createBackupValidationError("このバックアップ形式には現在対応していません");
+  }
+  if (!isPlainObject(backup.data)) {
+    throw createBackupValidationError("このアプリのバックアップファイルではありません");
+  }
+  if (typeof backup.exportedAt !== "string" || Number.isNaN(new Date(backup.exportedAt).getTime())) {
+    throw createBackupValidationError("バックアップファイルの保存日時が不正です");
+  }
+
+  const includedItems = BACKUP_STORAGE_ITEMS.filter((item) =>
+    Object.prototype.hasOwnProperty.call(backup.data, item.key));
+  if (!BACKUP_STORAGE_KEYS.some((key) => Object.prototype.hasOwnProperty.call(backup.data, key))) {
+    throw createBackupValidationError("バックアップ対象の学習データが含まれていません");
+  }
+  includedItems.forEach((item) => {
+    if (!isValidBackupItem(backup.data[item.key], item.type)) {
+      throw createBackupValidationError(`バックアップ内の「${item.key}」の形式が不正です`);
+    }
+  });
+  return backup;
+}
+
+function chooseBackupRestoreFile() {
+  pendingBackupRestore = null;
+  backupRestoreInput.value = "";
+  backupRestoreInput.click();
+}
+
+function readBackupRestoreFile(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    return;
+  }
+  if (!file.name.toLowerCase().endsWith(".json")) {
+    showMessage("JSON形式のバックアップファイルを選択してください");
+    backupRestoreInput.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      pendingBackupRestore = validateLearningDataBackup(JSON.parse(reader.result));
+      showBackupPreview(pendingBackupRestore);
+    } catch (error) {
+      pendingBackupRestore = null;
+      showMessage(error.userMessage || "バックアップファイルを読み込めませんでした。現在の学習データは変更されていません。");
+    } finally {
+      backupRestoreInput.value = "";
+    }
+  };
+  reader.onerror = () => {
+    pendingBackupRestore = null;
+    backupRestoreInput.value = "";
+    showMessage("バックアップファイルを読み込めませんでした。現在の学習データは変更されていません。");
+  };
+  reader.readAsText(file);
+}
+
+function getBackupSummary(backup) {
+  const questionStats = backup.data[QUESTION_STATS_STORAGE_KEY];
+  const importantSlides = backup.data[IMPORTANT_SLIDES_STORAGE_KEY];
+  return {
+    exportedAt: formatDateTime(backup.exportedAt),
+    questionCount: isPlainObject(questionStats) ? Object.keys(questionStats).length : 0,
+    importantSlideCount: Array.isArray(importantSlides) ? importantSlides.length : 0
+  };
+}
+
+function showBackupPreview(backup) {
+  const summary = getBackupSummary(backup);
+  document.getElementById("backupPreviewDate").textContent = summary.exportedAt;
+  document.getElementById("backupPreviewQuestions").textContent = `${summary.questionCount}問`;
+  document.getElementById("backupPreviewSlides").textContent = `${summary.importantSlideCount}件`;
+  document.getElementById("backupPreviewOverlay").classList.remove("hidden");
+}
+
+function closeBackupPreview() {
+  pendingBackupRestore = null;
+  document.getElementById("backupPreviewOverlay").classList.add("hidden");
+}
+
+function restoreBackupDataAtomically(backup, storage = localStorage) {
+  validateLearningDataBackup(backup);
+  const itemsToRestore = BACKUP_STORAGE_ITEMS.filter((item) =>
+    Object.prototype.hasOwnProperty.call(backup.data, item.key));
+  const serializedValues = new Map(itemsToRestore.map((item) => [
+    item.key,
+    JSON.stringify(backup.data[item.key])
+  ]));
+  const previousValues = new Map(itemsToRestore.map((item) => [item.key, storage.getItem(item.key)]));
+
+  try {
+    itemsToRestore.forEach((item) => storage.setItem(item.key, serializedValues.get(item.key)));
+  } catch (error) {
+    itemsToRestore.forEach((item) => {
+      const previousValue = previousValues.get(item.key);
+      if (previousValue === null) {
+        storage.removeItem(item.key);
+      } else {
+        storage.setItem(item.key, previousValue);
+      }
+    });
+    throw error;
+  }
+}
+
+function confirmBackupRestore() {
+  if (!pendingBackupRestore) {
+    return;
+  }
+  const ok = confirm("現在の学習データをバックアップ内容で置き換えます。よろしいですか？");
+  if (!ok) {
+    return;
+  }
+
+  try {
+    restoreBackupDataAtomically(pendingBackupRestore);
+    noteCards = loadNoteCards();
+    importantSlideIds = loadImportantSlideIds();
+    closeBackupPreview();
+    showStats();
+    showMessage("学習データを復元しました");
+  } catch (error) {
+    console.error("バックアップの復元に失敗しました。", error);
+    closeBackupPreview();
+    showMessage("バックアップファイルを読み込めませんでした。現在の学習データは変更されていません。");
+  }
 }
 
 function exportHistory() {

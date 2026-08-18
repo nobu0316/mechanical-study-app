@@ -1506,6 +1506,56 @@ textarea {
   margin-top: 0;
 }
 
+.data-dialog-overlay {
+  position: fixed;
+  z-index: 1100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  background: rgba(20, 35, 39, 0.62);
+  padding: 18px;
+}
+
+.data-dialog {
+  width: min(520px, 100%);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+
+.data-dialog h2 {
+  margin-bottom: 16px;
+}
+
+.backup-summary {
+  margin: 0;
+}
+
+.backup-summary div {
+  display: grid;
+  grid-template-columns: minmax(8em, 1fr) 2fr;
+  gap: 12px;
+  border-top: 1px solid var(--line);
+  padding: 10px 0;
+}
+
+.backup-summary div:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.backup-summary dt {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.backup-summary dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 640px) {
   body {
     font-size: 16px;
@@ -1630,6 +1680,15 @@ textarea {
 
   .ranking-item {
     grid-template-columns: 1fr;
+  }
+
+  .data-dialog {
+    padding: 20px;
+  }
+
+  .backup-summary div {
+    grid-template-columns: 1fr;
+    gap: 2px;
   }
 
   .rank-badge {
