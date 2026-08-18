@@ -24,6 +24,14 @@ const QUESTIONS_CSV = "questions.csv";
 const SLIDES_JSON = "slides.json";
 const WEAK_TOPIC_RATE_LIMIT = 70;
 const QUICK_REVIEW_QUESTION_LIMIT = 5;
+const WEAKNESS_REASONS = [
+  { key: "formula", label: "公式忘れ" },
+  { key: "understanding", label: "理解不足" },
+  { key: "unit", label: "単位・換算" },
+  { key: "calculation", label: "計算ミス" },
+  { key: "reading", label: "読み違い" },
+  { key: "terminology", label: "用語・選択肢迷い" }
+];
 const WEAKNESS_FIELD_ORDER = [
   "材料力学",
   "機械力学",
@@ -1632,6 +1640,7 @@ function answerQuestion(selectedNumber) {
       <button class="note-link-btn" type="button" data-add-note-from-current>この問題の要点カードを追加</button>
       <span class="unsure-review-message hidden" data-unsure-message aria-live="polite"></span>
     </div>
+    <div data-weakness-reason-host></div>
   `;
   feedbackArea.querySelector("[data-add-note-from-current]").addEventListener("click", () => showNoteForm(null, question));
   feedbackArea.querySelector("[data-mark-unsure]").addEventListener("click", (event) => {
@@ -1648,8 +1657,81 @@ function answerQuestion(selectedNumber) {
     const message = feedbackArea.querySelector("[data-unsure-message]");
     message.textContent = "復習対象に登録しました";
     message.classList.remove("hidden");
+    renderWeaknessReasonPrompt(question);
   });
+  if (!isCorrect) {
+    renderWeaknessReasonPrompt(question);
+  }
   renderStatusButtons(question, isCorrect, selectedNumber);
+}
+
+function renderWeaknessReasonPrompt(question) {
+  const host = feedbackArea.querySelector("[data-weakness-reason-host]");
+  if (!host) {
+    return;
+  }
+
+  host.innerHTML = `
+    <section class="weakness-reason-area" aria-label="弱点理由の登録">
+      <p class="weakness-reason-title">今回の原因は？</p>
+      <div class="weakness-reason-buttons">
+        ${WEAKNESS_REASONS.map((reason) => `
+          <button type="button" data-weakness-reason="${reason.key}">${reason.label}</button>
+        `).join("")}
+      </div>
+      <button class="weakness-reason-skip" type="button" data-weakness-reason-skip>今回は付けない</button>
+      <p class="weakness-reason-message hidden" data-weakness-reason-message aria-live="polite"></p>
+    </section>
+  `;
+
+  const registration = createWeaknessReasonRegistration(question);
+  host.querySelectorAll("[data-weakness-reason]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const reason = WEAKNESS_REASONS.find((item) => item.key === button.dataset.weaknessReason);
+      if (!reason || !registration.select(reason.key)) {
+        return;
+      }
+      completeWeaknessReasonPrompt(host, `弱点理由：${reason.label} を記録しました`);
+    });
+  });
+
+  host.querySelector("[data-weakness-reason-skip]").addEventListener("click", () => {
+    if (!registration.skip()) {
+      return;
+    }
+    completeWeaknessReasonPrompt(host, "今回は弱点理由を付けませんでした");
+  });
+}
+
+function createWeaknessReasonRegistration(question) {
+  let handled = false;
+  return {
+    select(reasonKey) {
+      if (handled || !WEAKNESS_REASONS.some((reason) => reason.key === reasonKey)) {
+        return false;
+      }
+      handled = recordQuestionReason(question, reasonKey);
+      return handled;
+    },
+    skip() {
+      if (handled) {
+        return false;
+      }
+      handled = true;
+      return true;
+    }
+  };
+}
+
+function completeWeaknessReasonPrompt(host, messageText) {
+  host.querySelectorAll("button").forEach((button) => {
+    button.disabled = true;
+  });
+  host.querySelector(".weakness-reason-buttons")?.classList.add("hidden");
+  host.querySelector("[data-weakness-reason-skip]")?.classList.add("hidden");
+  const message = host.querySelector("[data-weakness-reason-message]");
+  message.textContent = messageText;
+  message.classList.remove("hidden");
 }
 
 function loadQuestionStats() {
@@ -1691,7 +1773,8 @@ function normalizeQuestionStats(rawStats) {
       consecutiveCorrect: normalizeQuestionStatCount(item.consecutiveCorrect),
       lastCorrectAt: normalizeQuestionStatDateTime(item.lastCorrectAt),
       nextReviewAt: normalizeQuestionStatDate(item.nextReviewAt),
-      lastAnsweredAt: String(item.lastAnsweredAt || "")
+      lastAnsweredAt: String(item.lastAnsweredAt || ""),
+      reasonCounts: normalizeReasonCounts(item.reasonCounts)
     };
 
     const stat = normalized[questionId];
@@ -1710,6 +1793,21 @@ function normalizeQuestionStats(rawStats) {
 function normalizeQuestionStatCount(value) {
   const count = Number(value);
   return Number.isFinite(count) && count >= 0 ? Math.floor(count) : 0;
+}
+
+function createDefaultReasonCounts() {
+  return Object.fromEntries(WEAKNESS_REASONS.map((reason) => [reason.key, 0]));
+}
+
+function normalizeReasonCounts(rawReasonCounts) {
+  const normalized = createDefaultReasonCounts();
+  if (!rawReasonCounts || typeof rawReasonCounts !== "object" || Array.isArray(rawReasonCounts)) {
+    return normalized;
+  }
+  WEAKNESS_REASONS.forEach((reason) => {
+    normalized[reason.key] = normalizeQuestionStatCount(rawReasonCounts[reason.key]);
+  });
+  return normalized;
 }
 
 function normalizeQuestionStatDateTime(value) {
@@ -1780,11 +1878,24 @@ function getOrCreateQuestionStat(stats, question) {
       consecutiveCorrect: 0,
       lastCorrectAt: null,
       nextReviewAt: null,
-      lastAnsweredAt: ""
+      lastAnsweredAt: "",
+      reasonCounts: createDefaultReasonCounts()
     };
   }
   stats[questionId].field = String(question?.field || stats[questionId].field || "未分類");
+  stats[questionId].reasonCounts = normalizeReasonCounts(stats[questionId].reasonCounts);
   return stats[questionId];
+}
+
+function recordQuestionReason(question, reasonKey) {
+  if (!question?.id || !WEAKNESS_REASONS.some((reason) => reason.key === reasonKey)) {
+    return false;
+  }
+  const stats = loadQuestionStats();
+  const stat = getOrCreateQuestionStat(stats, question);
+  stat.reasonCounts[reasonKey] += 1;
+  saveQuestionStats(stats);
+  return true;
 }
 
 function recordQuestionResult(question, isCorrect) {

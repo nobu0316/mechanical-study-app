@@ -1061,6 +1061,59 @@ textarea {
   font-weight: 700;
 }
 
+.weakness-reason-area {
+  margin-top: 12px;
+  border-top: 1px solid rgba(139, 58, 50, 0.2);
+  padding-top: 12px;
+}
+
+.weakness-reason-title {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-weight: 800;
+}
+
+.weakness-reason-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.weakness-reason-buttons button,
+.weakness-reason-skip {
+  min-height: 44px;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.weakness-reason-buttons button {
+  border-color: #d7aaa5;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--error);
+}
+
+.weakness-reason-skip {
+  width: 100%;
+  margin-top: 8px;
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--muted);
+}
+
+.weakness-reason-message {
+  margin: 2px 0 0;
+  color: var(--primary-dark);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+@media (max-width: 480px) {
+  .weakness-reason-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .note-link-btn {
   min-height: 42px;
   border-color: var(--line);
