@@ -23,6 +23,12 @@
       <section id="homeScreen" class="screen active-screen">
         <div class="panel">
           <h2>今日の復習</h2>
+
+          <button id="startQuickReviewBtn" class="quick-review-btn" type="button">
+            <strong>5分だけ復習</strong>
+            <span>間違えた・迷った問題から自動出題</span>
+          </button>
+
           <div class="control-group">
             <label for="fieldSelect">分野</label>
             <select id="fieldSelect"></select>
@@ -59,6 +65,14 @@
         <div class="info-band">
           <h2>使い方</h2>
           <p>5〜10問だけ解き、解説で要点を確認します。間違えた問題や「迷ったので復習」に登録した問題は、弱点復習から条件を選んで再出題できます。</p>
+        </div>
+      </section>
+
+      <section id="quickReviewEmptyScreen" class="screen">
+        <div class="panel quick-review-empty">
+          <h2>現在、復習対象の弱点問題はありません</h2>
+          <p class="muted">通常問題で、次に復習する問題を見つけましょう。</p>
+          <button id="homeFromQuickReviewEmptyBtn" class="primary-btn" type="button">トップへ戻る</button>
         </div>
       </section>
 
@@ -372,8 +386,8 @@
 
       <section id="resultScreen" class="screen">
         <div class="panel">
-          <h2>結果</h2>
-          <div class="result-grid">
+          <h2 id="resultTitle">結果</h2>
+          <div id="standardResultSummary" class="result-grid">
             <div>
               <span class="stat-label">正解数</span>
               <strong id="resultScore"></strong>
@@ -388,12 +402,28 @@
             </div>
           </div>
 
+          <div id="quickReviewResultSummary" class="result-grid hidden">
+            <div>
+              <span class="stat-label">出題</span>
+              <strong id="quickReviewResultTotal"></strong>
+            </div>
+            <div>
+              <span class="stat-label">正解</span>
+              <strong id="quickReviewResultCorrect"></strong>
+            </div>
+            <div>
+              <span class="stat-label">不正解</span>
+              <strong id="quickReviewResultWrong"></strong>
+            </div>
+          </div>
+
           <h3>間違えた問題</h3>
           <div id="wrongList" class="list-area"></div>
 
           <div class="button-row">
             <button id="homeFromResultBtn" type="button">ホームへ戻る</button>
             <button id="reviewFromResultBtn" class="primary-btn" type="button">弱点復習へ進む</button>
+            <button id="retryQuickReviewBtn" class="primary-btn hidden" type="button">もう一度5分復習</button>
           </div>
         </div>
       </section>
