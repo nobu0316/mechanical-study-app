@@ -250,6 +250,48 @@ textarea {
   border-color: var(--primary-dark);
 }
 
+.quick-review-btn {
+  display: grid;
+  width: 100%;
+  min-height: 78px;
+  gap: 2px;
+  margin-bottom: 22px;
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  text-align: left;
+}
+
+.quick-review-btn:hover {
+  border-color: var(--primary-dark);
+  background: var(--primary-dark);
+}
+
+.quick-review-btn strong,
+.quick-review-btn span {
+  display: block;
+}
+
+.quick-review-btn strong {
+  font-size: 1.2rem;
+}
+
+.quick-review-btn span {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.9rem;
+}
+
+.quick-review-empty {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
+.quick-review-empty h2,
+.quick-review-empty p {
+  margin-bottom: 0;
+}
+
 .danger-btn {
   border-color: #d7aaa5;
   color: var(--error);
