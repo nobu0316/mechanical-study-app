@@ -1254,7 +1254,10 @@ function renderWeaknessQuestionItem(item) {
   const questionText = item.question
     ? truncateText(item.question.title || item.question.question || item.stat.questionId, 30)
     : item.stat.questionId;
-  const statusLabel = item.stat.status === "wrong" ? "間違えた" : "迷った";
+  const isConfirmingRetention = item.stat.consecutiveCorrect === 1;
+  const statusLabel = isConfirmingRetention
+    ? "定着確認中"
+    : item.stat.status === "wrong" ? "間違えた" : "迷った";
   return `
     <article class="weakness-question-item ${item.stat.status}">
       <div class="weakness-question-title">
@@ -1267,6 +1270,7 @@ function renderWeaknessQuestionItem(item) {
         <span>迷い ${item.stat.unsureCount}回</span>
         <span>正解 ${item.stat.correctCount}回</span>
       </div>
+      ${isConfirmingRetention ? `<p class="retention-list-progress">定着確認中 ●○　あと1回正解で弱点卒業</p>` : ""}
       <time datetime="${escapeHtml(item.stat.lastAnsweredAt)}">最終回答：${escapeHtml(formatDateTime(item.stat.lastAnsweredAt))}</time>
     </article>
   `;
@@ -1599,12 +1603,13 @@ function answerQuestion(selectedNumber) {
     }
   });
 
-  recordQuestionResult(question, isCorrect);
+  const questionResult = recordQuestionResult(question, isCorrect);
   quizAnswers.push({ question, selectedNumber, isCorrect, status: "", unsureRecorded: false });
 
   feedbackArea.className = `feedback ${isCorrect ? "correct" : "wrong"}`;
   feedbackArea.innerHTML = `
-    <strong>${isCorrect ? "正解です" : "不正解です"}</strong>
+    <strong>${isCorrect ? "✅ 正解" : "不正解です"}</strong>
+    ${renderRetentionFeedback(questionResult)}
     <div>正解：${question.answer}. ${question.choices[question.answer - 1]}</div>
     <div>${question.explanation}</div>
     <div class="feedback-actions">
@@ -1622,6 +1627,7 @@ function answerQuestion(selectedNumber) {
 
     recordQuestionUnsure(question);
     latestAnswer.unsureRecorded = true;
+    feedbackArea.querySelector("[data-retention-feedback]")?.remove();
     event.currentTarget.disabled = true;
     event.currentTarget.textContent = "復習対象に登録済み";
     const message = feedbackArea.querySelector("[data-unsure-message]");
@@ -1667,6 +1673,7 @@ function normalizeQuestionStats(rawStats) {
       wrongCount: normalizeQuestionStatCount(item.wrongCount),
       unsureCount: normalizeQuestionStatCount(item.unsureCount),
       correctCount: normalizeQuestionStatCount(item.correctCount),
+      consecutiveCorrect: normalizeQuestionStatCount(item.consecutiveCorrect),
       lastAnsweredAt: String(item.lastAnsweredAt || "")
     };
   });
@@ -1688,6 +1695,7 @@ function getOrCreateQuestionStat(stats, question) {
       wrongCount: 0,
       unsureCount: 0,
       correctCount: 0,
+      consecutiveCorrect: 0,
       lastAnsweredAt: ""
     };
   }
@@ -1697,23 +1705,63 @@ function getOrCreateQuestionStat(stats, question) {
 
 function recordQuestionResult(question, isCorrect) {
   if (!question?.id) {
-    return;
+    return null;
   }
   const stats = loadQuestionStats();
   const stat = getOrCreateQuestionStat(stats, question);
+  const result = applyQuestionResult(stat, isCorrect);
+
+  stat.lastAnsweredAt = new Date().toISOString();
+  saveQuestionStats(stats);
+  return result;
+}
+
+function applyQuestionResult(stat, isCorrect) {
+  const previousStatus = stat.status;
+  const wasWeakness = previousStatus === "wrong" || previousStatus === "unsure";
 
   if (isCorrect) {
     stat.correctCount += 1;
-    if (!stat.status) {
+    if (wasWeakness) {
+      stat.consecutiveCorrect = normalizeQuestionStatCount(stat.consecutiveCorrect) + 1;
+      if (stat.consecutiveCorrect >= 2) {
+        stat.status = "mastered";
+      }
+    } else if (!stat.status) {
       stat.status = "correct";
     }
   } else {
     stat.wrongCount += 1;
+    stat.consecutiveCorrect = 0;
     stat.status = "wrong";
   }
 
-  stat.lastAnsweredAt = new Date().toISOString();
-  saveQuestionStats(stats);
+  return {
+    previousStatus,
+    status: stat.status,
+    consecutiveCorrect: stat.consecutiveCorrect,
+    weaknessCorrect: isCorrect && wasWeakness
+  };
+}
+
+function renderRetentionFeedback(result) {
+  if (!result?.weaknessCorrect) {
+    return "";
+  }
+  if (result.status === "mastered") {
+    return `
+      <div class="retention-feedback mastered" data-retention-feedback>
+        <strong>この問題は定着しました</strong>
+        <span>弱点復習から卒業しました</span>
+      </div>
+    `;
+  }
+  return `
+    <div class="retention-feedback confirming" data-retention-feedback>
+      <strong>定着確認中　●○</strong>
+      <span>あと1回正解で弱点卒業</span>
+    </div>
+  `;
 }
 
 function recordQuestionUnsure(question) {
@@ -1722,12 +1770,17 @@ function recordQuestionUnsure(question) {
   }
   const stats = loadQuestionStats();
   const stat = getOrCreateQuestionStat(stats, question);
+  applyQuestionUnsure(stat);
+  stat.lastAnsweredAt = new Date().toISOString();
+  saveQuestionStats(stats);
+}
+
+function applyQuestionUnsure(stat) {
   stat.unsureCount += 1;
+  stat.consecutiveCorrect = 0;
   if (stat.status !== "wrong") {
     stat.status = "unsure";
   }
-  stat.lastAnsweredAt = new Date().toISOString();
-  saveQuestionStats(stats);
 }
 
 function showQuestionStatsSummary() {

@@ -460,6 +460,31 @@ textarea {
   margin-bottom: 6px;
 }
 
+.retention-feedback {
+  display: grid;
+  gap: 3px;
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.retention-feedback strong {
+  margin: 0;
+}
+
+.retention-feedback span,
+.retention-list-progress {
+  font-size: 0.92rem;
+}
+
+.retention-list-progress {
+  margin: 8px 0 0;
+  color: var(--success);
+  font-weight: 700;
+}
+
 .status-area {
   margin-top: 16px;
 }
