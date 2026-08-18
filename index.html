@@ -83,7 +83,10 @@
               <h2>弱点問題一覧</h2>
               <p class="muted">記録した「間違えた」「迷った」問題を確認し、そのまま復習できます。</p>
             </div>
-            <button id="homeFromWeaknessBtn" type="button">ホームへ戻る</button>
+            <div class="screen-head-actions">
+              <button id="showWeaknessAnalysisBtn" class="primary-btn" type="button">弱点分析</button>
+              <button id="homeFromWeaknessBtn" type="button">ホームへ戻る</button>
+            </div>
           </div>
 
           <div id="weaknessReviewSummary" class="weakness-review-summary"></div>
@@ -140,6 +143,50 @@
               <span>現在「迷った」になっている問題を出題</span>
             </button>
           </div>
+        </div>
+      </section>
+
+      <section id="weaknessAnalysisScreen" class="screen">
+        <div class="panel">
+          <div class="screen-head">
+            <div>
+              <h2>弱点分析</h2>
+              <p class="muted">今の弱点を確認し、次に復習する問題を選べます。</p>
+            </div>
+            <button id="backToWeaknessBtn" type="button">弱点問題一覧へ戻る</button>
+          </div>
+
+          <section aria-labelledby="weaknessAnalysisSummaryTitle">
+            <h3 id="weaknessAnalysisSummaryTitle">現在の弱点</h3>
+            <div id="weaknessAnalysisSummary" class="weakness-analysis-summary"></div>
+          </section>
+
+          <section class="weakness-analysis-section" aria-labelledby="weaknessPriorityTitle">
+            <h3 id="weaknessPriorityTitle">優先して復習 TOP3</h3>
+            <div id="weaknessPriorityList" class="weakness-priority-list"></div>
+          </section>
+
+          <section class="weakness-analysis-section" aria-labelledby="weaknessMatrixTitle">
+            <h3 id="weaknessMatrixTitle">分野 × 弱点理由</h3>
+            <p class="muted matrix-help">数字は理由の記録回数ではなく、現在その弱点を持つ問題数です。数字を押すと問題を絞り込めます。</p>
+            <div class="weakness-matrix-scroll">
+              <table class="weakness-matrix">
+                <thead id="weaknessMatrixHead"></thead>
+                <tbody id="weaknessMatrixBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="weaknessAnalysisSelection" class="weakness-analysis-section" aria-labelledby="weaknessSelectionTitle">
+            <div class="weakness-selection-head">
+              <div>
+                <h3 id="weaknessSelectionTitle">弱点を選択してください</h3>
+                <p id="weaknessSelectionCount" class="muted">マトリクスまたはTOP3から選べます。</p>
+              </div>
+              <button id="startSelectedWeaknessBtn" class="primary-btn hidden" type="button">この弱点を復習</button>
+            </div>
+            <div id="weaknessAnalysisQuestionList" class="weakness-analysis-question-list"></div>
+          </section>
         </div>
       </section>
 

@@ -238,6 +238,13 @@ textarea {
   margin-bottom: 0;
 }
 
+.screen-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .primary-btn {
   border-color: var(--primary);
   background: var(--primary);
@@ -799,6 +806,157 @@ textarea {
 
 .weakness-field-option select {
   min-width: 0;
+}
+
+.weakness-analysis-section {
+  margin-top: 28px;
+}
+
+.weakness-analysis-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.weakness-analysis-summary div {
+  display: grid;
+  gap: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f6fbfb;
+  padding: 14px;
+}
+
+.weakness-analysis-summary span,
+.weakness-priority-list small {
+  color: var(--muted);
+}
+
+.weakness-analysis-summary strong {
+  color: var(--primary-dark);
+  font-size: 1.35rem;
+}
+
+.weakness-priority-list,
+.weakness-analysis-question-list {
+  display: grid;
+  gap: 10px;
+}
+
+.weakness-priority-list button {
+  display: grid;
+  gap: 3px;
+  text-align: left;
+}
+
+.weakness-priority-list small {
+  font-size: 0.88rem;
+}
+
+.matrix-help {
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+.weakness-matrix-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.weakness-matrix {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  background: var(--surface);
+  font-size: 0.92rem;
+}
+
+.weakness-matrix th,
+.weakness-matrix td {
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 8px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.weakness-matrix thead th,
+.weakness-matrix tbody th {
+  background: #edf4f5;
+  color: var(--primary-dark);
+}
+
+.weakness-matrix tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  text-align: left;
+}
+
+.weakness-matrix button {
+  min-width: 42px;
+  min-height: 42px;
+  border-color: var(--primary);
+  color: var(--primary-dark);
+  font-weight: 800;
+  padding: 4px 10px;
+}
+
+.weakness-matrix td > span {
+  color: #9aa7aa;
+}
+
+.matrix-empty {
+  color: var(--muted);
+  text-align: left !important;
+}
+
+.weakness-selection-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.weakness-selection-head h3,
+.weakness-selection-head p {
+  margin-bottom: 0;
+}
+
+.weakness-analysis-question {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 12px;
+  border: 1px solid var(--line);
+  border-left: 5px solid #dfc17b;
+  border-radius: 8px;
+  background: #fffdf7;
+  padding: 12px;
+}
+
+.weakness-analysis-question.wrong {
+  border-left-color: var(--error);
+  background: #fff8f7;
+}
+
+.weakness-analysis-question div,
+.weakness-analysis-question div span {
+  display: block;
+}
+
+.weakness-analysis-question p {
+  grid-column: 1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.weakness-analysis-question button {
+  grid-column: 2;
+  grid-row: 1 / span 2;
 }
 
 .slide-controls {
@@ -1405,6 +1563,7 @@ textarea {
   }
 
   .screen-head,
+  .screen-head-actions,
   .slide-controls,
   .form-grid,
   .weakness-field-option,
@@ -1412,6 +1571,22 @@ textarea {
   .weakness-list-filters {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .weakness-analysis-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .weakness-selection-head,
+  .weakness-analysis-question {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .weakness-analysis-question p,
+  .weakness-analysis-question button {
+    grid-column: 1;
+    grid-row: auto;
   }
 
   .weakness-field-summary-row {

@@ -32,6 +32,24 @@ const WEAKNESS_REASONS = [
   { key: "reading", label: "読み違い" },
   { key: "terminology", label: "用語・選択肢迷い" }
 ];
+const PRIMARY_REASON_PRIORITY = [
+  "understanding",
+  "formula",
+  "unit",
+  "terminology",
+  "reading",
+  "calculation"
+];
+const UNCLASSIFIED_REASON_KEY = "unclassified";
+const WEAKNESS_REASON_ACTIONS = {
+  formula: "要点・公式を確認してから再挑戦",
+  understanding: "解説や図で意味を確認",
+  unit: "単位換算を重点復習",
+  calculation: "同種の計算問題を再計算",
+  reading: "問題文と条件の読み取りを確認",
+  terminology: "類似用語・選択肢を比較",
+  unclassified: "解説を確認して弱点理由を見つける"
+};
 const WEAKNESS_FIELD_ORDER = [
   "材料力学",
   "機械力学",
@@ -141,11 +159,13 @@ let quizMode = "normal";
 let statsState = createDefaultStatsState();
 let appInitialized = false;
 let calculatorState = createCalculatorState();
+let selectedWeaknessAnalysis = null;
 
 const screens = {
   home: document.getElementById("homeScreen"),
   quickReviewEmpty: document.getElementById("quickReviewEmptyScreen"),
   weaknessReview: document.getElementById("weaknessReviewScreen"),
+  weaknessAnalysis: document.getElementById("weaknessAnalysisScreen"),
   quiz: document.getElementById("quizScreen"),
   result: document.getElementById("resultScreen"),
   slides: document.getElementById("slidesScreen"),
@@ -234,6 +254,12 @@ function bindEvents() {
   addEvent("homeFromResultBtn", "click", showHome);
   addEvent("homeFromQuickReviewEmptyBtn", "click", showHome);
   addEvent("homeFromWeaknessBtn", "click", showHome);
+  addEvent("showWeaknessAnalysisBtn", "click", showWeaknessAnalysis);
+  addEvent("backToWeaknessBtn", "click", showWeaknessReview);
+  addEvent("weaknessPriorityList", "click", handleWeaknessAnalysisSelection);
+  addEvent("weaknessMatrixBody", "click", handleWeaknessAnalysisSelection);
+  addEvent("weaknessAnalysisQuestionList", "click", handleWeaknessQuestionAction);
+  addEvent("startSelectedWeaknessBtn", "click", startSelectedWeaknessReview);
   addEvent("startImmediateReviewBtn", "click", () => startWeaknessReview("all"));
   addEvent("startFieldReviewBtn", "click", () => startWeaknessReview("field"));
   addEvent("startWrongOnlyReviewBtn", "click", () => startWeaknessReview("wrong"));
@@ -1205,6 +1231,221 @@ function getWeaknessFieldRank(field) {
 function getWeaknessFields(items) {
   return [...new Set(items.map((item) => item.field))]
     .sort((a, b) => getWeaknessFieldRank(a) - getWeaknessFieldRank(b) || a.localeCompare(b, "ja"));
+}
+
+function getPrimaryWeaknessReason(reasonCounts) {
+  const normalized = normalizeReasonCounts(reasonCounts);
+  let selectedKey = UNCLASSIFIED_REASON_KEY;
+  let selectedCount = 0;
+  PRIMARY_REASON_PRIORITY.forEach((reasonKey) => {
+    const count = normalized[reasonKey];
+    if (count > selectedCount) {
+      selectedKey = reasonKey;
+      selectedCount = count;
+    }
+  });
+  return selectedKey;
+}
+
+function getWeaknessReasonLabel(reasonKey) {
+  return reasonKey === UNCLASSIFIED_REASON_KEY
+    ? "原因未登録"
+    : WEAKNESS_REASONS.find((reason) => reason.key === reasonKey)?.label || "原因未登録";
+}
+
+function buildWeaknessAnalysis(items, today = getLocalDateKey()) {
+  const currentItems = (Array.isArray(items) ? items : [])
+    .filter((item) => item?.stat?.questionId)
+    .filter((item) => item.stat.status === "wrong" || item.stat.status === "unsure")
+    .map((item) => ({
+      ...item,
+      field: String(item.field || item.stat.field || "未分類").trim() || "未分類",
+      primaryReason: getPrimaryWeaknessReason(item.stat.reasonCounts)
+    }));
+  const groups = new Map();
+
+  currentItems.forEach((item) => {
+    const groupKey = `${item.field}\u0000${item.primaryReason}`;
+    if (!groups.has(groupKey)) {
+      groups.set(groupKey, {
+        field: item.field,
+        reasonKey: item.primaryReason,
+        items: [],
+        wrongCount: 0,
+        dueCount: 0,
+        reasonTotal: 0
+      });
+    }
+    const group = groups.get(groupKey);
+    group.items.push(item);
+    group.wrongCount += Number(item.stat.status === "wrong");
+    group.dueCount += Number(isRetentionReviewDue(item.stat, today));
+    group.reasonTotal += Object.values(normalizeReasonCounts(item.stat.reasonCounts))
+      .reduce((sum, count) => sum + count, 0);
+  });
+
+  const rankedGroups = [...groups.values()].sort((a, b) =>
+    b.items.length - a.items.length
+    || b.wrongCount - a.wrongCount
+    || b.dueCount - a.dueCount
+    || b.reasonTotal - a.reasonTotal
+    || getWeaknessFieldRank(a.field) - getWeaknessFieldRank(b.field)
+    || a.field.localeCompare(b.field, "ja")
+    || PRIMARY_REASON_PRIORITY.indexOf(a.reasonKey) - PRIMARY_REASON_PRIORITY.indexOf(b.reasonKey)
+  );
+
+  return {
+    items: currentItems,
+    fields: getWeaknessFields(currentItems),
+    groups: rankedGroups,
+    topGroups: rankedGroups.slice(0, 3),
+    weaknessCount: currentItems.length,
+    waitingCount: currentItems.filter((item) => item.stat.consecutiveCorrect === 1
+      && Boolean(normalizeQuestionStatDate(item.stat.nextReviewAt))
+      && today < item.stat.nextReviewAt).length,
+    dueCount: currentItems.filter((item) => isRetentionReviewDue(item.stat, today)).length
+  };
+}
+
+function findWeaknessAnalysisGroup(analysis, field, reasonKey) {
+  return analysis.groups.find((group) => group.field === field && group.reasonKey === reasonKey) || null;
+}
+
+function showWeaknessAnalysis() {
+  selectedWeaknessAnalysis = null;
+  renderWeaknessAnalysis();
+  hideMessage();
+  showScreen("weaknessAnalysis");
+}
+
+function renderWeaknessAnalysis() {
+  const analysis = buildWeaknessAnalysis(getWeaknessListItems());
+  document.getElementById("weaknessAnalysisSummary").innerHTML = `
+    <div><span>弱点問題</span><strong>${analysis.weaknessCount}問</strong></div>
+    <div><span>定着確認待ち</span><strong>${analysis.waitingCount}問</strong></div>
+    <div><span>今日確認可能</span><strong>${analysis.dueCount}問</strong></div>
+  `;
+  renderWeaknessPriorityList(analysis);
+  renderWeaknessMatrix(analysis);
+  renderSelectedWeaknessGroup(analysis);
+}
+
+function renderWeaknessPriorityList(analysis) {
+  const container = document.getElementById("weaknessPriorityList");
+  if (analysis.topGroups.length === 0) {
+    container.innerHTML = `<p class="muted">現在、集計対象の弱点問題はありません。</p>`;
+    return;
+  }
+  container.innerHTML = analysis.topGroups.map((group, index) => `
+    <button type="button" data-analysis-field="${escapeHtml(group.field)}" data-analysis-reason="${group.reasonKey}">
+      <span><strong>${index + 1}. ${escapeHtml(group.field)} × ${escapeHtml(getWeaknessReasonLabel(group.reasonKey))}</strong>　${group.items.length}問</span>
+      <small>→ ${escapeHtml(WEAKNESS_REASON_ACTIONS[group.reasonKey])}</small>
+    </button>
+  `).join("");
+}
+
+function renderWeaknessMatrix(analysis) {
+  const reasonColumns = [...WEAKNESS_REASONS, { key: UNCLASSIFIED_REASON_KEY, label: "原因未登録" }];
+  document.getElementById("weaknessMatrixHead").innerHTML = `<tr><th scope="col">分野</th>${reasonColumns
+    .map((reason) => `<th scope="col">${escapeHtml(reason.label)}</th>`).join("")}</tr>`;
+  const body = document.getElementById("weaknessMatrixBody");
+  if (analysis.fields.length === 0) {
+    body.innerHTML = `<tr><td colspan="${reasonColumns.length + 1}" class="matrix-empty">現在、集計対象の弱点問題はありません。</td></tr>`;
+    return;
+  }
+  body.innerHTML = analysis.fields.map((field) => `<tr>
+    <th scope="row">${escapeHtml(field)}</th>
+    ${reasonColumns.map((reason) => {
+      const group = findWeaknessAnalysisGroup(analysis, field, reason.key);
+      const count = group?.items.length || 0;
+      return `<td>${count > 0
+        ? `<button type="button" aria-label="${escapeHtml(field)}、${escapeHtml(reason.label)}、${count}問" data-analysis-field="${escapeHtml(field)}" data-analysis-reason="${reason.key}">${count}</button>`
+        : `<span>0</span>`}</td>`;
+    }).join("")}
+  </tr>`).join("");
+}
+
+function handleWeaknessAnalysisSelection(event) {
+  const button = event.target.closest?.("[data-analysis-field][data-analysis-reason]");
+  if (!button) {
+    return;
+  }
+  selectedWeaknessAnalysis = {
+    field: button.dataset.analysisField,
+    reasonKey: button.dataset.analysisReason
+  };
+  const analysis = buildWeaknessAnalysis(getWeaknessListItems());
+  renderSelectedWeaknessGroup(analysis);
+  document.getElementById("weaknessAnalysisSelection").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderSelectedWeaknessGroup(analysis) {
+  const title = document.getElementById("weaknessSelectionTitle");
+  const count = document.getElementById("weaknessSelectionCount");
+  const list = document.getElementById("weaknessAnalysisQuestionList");
+  const startButton = document.getElementById("startSelectedWeaknessBtn");
+  const selection = selectedWeaknessAnalysis;
+  const group = selection ? findWeaknessAnalysisGroup(analysis, selection.field, selection.reasonKey) : null;
+  if (!group) {
+    title.textContent = "弱点を選択してください";
+    count.textContent = analysis.items.length === 0 ? "現在、集計対象の弱点問題はありません。" : "マトリクスまたはTOP3から選べます。";
+    list.innerHTML = "";
+    startButton.classList.add("hidden");
+    return;
+  }
+  title.textContent = `${group.field} ＞ ${getWeaknessReasonLabel(group.reasonKey)}`;
+  count.textContent = `対象：${group.items.length}問`;
+  startButton.classList.toggle("hidden", !group.items.some((item) => item.question));
+  list.innerHTML = group.items.map((item) => {
+    const text = item.question
+      ? truncateText(item.question.title || item.question.question || item.stat.questionId, 54)
+      : "問題データが見つかりません";
+    return `<article class="weakness-analysis-question ${item.stat.status}">
+      <div>
+        <strong>${escapeHtml(item.stat.questionId)}</strong>
+        <span>${escapeHtml(text)}</span>
+      </div>
+      <p>状態：${item.stat.status === "wrong" ? "間違えた" : "迷った"} ／ 間違い ${item.stat.wrongCount}回 ／ 迷い ${item.stat.unsureCount}回</p>
+      ${item.question ? `<button type="button" data-solve-question="${escapeHtml(item.stat.questionId)}">この問題を解く</button>` : ""}
+    </article>`;
+  }).join("");
+}
+
+function getSelectedWeaknessQuestions() {
+  if (!selectedWeaknessAnalysis) {
+    return [];
+  }
+  const analysis = buildWeaknessAnalysis(getWeaknessListItems());
+  const group = findWeaknessAnalysisGroup(
+    analysis,
+    selectedWeaknessAnalysis.field,
+    selectedWeaknessAnalysis.reasonKey
+  );
+  return group ? group.items.filter((item) => item.question).map((item) => item.question) : [];
+}
+
+function startSelectedWeaknessReview() {
+  const pool = getSelectedWeaknessQuestions();
+  if (pool.length === 0) {
+    showMessage("選択した弱点に対応する問題が見つかりませんでした。");
+    return;
+  }
+  reviewMode = true;
+  startQuiz(pool);
+}
+
+function handleWeaknessQuestionAction(event) {
+  const button = event.target.closest?.("[data-solve-question]");
+  if (!button) {
+    return;
+  }
+  const question = questions.find((item) => item.id === button.dataset.solveQuestion);
+  if (!question) {
+    showMessage("この問題のデータが見つかりませんでした。");
+    return;
+  }
+  reviewMode = true;
+  startQuiz([question]);
 }
 
 function setupWeaknessListFieldFilter(fields) {
