@@ -23,6 +23,7 @@ const QUESTION_STATS_STORAGE_KEY = "mechanicalExamQuestionStats";
 const QUESTIONS_CSV = "questions.csv";
 const SLIDES_JSON = "slides.json";
 const WEAK_TOPIC_RATE_LIMIT = 70;
+const QUICK_REVIEW_QUESTION_LIMIT = 5;
 const WEAKNESS_FIELD_ORDER = [
   "材料力学",
   "機械力学",
@@ -128,12 +129,14 @@ let quizStartTime = 0;
 let timerId = null;
 let quizAnswers = [];
 let reviewMode = false;
+let quizMode = "normal";
 let statsState = createDefaultStatsState();
 let appInitialized = false;
 let calculatorState = createCalculatorState();
 
 const screens = {
   home: document.getElementById("homeScreen"),
+  quickReviewEmpty: document.getElementById("quickReviewEmptyScreen"),
   weaknessReview: document.getElementById("weaknessReviewScreen"),
   quiz: document.getElementById("quizScreen"),
   result: document.getElementById("resultScreen"),
@@ -211,6 +214,7 @@ function setupNoteFormFields() {
 
 function bindEvents() {
   addEvent("startQuizBtn", "click", startNormalQuiz);
+  addEvent("startQuickReviewBtn", "click", startQuickReview);
   addEvent("reviewMistakesBtn", "click", showWeaknessReview);
   addEvent("showSlidesBtn", "click", showSlides);
   addEvent("showStatsBtn", "click", showStats);
@@ -220,6 +224,7 @@ function bindEvents() {
   addEvent("calculatorKeys", "click", handleCalculatorKey);
   addElementEvent(fieldSelect, "fieldSelect", "change", setupTopicFilter);
   addEvent("homeFromResultBtn", "click", showHome);
+  addEvent("homeFromQuickReviewEmptyBtn", "click", showHome);
   addEvent("homeFromWeaknessBtn", "click", showHome);
   addEvent("startImmediateReviewBtn", "click", () => startWeaknessReview("all"));
   addEvent("startFieldReviewBtn", "click", () => startWeaknessReview("field"));
@@ -282,6 +287,7 @@ function bindEvents() {
   addElementEvent(noteCardImportInput, "noteCardImportInput", "change", importNoteCards);
   addElementEvent(noteCardForm, "noteCardForm", "submit", saveNoteCardFromForm);
   addEvent("reviewFromResultBtn", "click", showWeaknessReview);
+  addEvent("retryQuickReviewBtn", "click", startQuickReview);
   addEvent("homeFromStatsBtn", "click", showHome);
   addEvent("resetHistoryBtn", "click", resetHistory);
   document.querySelectorAll("[data-stats-tab]").forEach((button) => {
@@ -1031,6 +1037,7 @@ function closeSlideZoom() {
 
 function startNormalQuiz() {
   reviewMode = false;
+  quizMode = "normal";
   const selectedField = fieldSelect.value;
   const selectedTopic = topicSelect.value || "全トピック";
   const count = getSelectedCount();
@@ -1052,6 +1059,53 @@ function startNormalQuiz() {
   }
 
   startQuiz(selectNormalQuizQuestions(pool, count));
+}
+
+function startQuickReview() {
+  if (questions.length === 0) {
+    showMessage("問題データがまだ読み込まれていません。少し待ってからもう一度お試しください。");
+    return;
+  }
+
+  const selectedQuestions = selectQuickReviewQuestions(getWeaknessReviewItems());
+  if (selectedQuestions.length === 0) {
+    hideMessage();
+    showScreen("quickReviewEmpty");
+    return;
+  }
+
+  reviewMode = true;
+  quizMode = "quickReview";
+  startQuiz(selectedQuestions, "quickReview");
+}
+
+function selectQuickReviewQuestions(items) {
+  return items
+    .map((item) => ({ ...item, randomOrder: Math.random() }))
+    .sort((a, b) => {
+      const statusDiff = Number(b.stat.status === "wrong") - Number(a.stat.status === "wrong");
+      if (statusDiff !== 0) {
+        return statusDiff;
+      }
+
+      const countDiff = (b.stat.wrongCount + b.stat.unsureCount)
+        - (a.stat.wrongCount + a.stat.unsureCount);
+      if (countDiff !== 0) {
+        return countDiff;
+      }
+
+      // 同じ状態・同じ弱点回数なら、古い復習日を優先しつつ同日内は偏りを防ぎます。
+      const dateDiff = getQuickReviewDateBucket(a.stat.lastAnsweredAt)
+        - getQuickReviewDateBucket(b.stat.lastAnsweredAt);
+      return dateDiff || a.randomOrder - b.randomOrder;
+    })
+    .slice(0, QUICK_REVIEW_QUESTION_LIMIT)
+    .map((item) => item.question);
+}
+
+function getQuickReviewDateBucket(value) {
+  const timestamp = getQuestionStatTimestamp(value);
+  return timestamp === 0 ? 0 : Math.floor(timestamp / 86400000);
 }
 
 function showWeaknessReview() {
@@ -1258,11 +1312,12 @@ function startVisibleWeaknessReview() {
   startQuiz(selectNormalQuizQuestions(pool, getSelectedCount()));
 }
 
-function startQuiz(selectedQuestions) {
+function startQuiz(selectedQuestions, mode = "normal") {
   if (!selectedQuestions || selectedQuestions.length === 0) {
     showMessage("出題できる問題がありません。条件や関連問題IDを確認してください。");
     return;
   }
+  quizMode = mode;
   hideMessage();
   if (questionsLoadedFromFallback) {
     showMessage("questions.csvを読み込めなかったため、画面確認用のサンプル問題で出題しています。");
@@ -1271,7 +1326,12 @@ function startQuiz(selectedQuestions) {
   currentIndex = 0;
   quizAnswers = [];
   quizStartTime = Date.now();
-  startTimer();
+  document.getElementById("timerText").classList.toggle("hidden", quizMode === "quickReview");
+  if (quizMode === "quickReview") {
+    stopTimer();
+  } else {
+    startTimer();
+  }
   showScreen("quiz");
   renderQuestion();
 }
@@ -1726,6 +1786,19 @@ function showResult() {
   const correct = quizAnswers.filter((item) => item.isCorrect).length;
   const elapsedSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
   const wrongAnswers = quizAnswers.filter((item) => !item.isCorrect);
+
+  const isQuickReview = quizMode === "quickReview";
+  document.getElementById("resultTitle").textContent = isQuickReview ? "5分復習 完了" : "結果";
+  document.getElementById("standardResultSummary").classList.toggle("hidden", isQuickReview);
+  document.getElementById("quickReviewResultSummary").classList.toggle("hidden", !isQuickReview);
+  document.getElementById("reviewFromResultBtn").classList.toggle("hidden", isQuickReview);
+  document.getElementById("retryQuickReviewBtn").classList.toggle("hidden", !isQuickReview);
+
+  if (isQuickReview) {
+    document.getElementById("quickReviewResultTotal").textContent = `${total}問`;
+    document.getElementById("quickReviewResultCorrect").textContent = `${correct}問`;
+    document.getElementById("quickReviewResultWrong").textContent = `${wrongAnswers.length}問`;
+  }
 
   document.getElementById("resultScore").textContent = `${correct} / ${total}`;
   document.getElementById("resultRate").textContent = formatRate(correct, total);
