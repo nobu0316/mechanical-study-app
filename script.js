@@ -1,19 +1,35 @@
-const FIELDS = [
-  "全分野",
+const VALID_FIELDS = [
+  "数学・力学基礎",
   "材料力学",
   "機械力学",
   "熱工学",
   "流体工学",
-  "熱・流体",
+  "制御工学",
   "機械要素",
+  "機械設計",
   "機械製図",
   "工業材料",
   "工作法",
-  "制御・メカトロ",
-  "制御工学",
-  "数学・力学基礎",
   "環境・安全"
 ];
+const FIELDS = ["全分野", ...VALID_FIELDS];
+const FIELD_NORMALIZATION_MAP = {
+  "数学・基礎": "数学・力学基礎",
+  "数学・力学基礎": "数学・力学基礎",
+  "材料力学": "材料力学",
+  "機械力学": "機械力学",
+  "熱工学": "熱工学",
+  "流体工学": "流体工学",
+  "制御・メカトロ": "制御工学",
+  "制御工学": "制御工学",
+  "機械要素": "機械要素",
+  "機械設計": "機械設計",
+  "工業材料": "工業材料",
+  "工作法": "工作法",
+  "機械製図": "機械製図",
+  "環境・安全": "環境・安全"
+};
+const UNKNOWN_FIELD_WARNINGS = new Set();
 
 const STORAGE_KEY = "mechanicalStudyHistory";
 const LEGACY_STORAGE_KEY = "mechanicalStudyHistoryV1";
@@ -434,7 +450,7 @@ function loadQuestionsWithXhr() {
 }
 
 function showCsvError() {
-  questions = FALLBACK_QUESTIONS;
+  questions = FALLBACK_QUESTIONS.map(normalizeQuestionField);
   questionsLoadedFromFallback = true;
   setupTopicFilter();
   renderDailyReviewCard();
@@ -470,7 +486,7 @@ function parseCsv(csvText) {
     if (cols.length !== 11) {
       console.error(`questions.csv ${index + 2}行目の列数が不正です。期待値=11 実際=${cols.length}`, line);
     }
-    return {
+    return normalizeQuestionField({
       id: cols[0],
       field: cols[1],
       topic: cols[2],
@@ -479,13 +495,66 @@ function parseCsv(csvText) {
       choices: [cols[5], cols[6], cols[7], cols[8]],
       answer: Number(cols[9]),
       explanation: cols[10]
-    };
+    });
   });
   const validQuestions = parsedQuestions.filter((item) => item.id && item.field && item.question && item.answer >= 1 && item.answer <= 4);
   if (validQuestions.length !== parsedQuestions.length) {
     console.error(`questions.csvに無効な行があります。有効=${validQuestions.length} 全体=${parsedQuestions.length}`);
   }
   return validQuestions;
+}
+
+function normalizeQuestionField(question) {
+  return {
+    ...question,
+    field: normalizeField(question?.field, question?.topic)
+  };
+}
+
+function normalizeField(field, topic) {
+  const rawField = String(field ?? "").trim();
+  const rawTopic = String(topic ?? "").trim();
+  if (!rawField) {
+    return "未分類";
+  }
+
+  if (rawField === "熱・流体") {
+    const fluidKeywords = ["流体", "流量", "流速", "速度水頭", "損失水頭", "圧力損失", "ベルヌーイ", "レイノルズ", "管路", "ポンプ"];
+    const thermalKeywords = ["熱", "温度", "冷凍", "COP", "チラー", "カルノー", "エンタルピー", "エントロピー"];
+    if (fluidKeywords.some((keyword) => rawTopic.includes(keyword))) {
+      return "流体工学";
+    }
+    if (thermalKeywords.some((keyword) => rawTopic.includes(keyword))) {
+      return "熱工学";
+    }
+    warnUnknownField(rawField, rawTopic);
+    return "未分類";
+  }
+
+  if (rawField === "制御・メカトロ") {
+    const controlKeywords = ["制御", "フィードバック", "PID", "一次遅れ", "時定数", "伝達関数", "ブロック線図", "応答", "安定", "センサ", "アクチュエータ"];
+    if (controlKeywords.some((keyword) => rawTopic.includes(keyword))) {
+      return "制御工学";
+    }
+    warnUnknownField(rawField, rawTopic);
+    return "未分類";
+  }
+
+  const normalized = FIELD_NORMALIZATION_MAP[rawField];
+  if (normalized) {
+    return normalized;
+  }
+  warnUnknownField(rawField, rawTopic);
+  return rawField;
+}
+
+function warnUnknownField(field, topic) {
+  const warningKey = `${field}\u0000${topic}`;
+  if (UNKNOWN_FIELD_WARNINGS.has(warningKey)) {
+    return;
+  }
+  UNKNOWN_FIELD_WARNINGS.add(warningKey);
+  console.warn(`正規化規則に一致しないfieldです: field=${field} topic=${topic || "未設定"}`);
 }
 
 function loadSlides() {
@@ -523,7 +592,7 @@ function normalizeSlides(rawSlides) {
   return (Array.isArray(rawSlides) ? rawSlides : [])
     .map((slide) => ({
       id: String(slide.id || ""),
-      field: String(slide.field || "分野不明"),
+      field: normalizeField(slide.field, slide.topic),
       topic: String(slide.topic || "トピック不明"),
       title: String(slide.title || "無題のスライド"),
       description: String(slide.description || ""),
@@ -677,7 +746,7 @@ function showNoteForm(note = null, sourceQuestion = null) {
   if (note?.field && ![...noteFieldSelect.options].some((option) => option.value === note.field)) {
     noteFieldSelect.add(new Option(note.field, note.field));
   }
-  noteFieldSelect.value = note?.field || sourceQuestion?.field || "制御・メカトロ";
+  noteFieldSelect.value = normalizeField(note?.field || sourceQuestion?.field || "制御工学", note?.topic || sourceQuestion?.topic);
   document.getElementById("noteTopicInput").value = note?.topic || sourceQuestion?.topic || "";
   document.getElementById("noteMemoInput").value = note?.memo || "";
   document.getElementById("noteRelatedIdsInput").value = (note?.relatedQuestionIds || (sourceQuestion ? [sourceQuestion.id] : [])).join(", ");
@@ -1402,7 +1471,9 @@ function getQuestionStatTimestamp(value) {
 
 function getWeaknessItemField(stat) {
   const question = questions.find((item) => item.id === stat.questionId);
-  return String(question?.field || stat.field || "未分類").trim() || "未分類";
+  return question
+    ? normalizeField(question.field, question.topic)
+    : normalizeField(stat.field);
 }
 
 function getWeaknessFieldRank(field) {
@@ -1444,7 +1515,10 @@ function buildWeaknessAnalysis(items, today = getLocalDateKey()) {
     .filter((item) => item.stat.status === "wrong" || item.stat.status === "unsure")
     .map((item) => ({
       ...item,
-      field: String(item.field || item.stat.field || "未分類").trim() || "未分類",
+      field: normalizeField(
+        item.question?.field || item.field || item.stat.field,
+        item.question?.topic || item.stat.topic
+      ),
       primaryReason: getPrimaryWeaknessReason(item.stat.reasonCounts)
     }));
   const groups = new Map();
@@ -2309,7 +2383,10 @@ function getOrCreateQuestionStat(stats, question) {
       reasonCounts: createDefaultReasonCounts()
     };
   }
-  stats[questionId].field = String(question?.field || stats[questionId].field || "未分類");
+  // 既存localStorageのfieldは移行で書き換えず、表示・集計時に正規化する。
+  if (!stats[questionId].field) {
+    stats[questionId].field = normalizeField(question?.field, question?.topic);
+  }
   stats[questionId].reasonCounts = normalizeReasonCounts(stats[questionId].reasonCounts);
   return stats[questionId];
 }
@@ -2765,8 +2842,10 @@ function buildQuestionMistakeRows(history) {
     .map(([id, stat]) => {
       const question = questions.find((q) => q.id === id);
       const title = question ? question.question : stat.question || `問題ID：${id}`;
-      const field = stat.field || question?.field || "分野不明";
-      const topic = stat.topic || question?.topic || "トピック不明";
+      const field = question
+        ? normalizeField(question.field, question.topic)
+        : normalizeField(stat.field, stat.topic);
+      const topic = question?.topic || stat.topic || "トピック不明";
       return {
         id,
         field,
@@ -2784,8 +2863,10 @@ function buildRecentMistakeRows(history) {
     .sort((a, b) => new Date(b.answeredAt) - new Date(a.answeredAt))
     .map((record) => {
       const question = questions.find((q) => q.id === record.questionId);
-      const field = record.field || question?.field || "分野不明";
-      const topic = record.topic || question?.topic || "トピック不明";
+      const field = question
+        ? normalizeField(question.field, question.topic)
+        : normalizeField(record.field, record.topic);
+      const topic = question?.topic || record.topic || "トピック不明";
       const questionText = record.question || question?.question || `問題ID：${record.questionId}`;
       return {
         answeredAt: record.answeredAt,
@@ -2802,8 +2883,10 @@ function buildTopicSummaries(history) {
 
   records.forEach((record) => {
     const question = questions.find((q) => q.id === record.questionId);
-    const field = record.field || question?.field;
-    const topic = record.topic || question?.topic;
+    const topic = question?.topic || record.topic;
+    const field = question
+      ? normalizeField(question.field, question.topic)
+      : normalizeField(record.field, topic);
     if (!field || !topic) {
       return;
     }
@@ -2823,7 +2906,10 @@ function buildTopicSummaries(history) {
     Object.entries(history.byTopic || {}).forEach(([key, stat]) => {
       const keyParts = key.split("||");
       const topic = stat.topic || keyParts[keyParts.length - 1];
-      const field = stat.field || (keyParts.length > 1 ? keyParts[0] : findFieldByTopic(topic));
+      const field = normalizeField(
+        stat.field || (keyParts.length > 1 ? keyParts[0] : findFieldByTopic(topic)),
+        topic
+      );
       summaries[getTopicKey(field, topic)] = {
         field,
         topic,
@@ -2857,7 +2943,9 @@ function saveAnswer(question, isCorrect, selectedNumber, status) {
 
   const questionStat = studyHistory[question.id];
   // questions.csvを変更しないため、履歴側にも表示に必要な最小情報だけ持たせます。
-  questionStat.field = question.field;
+  if (!questionStat.field) {
+    questionStat.field = normalizeField(question.field, question.topic);
+  }
   questionStat.topic = question.topic;
   questionStat.id = question.id;
   questionStat.status = status;
@@ -2933,8 +3021,10 @@ function getHistory() {
   const studyHistory = getStudyHistory();
   Object.values(studyHistory).forEach((item) => {
     const question = questions.find((q) => q.id === item.id);
-    const field = item.field || question?.field || "分野不明";
-    const topic = item.topic || question?.topic || "トピック不明";
+    const topic = question?.topic || item.topic || "トピック不明";
+    const field = question
+      ? normalizeField(question.field, question.topic)
+      : normalizeField(item.field, topic);
     const correctCount = Number(item.correctCount || 0);
     const incorrectCount = Number(item.incorrectCount || item.wrongCount || 0);
     const totalCount = correctCount + incorrectCount;
