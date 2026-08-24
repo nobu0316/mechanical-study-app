@@ -260,6 +260,78 @@
     ]
   },
   {
+    "id": "SLIDE_MACHINE_ELEMENT_CIRCUMFERENTIAL_FORCE_MEANING",
+    "field": "機械要素",
+    "topic": "円周力",
+    "title": "円周力とは何か",
+    "description": "円周力を、軸の外周にあるキーがトルクを伝えるときに受ける接線方向の力としてイメージで理解するスライド",
+    "image": "slides/circumferential-force-meaning.png",
+    "summary": [
+      "トルクは軸を回そうとする働き",
+      "キーは軸の外周でトルクを伝え、そのときキーに働く接線方向の力を円周力Fという",
+      "円周力は軸中心ではなく、中心から半径rだけ離れた外周で働く",
+      "中心から遠いほど、同じトルクを小さい力で伝えられる",
+      "レンチやドアノブも、中心から遠い位置ほど小さい力で回せるという同じ原理"
+    ],
+    "relatedQuestionIds": [
+      "MACHINE_ELEMENT_TORQUE_KEY_001",
+      "MACHINE_ELEMENT_TORQUE_KEY_003",
+      "M_DESIGN_TORQUE_002",
+      "M_DESIGN_TORQUE_008"
+    ]
+  },
+  {
+    "id": "SLIDE_MACHINE_ELEMENT_CIRCUMFERENTIAL_FORCE_FORMULA",
+    "field": "機械要素",
+    "topic": "円周力",
+    "title": "なぜ F = 2T/d になるのか",
+    "description": "T=F×rとr=d/2からF=2T/dへ変形する流れと、軸径による円周力の違いを図で理解するスライド",
+    "image": "slides/circumferential-force-formula.png",
+    "summary": [
+      "トルクは T = F × r で表す",
+      "軸外周までの半径は r = d/2 なので、T = F × d/2 となる",
+      "Fについて解くと F = 2T/d。2が付くのは半径がd/2だから",
+      "同じトルクなら、軸径dが大きいほど円周力Fは小さく、dが小さいほどFは大きい",
+      "dをmmで使うときはTをN・mmにそろえ、N・mのままmmで割らない",
+      "例：T=500N・m=500000N・mm、d=50mmならF=2×500000/50=20000N"
+    ],
+    "relatedQuestionIds": [
+      "MACHINE_ELEMENT_TORQUE_KEY_001",
+      "MACHINE_ELEMENT_TORQUE_KEY_002",
+      "MACHINE_ELEMENT_TORQUE_KEY_003",
+      "M_DESIGN_TORQUE_004",
+      "M_DESIGN_TORQUE_006"
+    ]
+  },
+  {
+    "id": "SLIDE_MACHINE_ELEMENT_CIRCUMFERENTIAL_FORCE_KEY_LENGTH",
+    "field": "機械要素",
+    "topic": "キー",
+    "title": "円周力からキー長さへつなげる",
+    "description": "トルクから円周力、キーのせん断応力、必要長さへと前の計算結果を渡す一連の設計手順を理解するスライド",
+    "image": "slides/circumferential-force-key-length.png",
+    "summary": [
+      "軸動力と回転速度からトルクTを求め、F=2T/dで円周力へ変換する",
+      "円周力Fはキーを横へずらそうとする力として働く",
+      "キーのせん断面積はA=b×lで、せん断応力はτ=F/(bl)",
+      "必要長さはl=F/(τb)で求める",
+      "円周力Fが大きいほどキーは長く必要になる",
+      "キー幅bまたは許容せん断応力τが大きいほど必要長さlは短くできる",
+      "全体の流れは、トルク→円周力→せん断→キー長さ"
+    ],
+    "relatedQuestionIds": [
+      "MACHINE_ELEMENT_SHAFT_POWER_001",
+      "MACHINE_ELEMENT_SHAFT_POWER_002",
+      "MACHINE_ELEMENT_TORQUE_KEY_001",
+      "MACHINE_ELEMENT_TORQUE_KEY_002",
+      "MACHINE_ELEMENT_KEY_SHEAR_001",
+      "MACHINE_ELEMENT_KEY_SHEAR_002",
+      "MACHINE_ELEMENT_KEY_SHEAR_003",
+      "MACHINE_ELEMENT_KEY_SHEAR_004",
+      "MACHINE_ELEMENT_POWER_KEY_FLOW_001"
+    ]
+  },
+  {
     "id": "SLIDE_MACHINE_ELEMENT_TORQUE_KEY_FORCE",
     "field": "機械要素",
     "topic": "ねじりモーメント",
