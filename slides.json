@@ -262,28 +262,25 @@
   {
     "id": "SLIDE_MACHINE_ELEMENT_CIRCUMFERENTIAL_FORCE_MEANING",
     "field": "機械要素",
-    "topic": "円周力",
+    "topic": "円周力・キー",
     "title": "円周力とは何か",
     "description": "円周力を、軸の外周にあるキーがトルクを伝えるときに受ける接線方向の力としてイメージで理解するスライド",
     "image": "slides/circumferential-force-meaning.png",
     "summary": [
-      "トルクは軸を回そうとする働き",
-      "キーは軸の外周でトルクを伝え、そのときキーに働く接線方向の力を円周力Fという",
-      "円周力は軸中心ではなく、中心から半径rだけ離れた外周で働く",
+      "円周力Fは、軸の外周でトルクを伝える接線方向の力",
+      "トルクTは軸を回そうとする働き",
+      "キーは軸の外周でトルクを伝え、円周力Fは中心から半径d/2だけ離れた位置で働く",
       "中心から遠いほど、同じトルクを小さい力で伝えられる",
       "レンチやドアノブも、中心から遠い位置ほど小さい力で回せるという同じ原理"
     ],
     "relatedQuestionIds": [
-      "MACHINE_ELEMENT_TORQUE_KEY_001",
-      "MACHINE_ELEMENT_TORQUE_KEY_003",
-      "M_DESIGN_TORQUE_002",
-      "M_DESIGN_TORQUE_008"
+      "MACHINE_ELEMENT_TORQUE_KEY_003"
     ]
   },
   {
     "id": "SLIDE_MACHINE_ELEMENT_CIRCUMFERENTIAL_FORCE_FORMULA",
     "field": "機械要素",
-    "topic": "円周力",
+    "topic": "円周力・キー",
     "title": "なぜ F = 2T/d になるのか",
     "description": "T=F×rとr=d/2からF=2T/dへ変形する流れと、軸径による円周力の違いを図で理解するスライド",
     "image": "slides/circumferential-force-formula.png",
@@ -297,82 +294,33 @@
     ],
     "relatedQuestionIds": [
       "MACHINE_ELEMENT_TORQUE_KEY_001",
-      "MACHINE_ELEMENT_TORQUE_KEY_002",
-      "MACHINE_ELEMENT_TORQUE_KEY_003",
-      "M_DESIGN_TORQUE_004",
-      "M_DESIGN_TORQUE_006"
+      "MACHINE_ELEMENT_TORQUE_KEY_002"
     ]
   },
   {
     "id": "SLIDE_MACHINE_ELEMENT_CIRCUMFERENTIAL_FORCE_KEY_LENGTH",
     "field": "機械要素",
-    "topic": "キー",
-    "title": "円周力からキー長さへつなげる",
+    "topic": "円周力・キー",
+    "title": "円周力からキー長さへ",
     "description": "トルクから円周力、キーのせん断応力、必要長さへと前の計算結果を渡す一連の設計手順を理解するスライド",
     "image": "slides/circumferential-force-key-length.png",
     "summary": [
       "軸動力と回転速度からトルクTを求め、F=2T/dで円周力へ変換する",
       "円周力Fはキーを横へずらそうとする力として働く",
       "キーのせん断面積はA=b×lで、せん断応力はτ=F/(bl)",
-      "必要長さはl=F/(τb)で求める",
+      "発生するせん断応力τと許容せん断応力τaを区別し、必要長さはl=F/(τa b)で求める",
       "円周力Fが大きいほどキーは長く必要になる",
-      "キー幅bまたは許容せん断応力τが大きいほど必要長さlは短くできる",
+      "キー幅bまたは許容せん断応力τaが大きいほど必要長さlは短くできる",
       "全体の流れは、トルク→円周力→せん断→キー長さ"
     ],
     "relatedQuestionIds": [
       "MACHINE_ELEMENT_SHAFT_POWER_001",
       "MACHINE_ELEMENT_SHAFT_POWER_002",
-      "MACHINE_ELEMENT_TORQUE_KEY_001",
-      "MACHINE_ELEMENT_TORQUE_KEY_002",
       "MACHINE_ELEMENT_KEY_SHEAR_001",
       "MACHINE_ELEMENT_KEY_SHEAR_002",
       "MACHINE_ELEMENT_KEY_SHEAR_003",
       "MACHINE_ELEMENT_KEY_SHEAR_004",
       "MACHINE_ELEMENT_POWER_KEY_FLOW_001"
-    ]
-  },
-  {
-    "id": "SLIDE_MACHINE_ELEMENT_TORQUE_KEY_FORCE",
-    "field": "機械要素",
-    "topic": "ねじりモーメント",
-    "title": "軸トルクとキー円周力",
-    "description": "軸断面とてこのイメージから、キー位置の半径 d/2 と円周力 F = 2T / d の関係を直感的に理解するスライド",
-    "image": "slides/slidetorque-key-force.png",
-    "summary": [
-      "円周力は、軸の外周にあるキー位置でトルクを支える力",
-      "トルクは「力 × 中心からの距離」。キーまでの距離は直径dではなく半径d/2",
-      "T = F × d/2 をFについて解くと、円周力は F = 2T / d",
-      "同じトルクなら、軸径dが大きいほど半径が大きくなり、必要な円周力Fは小さくなる",
-      "同じトルクなら、軸径dが小さいほど半径が小さくなり、必要な円周力Fは大きくなる",
-      "例：T = 500 N・m = 500000 N・mm、d = 50 mmなら、F = 2 × 500000 / 50 = 20000 N",
-      "dをmmで使うならTもN・mmにそろえ、N・mのままmmで割らない"
-    ],
-    "relatedQuestionIds": [
-      "MACHINE_ELEMENT_TORQUE_KEY_001",
-      "MACHINE_ELEMENT_TORQUE_KEY_002",
-      "MACHINE_ELEMENT_TORQUE_KEY_003"
-    ]
-  },
-  {
-    "id": "SLIDE_MACHINE_ELEMENT_KEY_SHEAR_LENGTH",
-    "field": "機械要素",
-    "topic": "キー",
-    "title": "キーのせん断応力と必要長さ",
-    "description": "キーに加わるせん断力から、必要なキー長さ l = F / (τ b) を求める流れを整理するスライド",
-    "image": "slides/slidekey-shear-length.png",
-    "summary": [
-      "キーは軸とハブの間でトルクを伝える部品であり、せん断力を受ける",
-      "キーのせん断応力は、τ = F / A で考える",
-      "キーのせん断面積は A = b × l である",
-      "したがって、τ = F / (b l) となる",
-      "必要なキー長さは、l = F / (τ b) で求める",
-      "MPaはN/mm2なので、FはN、bとlはmmでそろえる",
-      "計算値より小さい標準長さは選ばず、計算値以上の標準寸法を選ぶ"
-    ],
-    "relatedQuestionIds": [
-      "MACHINE_ELEMENT_KEY_SHEAR_001",
-      "MACHINE_ELEMENT_KEY_SHEAR_002",
-      "MACHINE_ELEMENT_KEY_SHEAR_003"
     ]
   },
   {
