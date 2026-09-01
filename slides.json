@@ -424,5 +424,29 @@
       "MTRL_C1720_Q002",
       "MTRL_C1720_Q003"
     ]
+  },
+  {
+    "id": "SLIDE_MTRL_LIMIT_GAUGE_001",
+    "field": "工業材料",
+    "topic": "限界ゲージ",
+    "title": "限界ゲージ ― 穴と軸のGOを混同しない",
+    "description": "穴用と軸用のGO・NO-GO、下限・上限、プラグ・リングゲージの対応を図で比較するスライド",
+    "image": "slides/limit-gauge-hole-shaft.svg",
+    "priority": "high",
+    "summary": [
+      "穴用：GO＝下限寸法、NO-GO＝上限寸法",
+      "軸用：GO＝上限寸法、NO-GO＝下限寸法",
+      "穴が小さすぎるとGOが入らないため、穴GOは下限",
+      "軸が太すぎるとGOを通らないため、軸GOは上限",
+      "穴にはプラグゲージ、軸にはリングゲージまたははさみゲージ",
+      "覚え方：穴GOは下、軸GOは上"
+    ],
+    "relatedQuestionIds": [
+      "MTRL_R7_MP3_Q001",
+      "MTRL_R7_MP3_Q002",
+      "MTRL_R7_MP3_Q003",
+      "MTRL_R7_MP3_Q004",
+      "MTRL_R7_MP3_Q005"
+    ]
   }
 ]
