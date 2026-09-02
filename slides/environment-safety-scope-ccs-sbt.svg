@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Scope・CCS・SBTを区別</title>
+  <desc id="desc">Scope 1は自社の直接排出、Scope 2は購入電力と購入熱、CCSは二酸化炭素回収地下貯留技術、SBTは科学的根拠に基づく削減目標。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4fafb"/><stop offset="1" stop-color="#edf3f7"/></linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#536b75"/></marker>
+    <style>text{font-family:Arial,'Yu Gothic',Meiryo,sans-serif;fill:#102a36}.title{font-size:46px;font-weight:900}.section{font-size:26px;font-weight:900}.term{font-size:38px;font-weight:900}.meaning{font-size:28px;font-weight:900}.cue{font-size:22px;font-weight:800}.small{font-size:18px;font-weight:800}.white{fill:#fff}.blue{fill:#145c86}.teal{fill:#087064}.orange{fill:#ad4f20}.purple{fill:#62448f}</style>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <text x="48" y="75" class="title">Scope・CCS・SBTを区別</text>
+  <rect x="830" y="28" width="322" height="52" rx="26" fill="#102a36"/><text x="991" y="63" text-anchor="middle" class="small white">数字は排出源 ／ 英字は技術・目標</text>
+
+  <text x="48" y="126" class="section blue">Scope 1 / Scope 2</text>
+  <rect x="42" y="145" width="548" height="205" rx="24" fill="#fff" stroke="#72a8c5" stroke-width="3"/>
+  <rect x="65" y="169" width="178" height="57" rx="15" fill="#e5f1f7"/><text x="154" y="209" text-anchor="middle" class="term blue">Scope 1</text>
+  <text x="275" y="195" class="meaning blue">自社で直接排出</text>
+  <g transform="translate(72 247)"><rect x="0" y="27" width="72" height="47" rx="7" fill="#c8dce5" stroke="#145c86" stroke-width="3"/><path d="M16 27V4h12v23M43 27V11h12v16" fill="none" stroke="#145c86" stroke-width="6"/><path d="M92 66c-17-21 6-31-2-52 24 17 25 38 15 52z" fill="#e46a35"/><line x1="122" y1="50" x2="184" y2="50" stroke="#536b75" stroke-width="4" marker-end="url(#arrow)"/><text x="205" y="45" class="cue">自分で燃やす</text><text x="205" y="72" class="small blue">＝ Scope 1</text></g>
+
+  <rect x="610" y="145" width="548" height="205" rx="24" fill="#fff" stroke="#6db3a7" stroke-width="3"/>
+  <rect x="633" y="169" width="178" height="57" rx="15" fill="#e0f4ef"/><text x="722" y="209" text-anchor="middle" class="term teal">Scope 2</text>
+  <text x="843" y="195" class="meaning teal">購入電力・熱</text>
+  <g transform="translate(642 247)"><circle cx="38" cy="49" r="34" fill="#dff3ef" stroke="#087064" stroke-width="3"/><path d="M44 13L21 50h21l-9 34 28-44H40z" fill="#f0ad2d"/><line x1="88" y1="50" x2="150" y2="50" stroke="#536b75" stroke-width="4" marker-end="url(#arrow)"/><text x="174" y="45" class="cue">買ったエネルギー</text><text x="174" y="72" class="small teal">＝ Scope 2</text></g>
+
+  <text x="48" y="398" class="section orange">CCS / SBT</text>
+  <rect x="42" y="417" width="548" height="205" rx="24" fill="#fff" stroke="#dc9a70" stroke-width="3"/>
+  <rect x="65" y="441" width="178" height="57" rx="15" fill="#fff0e7"/><text x="154" y="481" text-anchor="middle" class="term orange">CCS</text>
+  <text x="275" y="467" class="meaning orange">CO₂回収・地下貯留</text>
+  <g transform="translate(72 515)"><rect x="0" y="0" width="90" height="43" rx="8" fill="#d8e5e8" stroke="#536b75" stroke-width="3"/><text x="45" y="28" text-anchor="middle" class="small">CO₂</text><path d="M110 9v55" stroke="#ad4f20" stroke-width="7" marker-end="url(#arrow)"/><path d="M88 73h76M96 87h60" stroke="#8a6a51" stroke-width="7"/><text x="198" y="31" class="cue">回収して地下へ</text><text x="198" y="62" class="meaning orange">技術</text></g>
+
+  <rect x="610" y="417" width="548" height="205" rx="24" fill="#fff" stroke="#a490cc" stroke-width="3"/>
+  <rect x="633" y="441" width="178" height="57" rx="15" fill="#eee9f8"/><text x="722" y="481" text-anchor="middle" class="term purple">SBT</text>
+  <text x="843" y="457" class="meaning purple">科学的根拠</text><text x="843" y="490" class="meaning purple">に基づく削減目標</text>
+  <g transform="translate(642 515)"><circle cx="42" cy="43" r="37" fill="#eee9f8" stroke="#62448f" stroke-width="3"/><circle cx="42" cy="43" r="23" fill="none" stroke="#62448f" stroke-width="3"/><circle cx="42" cy="43" r="9" fill="#62448f"/><line x1="78" y1="43" x2="143" y2="43" stroke="#536b75" stroke-width="4" marker-end="url(#arrow)"/><text x="167" y="36" class="cue">科学に合わせる</text><text x="167" y="68" class="meaning purple">目標</text></g>
+  <text x="600" y="657" text-anchor="middle" class="small" fill="#536b75">1は自分 ／ 2は買う　　CCSは技術 ／ SBTは目標</text>
+</svg>

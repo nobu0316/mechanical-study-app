@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">環境安全① 最優先5ワード</title>
+  <desc id="desc">イタイイタイ病とカドミウム、WBGTと28以上の厳重警戒、購入電力とScope 2、二酸化炭素回収地下貯留とCCS、科学的根拠に基づく削減目標とSBTの対応。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2faf8"/><stop offset="1" stop-color="#eef4f7"/></linearGradient>
+    <style>text{font-family:Arial,'Yu Gothic',Meiryo,sans-serif;fill:#102a36}.title{font-size:46px;font-weight:900}.kicker{font-size:19px;font-weight:800;letter-spacing:1.5px}.cue{font-size:25px;font-weight:800}.answer{font-size:34px;font-weight:900}.arrow{font-size:30px;font-weight:900}.small{font-size:18px;font-weight:800}.white{fill:#fff}.teal{fill:#096b65}.navy{fill:#123e5a}.orange{fill:#ad4f20}.purple{fill:#5c438f}</style>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <text x="48" y="46" class="kicker teal">MECHANICAL DESIGN EXAM • QUICK REVIEW</text>
+  <text x="48" y="96" class="title">環境安全① 最優先5ワード</text>
+  <rect x="895" y="42" width="255" height="50" rx="25" fill="#123e5a"/><text x="1022" y="76" text-anchor="middle" class="small white">5〜15秒で即答</text>
+
+  <rect x="42" y="126" width="548" height="144" rx="22" fill="#fff" stroke="#82b9b3" stroke-width="3"/>
+  <circle cx="93" cy="198" r="32" fill="#dff3ef"/><text x="93" y="208" text-anchor="middle" class="answer teal">1</text>
+  <text x="145" y="181" class="cue">イタイイタイ病</text><text x="405" y="181" class="arrow teal">→</text>
+  <text x="145" y="229" class="answer teal">カドミウム</text>
+
+  <rect x="610" y="126" width="548" height="144" rx="22" fill="#fff" stroke="#dfa36e" stroke-width="3"/>
+  <circle cx="661" cy="198" r="32" fill="#fff0e4"/><text x="661" y="208" text-anchor="middle" class="answer orange">2</text>
+  <text x="713" y="174" class="cue">WBGT</text><text x="835" y="174" class="arrow orange">→</text>
+  <text x="713" y="222" class="answer orange">28以上＝厳重警戒</text>
+  <text x="1048" y="249" text-anchor="end" class="small orange">※単位のない指数</text>
+
+  <rect x="42" y="294" width="548" height="144" rx="22" fill="#fff" stroke="#7aa9c0" stroke-width="3"/>
+  <circle cx="93" cy="366" r="32" fill="#e6f1f6"/><text x="93" y="376" text-anchor="middle" class="answer navy">3</text>
+  <text x="145" y="349" class="cue">購入電力・購入熱</text><text x="425" y="349" class="arrow navy">→</text>
+  <text x="145" y="397" class="answer navy">Scope 2</text><text x="335" y="397" class="small navy">買ったエネルギー</text>
+
+  <rect x="610" y="294" width="548" height="144" rx="22" fill="#fff" stroke="#df9b70" stroke-width="3"/>
+  <circle cx="661" cy="366" r="32" fill="#fff0e7"/><text x="661" y="376" text-anchor="middle" class="answer orange">4</text>
+  <text x="713" y="344" class="cue">CO₂回収＋地下貯留</text><text x="1018" y="344" class="arrow orange">→</text>
+  <text x="713" y="398" class="answer orange">CCS</text><rect x="825" y="364" width="116" height="40" rx="20" fill="#fff0e7"/><text x="883" y="391" text-anchor="middle" class="small orange">技術</text>
+
+  <rect x="42" y="462" width="1116" height="150" rx="24" fill="#fff" stroke="#9f8cc7" stroke-width="3"/>
+  <circle cx="100" cy="537" r="34" fill="#eee9f8"/><text x="100" y="548" text-anchor="middle" class="answer purple">5</text>
+  <text x="158" y="521" class="cue">科学的根拠に基づく温室効果ガス削減目標</text><text x="812" y="521" class="arrow purple">→</text>
+  <text x="158" y="569" class="answer purple">SBT</text><rect x="270" y="535" width="116" height="40" rx="20" fill="#eee9f8"/><text x="328" y="562" text-anchor="middle" class="small purple">目標</text>
+  <rect x="750" y="546" width="355" height="45" rx="22" fill="#123e5a"/><text x="928" y="577" text-anchor="middle" class="small white">CCSは技術 ／ SBTは目標</text>
+  <text x="600" y="650" text-anchor="middle" class="small" fill="#536b75">病名→物質　数値→区分　購入→Scope 2　回収・貯留→CCS　科学的目標→SBT</text>
+</svg>
