@@ -448,5 +448,54 @@
       "MTRL_R7_MP3_Q004",
       "MTRL_R7_MP3_Q005"
     ]
+  },
+  {
+    "id": "SLIDE_ENV_R7_ES1_PRIORITY_001",
+    "field": "環境・安全",
+    "topic": "環境安全①・最優先",
+    "title": "環境安全① 最優先5ワード",
+    "description": "カドミウム、WBGT 28、Scope 2、CCS、SBTを一目で反復するスライド",
+    "image": "slides/environment-safety-priority-words.svg",
+    "priority": "high",
+    "summary": [
+      "イタイイタイ病＝カドミウム",
+      "WBGT 28以上＝厳重警戒。WBGTは単位のない指数",
+      "購入電力・購入熱＝Scope 2",
+      "CO₂回収＋地下貯留＝CCS",
+      "科学的根拠に基づく削減目標＝SBT"
+    ],
+    "relatedQuestionIds": [
+      "ENV_R7_ES1_Q001",
+      "ENV_R7_ES1_Q007",
+      "ENV_R7_ES1_Q008",
+      "ENV_R7_ES1_Q009",
+      "ENV_R7_ES1_Q010",
+      "ENV_R7_ES1_Q016"
+    ]
+  },
+  {
+    "id": "SLIDE_ENV_R7_ES1_DISTINCTION_001",
+    "field": "環境・安全",
+    "topic": "Scope・CCS・SBT",
+    "title": "Scope・CCS・SBTを区別",
+    "description": "Scope 1と2、CCSとSBTを直接排出・購入エネルギー・技術・目標で区別するスライド",
+    "image": "slides/environment-safety-scope-ccs-sbt.svg",
+    "priority": "high",
+    "summary": [
+      "Scope 1＝自社で直接排出＝自分で燃やす",
+      "Scope 2＝購入電力・購入熱＝買ったエネルギー",
+      "CCS＝CO₂回収・地下貯留＝技術",
+      "SBT＝科学的根拠に基づく削減目標＝目標",
+      "覚え方：1は自分、2は買う。CCSは技術、SBTは目標"
+    ],
+    "relatedQuestionIds": [
+      "ENV_R7_ES1_Q008",
+      "ENV_R7_ES1_Q009",
+      "ENV_R7_ES1_Q010",
+      "ENV_R7_ES1_Q011",
+      "ENV_R7_ES1_Q012",
+      "ENV_R7_ES1_Q013",
+      "ENV_R7_ES1_Q014"
+    ]
   }
 ]
