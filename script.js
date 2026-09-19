@@ -220,7 +220,6 @@ const noteFieldSelect = document.getElementById("noteFieldSelect");
 const noteStatusSelect = document.getElementById("noteStatusSelect");
 const choicesArea = document.getElementById("choicesArea");
 const feedbackArea = document.getElementById("feedbackArea");
-const statusArea = document.getElementById("statusArea");
 const nextQuestionBtn = document.getElementById("nextQuestionBtn");
 const historyImportInput = document.getElementById("historyImportInput");
 const backupRestoreInput = document.getElementById("backupRestoreInput");
@@ -1893,8 +1892,6 @@ function renderQuestion() {
 
   feedbackArea.className = "feedback hidden";
   feedbackArea.innerHTML = "";
-  statusArea.className = "status-area hidden";
-  statusArea.innerHTML = "";
   nextQuestionBtn.classList.add("hidden");
 
   choicesArea.innerHTML = "";
@@ -2115,6 +2112,10 @@ function updateCalculatorDisplay() {
 }
 
 function answerQuestion(selectedNumber) {
+  // 選択肢の連打でも、同じ回答の統計・履歴は一度だけ保存する。
+  if (quizAnswers.length !== currentIndex) {
+    return;
+  }
   const question = currentQuiz[currentIndex];
   const isCorrect = selectedNumber === question.answer;
   const buttons = [...choicesArea.querySelectorAll("button")];
@@ -2131,7 +2132,10 @@ function answerQuestion(selectedNumber) {
   });
 
   const questionResult = recordQuestionResult(question, isCorrect);
-  quizAnswers.push({ question, selectedNumber, isCorrect, status: "", unsureRecorded: false, questionResult });
+  const answer = { question, selectedNumber, isCorrect, unsureRecorded: false, questionResult };
+  quizAnswers.push(answer);
+  // 既存の学習履歴形式を維持し、自己申告を待たずに正誤を記録する。
+  saveAnswer(question, isCorrect, selectedNumber, isCorrect ? "わかった" : "間違えた");
 
   feedbackArea.className = `feedback ${isCorrect ? "correct" : "wrong"}`;
   feedbackArea.innerHTML = `
@@ -2140,36 +2144,38 @@ function answerQuestion(selectedNumber) {
     <div>正解：${question.answer}. ${question.choices[question.answer - 1]}</div>
     <div>${question.explanation}</div>
     <div class="feedback-actions">
-      <button class="unsure-review-btn" type="button" data-mark-unsure>迷ったので復習</button>
+      ${isCorrect ? '<button class="unsure-review-btn" type="button" data-mark-unsure>まだ不安</button>' : ""}
       <button class="note-link-btn" type="button" data-add-note-from-current>この問題の要点カードを追加</button>
       <span class="unsure-review-message hidden" data-unsure-message aria-live="polite"></span>
     </div>
     <div data-weakness-reason-host></div>
   `;
   feedbackArea.querySelector("[data-add-note-from-current]").addEventListener("click", () => showNoteForm(null, question));
-  feedbackArea.querySelector("[data-mark-unsure]").addEventListener("click", (event) => {
+  feedbackArea.querySelector("[data-mark-unsure]")?.addEventListener("click", (event) => {
     const latestAnswer = quizAnswers[quizAnswers.length - 1];
-    if (!latestAnswer || latestAnswer.question.id !== question.id || latestAnswer.unsureRecorded) {
+    if (latestAnswer !== answer || !isCorrect || answer.unsureRecorded) {
       return;
     }
 
     recordQuestionUnsure(question);
+    updateLatestAnswerStatus(question.id, "迷った");
     latestAnswer.unsureRecorded = true;
     feedbackArea.querySelector("[data-retention-feedback]")?.remove();
     event.currentTarget.disabled = true;
-    event.currentTarget.textContent = "復習対象に登録済み";
+    event.currentTarget.classList.add("hidden");
     const message = feedbackArea.querySelector("[data-unsure-message]");
-    message.textContent = "復習対象に登録しました";
+    message.textContent = "弱点として登録しました";
     message.classList.remove("hidden");
-    renderWeaknessReasonPrompt(question);
+    renderWeaknessReasonPrompt(question, "何が不安でしたか？");
   });
   if (!isCorrect) {
     renderWeaknessReasonPrompt(question);
   }
-  renderStatusButtons(question, isCorrect, selectedNumber);
+  nextQuestionBtn.textContent = currentIndex === currentQuiz.length - 1 ? "結果を見る" : "次の問題へ";
+  nextQuestionBtn.classList.remove("hidden");
 }
 
-function renderWeaknessReasonPrompt(question) {
+function renderWeaknessReasonPrompt(question, title = "何が原因でしたか？") {
   const host = feedbackArea.querySelector("[data-weakness-reason-host]");
   if (!host) {
     return;
@@ -2177,7 +2183,7 @@ function renderWeaknessReasonPrompt(question) {
 
   host.innerHTML = `
     <section class="weakness-reason-area" aria-label="弱点理由の登録">
-      <p class="weakness-reason-title">今回の原因は？</p>
+      <p class="weakness-reason-title">${escapeHtml(title)}</p>
       <div class="weakness-reason-buttons">
         ${WEAKNESS_REASONS.map((reason) => `
           <button type="button" data-weakness-reason="${reason.key}">${reason.label}</button>
@@ -2510,40 +2516,10 @@ function showQuestionStatsSummary() {
   showMessage(`間違えた問題：${wrongCount}問 / 迷った問題：${unsureCount}問 / 正解記録あり：${correctCount}問`);
 }
 
-function renderStatusButtons(question, isCorrect, selectedNumber) {
-  statusArea.className = "status-area";
-  statusArea.innerHTML = `
-    <p class="status-title">この問題の手応えを記録してください</p>
-    <div class="status-buttons" role="group" aria-label="学習状態を記録">
-      <button type="button" data-status="わかった">わかった</button>
-      <button type="button" data-status="迷った">迷った</button>
-      <button type="button" data-status="間違えた">間違えた</button>
-    </div>
-  `;
-
-  statusArea.querySelectorAll("[data-status]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const status = button.dataset.status;
-      const latestAnswer = quizAnswers[quizAnswers.length - 1];
-      if (latestAnswer && latestAnswer.question.id === question.id) {
-        // 同じ回答で押し直した場合は、回数を増やさず最後の状態だけ直します。
-        if (latestAnswer.status) {
-          updateLatestAnswerStatus(question.id, status);
-        } else {
-          saveAnswer(question, isCorrect, selectedNumber, status);
-        }
-        latestAnswer.status = status;
-      }
-      statusArea.querySelectorAll("[data-status]").forEach((item) => {
-        item.classList.toggle("selected-status", item === button);
-      });
-      nextQuestionBtn.textContent = currentIndex === currentQuiz.length - 1 ? "結果を見る" : "次の問題へ";
-      nextQuestionBtn.classList.remove("hidden");
-    });
-  });
-}
-
 function goNextQuestion() {
+  if (quizAnswers.length !== currentIndex + 1) {
+    return;
+  }
   currentIndex += 1;
   if (currentIndex >= currentQuiz.length) {
     showResult();

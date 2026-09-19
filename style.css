@@ -540,44 +540,6 @@ textarea {
   font-weight: 700;
 }
 
-.status-area {
-  margin-top: 16px;
-}
-
-.status-title {
-  margin-bottom: 8px;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-.status-buttons {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.status-buttons button {
-  min-height: 56px;
-  font-weight: 800;
-}
-
-.status-buttons [data-status="わかった"] {
-  border-color: #b7dcca;
-}
-
-.status-buttons [data-status="迷った"] {
-  border-color: #dfc17b;
-}
-
-.status-buttons [data-status="間違えた"] {
-  border-color: #d7aaa5;
-}
-
-.status-buttons .selected-status {
-  border-color: var(--primary);
-  background: #e3f1f2;
-  color: var(--primary-dark);
-}
 
 .result-grid {
   display: grid;
@@ -1252,10 +1214,10 @@ textarea {
 }
 
 .unsure-review-btn {
-  min-height: 42px;
-  border-color: #dfc17b;
-  background: #fff8e8;
-  color: #6f4b12;
+  min-height: 44px;
+  border-color: var(--line);
+  background: #fff;
+  color: var(--primary-dark);
   padding: 8px 12px;
   font-size: 0.92rem;
   font-weight: 700;
@@ -1620,8 +1582,7 @@ textarea {
   }
 
   .button-row,
-  .result-grid,
-  .status-buttons {
+  .result-grid {
     display: grid;
     grid-template-columns: 1fr;
   }
