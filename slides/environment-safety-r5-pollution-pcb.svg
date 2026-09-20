@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">公害・PCB 混同防止</title>
+  <desc id="desc">水俣病と新潟水俣病はメチル水銀、イタイイタイ病はカドミウム、四日市ぜんそくは硫黄酸化物、試験ではカネミ油症はPCB。PCBの名称と絶縁油の用途を補足する。</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#f2faf8"/><stop offset="1" stop-color="#eef4f7"/></linearGradient>
+    <style>text{font-family:Arial,'Yu Gothic',Meiryo,sans-serif;fill:#102a36}.title{font-size:44px;font-weight:900}.kicker{font-size:19px;font-weight:800;letter-spacing:1.5px}.cue{font-size:29px;font-weight:800}.answer{font-size:34px;font-weight:900}.small{font-size:19px;font-weight:700}.teal{fill:#096b65}.blue{fill:#123e5a}.orange{fill:#ad4f20}</style>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <text x="48" y="44" class="kicker teal">R5 ENVIRONMENT • RECALL THE PAIRS</text>
+  <text x="48" y="97" class="title">公害・PCB 混同防止</text>
+  <rect x="42" y="126" width="1116" height="136" rx="20" fill="#dff3ef" stroke="#82b9b3" stroke-width="3"/>
+  <text x="76" y="174" class="cue">水俣病</text><text x="406" y="174" class="answer teal">→</text>
+  <text x="482" y="174" class="answer teal">メチル水銀</text>
+  <text x="76" y="235" class="cue">新潟水俣病</text><text x="406" y="235" class="answer teal">→</text>
+  <text x="482" y="235" class="answer teal">メチル水銀</text>
+  <path d="M740 153 H763 V226 H740" fill="none" stroke="#096b65" stroke-width="4"/>
+  <text x="793" y="185" class="cue teal">水俣系は両方</text>
+  <text x="793" y="222" class="small teal">「メチル」まで答える</text>
+  <rect x="42" y="277" width="1116" height="60" rx="18" fill="#fff"/>
+  <text x="76" y="318" class="cue">イタイイタイ病</text><text x="406" y="318" class="answer blue">→</text>
+  <text x="482" y="318" class="answer blue">カドミウム</text>
+  <rect x="42" y="351" width="1116" height="60" rx="18" fill="#fff"/>
+  <text x="76" y="392" class="cue">四日市ぜんそく</text><text x="406" y="392" class="answer blue">→</text>
+  <text x="482" y="392" class="answer blue">硫黄酸化物 SOx</text>
+  <text x="854" y="391" class="small">ぜんそく→空気</text>
+  <rect x="42" y="425" width="1116" height="60" rx="18" fill="#fff0e7" stroke="#dfa36e" stroke-width="2"/>
+  <text x="76" y="466" class="cue">カネミ油症</text><text x="406" y="466" class="answer orange">→</text>
+  <text x="482" y="466" class="answer orange">PCB</text>
+  <text x="793" y="465" class="cue orange">油症 → PCB</text>
+  <rect x="42" y="503" width="1116" height="125" rx="20" fill="#fff" stroke="#c7d8dd" stroke-width="2"/>
+  <text x="69" y="543" class="cue orange">PCB → ポリ塩化ビフェニル</text>
+  <text x="69" y="579" class="small">昔は変圧器・コンデンサなどの絶縁油。熱に強い・絶縁性が高い。</text>
+  <text x="69" y="610" class="small orange">ただし、有害・分解されにくい・蓄積しやすい。</text>
+  <text x="600" y="658" text-anchor="middle" class="small">カネミ油症＝PCBは試験の対応。実際にはPCDF等のダイオキシン類も関与。</text>
+</svg>

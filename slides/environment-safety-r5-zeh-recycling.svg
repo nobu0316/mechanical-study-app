@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">ZEH・ZEB・リサイクル法 混同防止</title>
+  <desc id="desc">ZEHはHがHouseで住宅、ZEBはBがBuildingで建築物。容器包装は容器包装リサイクル法、携帯電話やデジカメは小型家電リサイクル法。</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#f2faf8"/><stop offset="1" stop-color="#eef4f7"/></linearGradient>
+    <style>text{font-family:Arial,'Yu Gothic',Meiryo,sans-serif;fill:#102a36}.title{font-size:42px;font-weight:900}.kicker{font-size:19px;font-weight:800;letter-spacing:1.5px}.big{font-size:40px;font-weight:900}.cue{font-size:28px;font-weight:800}.small{font-size:19px;font-weight:700}.teal{fill:#096b65}.blue{fill:#123e5a}.orange{fill:#ad4f20}.white{fill:#fff}</style>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <text x="48" y="44" class="kicker teal">R5 ENVIRONMENT • DISTINGUISH THE TARGETS</text>
+  <text x="48" y="96" class="title">ZEH・ZEB・リサイクル法 混同防止</text>
+  <rect x="42" y="126" width="548" height="218" rx="22" fill="#fff" stroke="#82b9b3" stroke-width="3"/>
+  <path d="M76 214 L134 164 L192 214 M88 209 V276 H180 V209 M121 276 V237 H147 V276" fill="#dff3ef" stroke="#096b65" stroke-width="5" stroke-linejoin="round"/>
+  <text x="223" y="179" class="cue teal">ZEH</text>
+  <text x="223" y="232" class="big teal">H＝House</text>
+  <text x="223" y="277" class="cue">→ 住宅</text>
+  <text x="316" y="319" text-anchor="middle" class="small">Net Zero Energy House</text>
+  <rect x="610" y="126" width="548" height="218" rx="22" fill="#fff" stroke="#8aaabb" stroke-width="3"/>
+  <rect x="654" y="166" width="95" height="112" rx="5" fill="#e4eef5" stroke="#123e5a" stroke-width="5"/>
+  <path d="M671 187 H691 M714 187 H734 M671 212 H691 M714 212 H734 M671 237 H691 M714 237 H734 M693 278 V256 H713 V278" fill="none" stroke="#123e5a" stroke-width="5"/>
+  <text x="786" y="179" class="cue blue">ZEB</text>
+  <text x="786" y="232" class="big blue">B＝Building</text>
+  <text x="786" y="277" class="cue">→ 建築物</text>
+  <text x="884" y="319" text-anchor="middle" class="small">Net Zero Energy Building</text>
+  <rect x="42" y="359" width="1116" height="58" rx="17" fill="#123e5a"/>
+  <text x="600" y="398" text-anchor="middle" class="cue white">省エネ ＋ 創エネ → 年間エネルギー収支を実質ゼロへ</text>
+  <rect x="42" y="435" width="548" height="157" rx="22" fill="#fff"/>
+  <path d="M87 458 H111 V480 L124 497 V553 H74 V497 L87 480 Z" fill="#dff3ef" stroke="#096b65" stroke-width="4"/>
+  <path d="M79 511 H119 M79 539 H119" stroke="#096b65" stroke-width="3"/>
+  <text x="158" y="479" class="cue">容器・包装</text>
+  <text x="158" y="520" class="small">ペットボトルなど</text>
+  <text x="158" y="565" class="cue teal">→ 容器包装リサイクル法</text>
+  <rect x="610" y="435" width="548" height="157" rx="22" fill="#fff"/>
+  <rect x="646" y="463" width="56" height="90" rx="8" fill="#fff0e7" stroke="#ad4f20" stroke-width="4"/>
+  <path d="M655 478 H693 M655 532 H693" stroke="#ad4f20" stroke-width="3"/>
+  <circle cx="674" cy="543" r="3" fill="#ad4f20"/>
+  <text x="725" y="479" class="cue">携帯電話・デジカメなど</text>
+  <text x="725" y="520" class="small">小型電子機器の有用金属を回収</text>
+  <text x="725" y="565" class="cue orange">→ 小型家電リサイクル法</text>
+  <text x="600" y="630" text-anchor="middle" class="small">家電4品目は家電リサイクル法：エアコン・テレビ・冷蔵庫／冷凍庫・洗濯機／衣類乾燥機</text>
+  <text x="600" y="660" text-anchor="middle" class="small teal">H＝House、B＝Building。リサイクル法は「何を回収するか」で区別。</text>
+</svg>
