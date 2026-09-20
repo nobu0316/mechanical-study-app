@@ -52,6 +52,34 @@ const BACKUP_STORAGE_ITEMS = [
 const BACKUP_STORAGE_KEYS = BACKUP_STORAGE_ITEMS.map((item) => item.key);
 const QUESTIONS_CSV = "questions.csv";
 const SLIDES_JSON = "slides.json";
+// CSVの11列と保存済み履歴は維持し、追加問題の入力形式・内容タグだけを補足する。
+// 内容タグは学習テーマ用。回答後に選ぶ既存の弱点理由タグとは別に扱う。
+const QUESTION_PRACTICE = {
+  M_R7_M3_Q001: { tags: ["pin-bmd-confusion"], inputAnswers: ["伝えない", "伝わらない", "伝達しない", "通さない"] },
+  M_R7_M3_Q002: { tags: ["pin-bmd-confusion"], inputUnit: "kN・m" },
+  M_R7_M3_Q003: { tags: ["pin-sfd-confusion"], inputAnswers: ["×", "x", "バツ", "ばつ", "誤り", "正しくない"] },
+  M_R7_M3_Q004: { tags: ["pin-bmd-confusion", "sfd-bmd-direction"], inputAnswers: ["上がる", "上昇", "増加", "増える", "右上がり"] },
+  M_R7_M3_Q005: { tags: ["pin-bmd-confusion"], inputAnswers: ["正しくない", "×", "x", "誤り", "間違い"] },
+  M_R7_M3_Q006: { tags: ["sfd-bmd-direction"], inputAnswers: ["上がる", "上昇", "増加", "増える", "右上がり"] },
+  M_R7_M3_Q007: { tags: ["sfd-bmd-direction"], inputAnswers: ["下がる", "下降", "減少", "減る", "右下がり"] },
+  M_R7_M3_Q008: { tags: ["sfd-bmd-direction"], inputAnswers: ["水平", "一定", "変化しない", "変わらない"] },
+  M_R7_M3_Q009: { tags: ["sfd-bmd-direction"], inputAnswers: ["マイナス", "負", "負の値", "-"] },
+  M_R7_M3_Q010: { tags: ["sfd-bmd-direction"], inputAnswers: ["プラス", "正", "正の値", "+"] },
+  M_R7_M3_Q011: { tags: ["bmd-sign"], inputUnit: "kN・m" },
+  M_R7_M3_Q012: { tags: ["bmd-sign"], inputUnit: "kN・m" },
+  M_R7_M3_Q013: { tags: ["bmd-sign"], inputUnit: "kN・m" },
+  M_R7_M3_Q014: { tags: ["bmd-sign"], inputUnit: "kN・m" },
+  M_R7_M3_Q015: { tags: ["bmd-sign"], inputUnit: "kN・m" },
+  M_R7_M3_Q016: { tags: ["sfd-balance"], inputUnit: "kN" },
+  M_R7_M3_Q017: { tags: ["sfd-balance"], inputUnit: "kN" },
+  M_R7_M3_Q018: { tags: ["sfd-balance"], inputUnit: "kN" },
+  M_R7_M3_Q019: { tags: ["sfd-balance"], inputUnit: "kN" },
+  M_R7_M3_Q020: { tags: ["sfd-balance"], inputUnit: "kN" },
+  M_R7_M3_Q021: { tags: ["pin-bmd-confusion", "pin-sfd-confusion"] },
+  M_R7_M3_Q022: { tags: ["pin-bmd-confusion", "sfd-bmd-direction", "bmd-sign"], inputUnit: "kN・m" },
+  M_R7_M3_Q023: { tags: ["bmd-sign"], inputUnit: "kN・m" },
+  M_R7_M3_Q024: { tags: ["pin-bmd-confusion", "sfd-bmd-direction"] }
+};
 const WEAK_TOPIC_RATE_LIMIT = 70;
 const QUICK_REVIEW_QUESTION_LIMIT = 5;
 const DAILY_REVIEW_QUESTION_LIMIT = 5;
@@ -496,7 +524,8 @@ function parseCsv(csvText) {
       question: cols[4],
       choices: [cols[5], cols[6], cols[7], cols[8]],
       answer: Number(cols[9]),
-      explanation: cols[10]
+      explanation: cols[10],
+      ...QUESTION_PRACTICE[cols[0]]
     });
   });
   const validQuestions = parsedQuestions.filter((item) => item.id && item.field && item.question && item.answer >= 1 && item.answer <= 4);
@@ -1895,6 +1924,10 @@ function renderQuestion() {
   nextQuestionBtn.classList.add("hidden");
 
   choicesArea.innerHTML = "";
+  if (question.inputAnswers || question.inputUnit) {
+    renderRecallQuestion(question);
+    return;
+  }
   question.choices.forEach((choice, index) => {
     const button = document.createElement("button");
     button.type = "button";
@@ -1903,6 +1936,55 @@ function renderQuestion() {
     button.addEventListener("click", () => answerQuestion(index + 1));
     choicesArea.appendChild(button);
   });
+}
+
+function normalizeRecallAnswer(value) {
+  return String(value).normalize("NFKC").toLowerCase().replace(/[−–]/g, "-").replace(/\s/g, "").replace(/。$/, "");
+}
+
+function isRecallAnswerCorrect(question, value) {
+  const normalized = normalizeRecallAnswer(value);
+  if (question.inputUnit) {
+    // 符号は必須の判定対象。全角・単位省略は許容し、別単位や式は受け付けない。
+    const match = normalized.match(/^([+-]?(?:\d+(?:\.\d+)?|\.\d+))(.*)$/);
+    if (!match) return false;
+    const unit = (text) => normalizeRecallAnswer(text).replace(/[・·⋅×*.]/g, "");
+    if (match[2] && unit(match[2]) !== unit(question.inputUnit)) return false;
+    const expected = Number.parseFloat(normalizeRecallAnswer(question.choices[question.answer - 1]));
+    return Number(match[1]) === expected;
+  }
+  return (question.inputAnswers || []).some((answer) => normalizeRecallAnswer(answer) === normalized);
+}
+
+function renderRecallQuestion(question) {
+  const form = document.createElement("form");
+  form.className = "recall-form";
+  const label = document.createElement("label");
+  label.textContent = "答えを入力";
+  const input = document.createElement("input");
+  input.type = "text";
+  input.name = "recallAnswer";
+  input.required = true;
+  input.autocomplete = "off";
+  input.spellcheck = false;
+  const hint = document.createElement("p");
+  hint.className = "muted recall-hint";
+  hint.textContent = question.inputUnit
+    ? `符号に注意して数値で回答。単位は${question.inputUnit}（入力は省略可）。`
+    : "短い言葉で回答してください。";
+  const submit = document.createElement("button");
+  submit.type = "submit";
+  submit.className = "primary-btn";
+  submit.textContent = "回答する";
+  label.appendChild(input);
+  form.append(label, hint, submit);
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!input.value.trim() || currentQuiz[currentIndex] !== question || quizAnswers.length !== currentIndex) return;
+    // 自動採点後は、正誤記録・理由タグ・定着確認を既存の回答処理へ渡す。
+    answerQuestion(isRecallAnswerCorrect(question, input.value) ? question.answer : null);
+  });
+  choicesArea.appendChild(form);
 }
 
 function createCalculatorState() {
@@ -2118,7 +2200,8 @@ function answerQuestion(selectedNumber) {
   }
   const question = currentQuiz[currentIndex];
   const isCorrect = selectedNumber === question.answer;
-  const buttons = [...choicesArea.querySelectorAll("button")];
+  const buttons = [...choicesArea.querySelectorAll(".choice-btn")];
+  choicesArea.querySelectorAll("button, input").forEach((control) => { control.disabled = true; });
 
   buttons.forEach((button, index) => {
     const choiceNumber = index + 1;
@@ -2141,7 +2224,7 @@ function answerQuestion(selectedNumber) {
   feedbackArea.innerHTML = `
     <strong>${isCorrect ? "✅ 正解" : "不正解です"}</strong>
     ${renderRetentionFeedback(questionResult)}
-    <div>正解：${question.answer}. ${question.choices[question.answer - 1]}</div>
+    <div>正解：${question.inputAnswers || question.inputUnit ? "" : `${question.answer}. `}${question.choices[question.answer - 1]}</div>
     <div>${question.explanation}</div>
     <div class="feedback-actions">
       ${isCorrect ? '<button class="unsure-review-btn" type="button" data-mark-unsure>まだ不安</button>' : ""}

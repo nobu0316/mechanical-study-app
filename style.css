@@ -473,6 +473,24 @@ textarea {
   gap: 10px;
 }
 
+.recall-form {
+  display: grid;
+  gap: 10px;
+}
+
+.recall-form input {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  font-size: 16px;
+}
+
+.recall-hint {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
 .choice-btn {
   width: 100%;
   min-height: 56px;

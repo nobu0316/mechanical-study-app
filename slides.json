@@ -497,5 +497,54 @@
       "ENV_R7_ES1_Q013",
       "ENV_R7_ES1_Q014"
     ]
+  },
+  {
+    "id": "SLIDE_M_R7_M3_PIN_001",
+    "field": "材料力学",
+    "topic": "ピン結合・混同対策",
+    "title": "摩擦のないピン結合Dとは？",
+    "description": "ピンが決めるD点のBMD＝0と、SFDが決める右側の傾きを分ける",
+    "image": "slides/mechanics-pin-joint-bmd.svg",
+    "priority": "high",
+    "summary": [
+      "力は通す。モーメントは通さない。摩擦のない内部ピンDではBMD＝0",
+      "左右に切り分けたD点の力は同じ大きさ・逆向き",
+      "D点のSFD＝0とは限らない。ピンを通してせん断力も伝わる",
+      "0になるのはD点。D以降のBMDの傾きはSFDで決まる"
+    ],
+    "relatedQuestionIds": ["M_R7_M3_Q001", "M_R7_M3_Q002", "M_R7_M3_Q003", "M_R7_M3_Q004", "M_R7_M3_Q005", "M_R7_M3_Q021", "M_R7_M3_Q022", "M_R7_M3_Q024"]
+  },
+  {
+    "id": "SLIDE_M_R7_M3_DIRECTION_001",
+    "field": "材料力学",
+    "topic": "SFDとBMDの方向",
+    "title": "SFDがBMDの進む方向を決める",
+    "description": "SFDの＋・－・0から、右に進むBMDの増加・減少・水平を判断する",
+    "image": "slides/mechanics-sfd-bmd-direction.svg",
+    "priority": "high",
+    "summary": [
+      "＋なら上がる、－なら下がる、0なら水平。図は右向きに進み正のBMDを上へ描く",
+      "SFDが一定ならBMDは直線。SFD＝0なら現在のBMDの値を保つ",
+      "D点でBMD＝0でも、その右側のSFDが＋ならBMDは再び上がる",
+      "SFDは左から歩く、力の残高。上向きは足す、下向きは引く"
+    ],
+    "relatedQuestionIds": ["M_R7_M3_Q004", "M_R7_M3_Q005", "M_R7_M3_Q006", "M_R7_M3_Q007", "M_R7_M3_Q008", "M_R7_M3_Q009", "M_R7_M3_Q010", "M_R7_M3_Q016", "M_R7_M3_Q017", "M_R7_M3_Q018", "M_R7_M3_Q019", "M_R7_M3_Q020", "M_R7_M3_Q024"]
+  },
+  {
+    "id": "SLIDE_M_R7_M3_CHANGE_001",
+    "field": "材料力学",
+    "topic": "BMDの符号計算",
+    "title": "BMDは現在値＋増減量",
+    "description": "現在値→符号付きの変化量→右端の順で、BMD計算の符号ミスを防ぐ",
+    "image": "slides/mechanics-bmd-change.svg",
+    "priority": "high",
+    "summary": [
+      "SFDが一定の区間では右端BMD＝左端BMD＋SFD×距離",
+      "BMD＝現在地。SFD×距離＝その区間で増えた／減った量。現在値＋増減量",
+      "現在値30→変化量－10×2＝－20→右端30＋（－20）＝10 kN・m",
+      "現在値0→変化量＋15×2＝＋30→右端0＋30＝＋30 kN・m",
+      "BMDの変化量＝SFDの符号付き面積。SFDが四角形なら高さ×横幅。負の面積は減少分"
+    ],
+    "relatedQuestionIds": ["M_R7_M3_Q011", "M_R7_M3_Q012", "M_R7_M3_Q013", "M_R7_M3_Q014", "M_R7_M3_Q015", "M_R7_M3_Q022", "M_R7_M3_Q023"]
   }
 ]
