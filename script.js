@@ -329,7 +329,6 @@ function bindEvents() {
   addEvent("reviewMistakesBtn", "click", showWeaknessReview);
   addEvent("showSlidesBtn", "click", showSlides);
   addEvent("showStatsBtn", "click", showStats);
-  addEvent("showQuestionStatsBtn", "click", showQuestionStatsSummary);
   addEvent("toggleCalculatorBtn", "click", toggleCalculator);
   addEvent("closeCalculatorBtn", "click", closeCalculator);
   addEvent("calculatorKeys", "click", handleCalculatorKey);
@@ -2608,14 +2607,6 @@ function applyQuestionUnsure(stat) {
   if (stat.status !== "wrong") {
     stat.status = "unsure";
   }
-}
-
-function showQuestionStatsSummary() {
-  const stats = Object.values(loadQuestionStats());
-  const wrongCount = stats.filter((stat) => stat.status === "wrong").length;
-  const unsureCount = stats.filter((stat) => stat.status === "unsure").length;
-  const correctCount = stats.filter((stat) => stat.correctCount > 0).length;
-  showMessage(`間違えた問題：${wrongCount}問 / 迷った問題：${unsureCount}問 / 正解記録あり：${correctCount}問`);
 }
 
 function goNextQuestion() {
