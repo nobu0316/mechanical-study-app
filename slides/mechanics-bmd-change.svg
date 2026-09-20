@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">BMDは現在値＋増減量</title>
+  <desc id="desc">一定SFDの区間では右端BMDは左端BMDとSFDかける距離の和。30からマイナス20で10、0からプラス30で30になる2例をSFDの符号付き面積で示す。</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#f4fafb"/><stop offset="1" stop-color="#edf3f7"/></linearGradient>
+    <style>text{font-family:Arial,'Yu Gothic',Meiryo,sans-serif;fill:#102a36}.title{font-size:44px;font-weight:900}.formula{font-size:35px;font-weight:900}.lead{font-size:26px;font-weight:800}.label{font-size:24px;font-weight:800}.small{font-size:18px;font-weight:700}.teal{fill:#087064}.orange{fill:#ad4f20}.blue{fill:#145c86}.white{fill:#fff}</style>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <text x="48" y="68" class="title">BMDは現在値＋増減量</text>
+  <rect x="42" y="92" width="1116" height="74" rx="18" fill="#102a36"/>
+  <text x="600" y="141" text-anchor="middle" class="formula white">右端BMD ＝ 左端BMD ＋ SFD × 距離</text>
+  <text x="600" y="199" text-anchor="middle" class="small">SFDが一定の区間で使用。左端BMD＝現在地 ／ SFD×距離＝増えた・減った量</text>
+  <rect x="42" y="221" width="546" height="347" rx="24" fill="#fff" stroke="#dc9a70" stroke-width="3"/>
+  <text x="67" y="263" class="lead orange">例1　30から、20だけ減る</text>
+  <text x="67" y="304" class="label">現在値：30 kN・m</text>
+  <text x="67" y="344" class="label">変化量：－10 × 2 ＝ －20 kN・m</text>
+  <rect x="66" y="363" width="498" height="56" rx="12" fill="#fff0e7"/>
+  <text x="80" y="400" class="lead orange">右端：30 ＋（－20）＝ 10 kN・m</text>
+  <text x="69" y="453" class="small">SFD</text>
+  <line x1="169" y1="447" x2="341" y2="447" stroke="#82959d" stroke-width="2"/>
+  <text x="145" y="453" class="small">0</text>
+  <rect x="186" y="447" width="139" height="65" fill="#fff0e7" stroke="#ad4f20" stroke-width="3"/>
+  <text x="69" y="496" class="small orange">－10 kN</text>
+  <text x="252" y="539" text-anchor="middle" class="small">2 m</text>
+  <text x="359" y="482" class="label orange">面積 －20</text>
+  <text x="359" y="515" class="small">＝ 減少分</text>
+  <rect x="612" y="221" width="546" height="347" rx="24" fill="#fff" stroke="#6db3a7" stroke-width="3"/>
+  <text x="637" y="263" class="lead teal">例2　0から、30だけ増える</text>
+  <text x="637" y="304" class="label">現在値：0 kN・m</text>
+  <text x="637" y="344" class="label">変化量：＋15 × 2 ＝ ＋30 kN・m</text>
+  <rect x="636" y="363" width="498" height="56" rx="12" fill="#e0f4ef"/>
+  <text x="650" y="400" class="lead teal">右端：0 ＋ 15 × 2 ＝ ＋30 kN・m</text>
+  <text x="639" y="453" class="small">SFD</text>
+  <line x1="739" y1="512" x2="911" y2="512" stroke="#82959d" stroke-width="2"/>
+  <text x="715" y="518" class="small">0</text>
+  <rect x="756" y="447" width="139" height="65" fill="#dff3ef" stroke="#087064" stroke-width="3"/>
+  <text x="639" y="488" class="small teal">＋15 kN</text>
+  <text x="825" y="539" text-anchor="middle" class="small">2 m</text>
+  <text x="929" y="482" class="label teal">面積 ＋30</text>
+  <text x="929" y="515" class="small">＝ 増加分</text>
+  <text x="600" y="611" text-anchor="middle" class="lead blue">右端＝現在のBMD＋変化量。最後の＋／－まで確認。</text>
+  <text x="600" y="649" text-anchor="middle" class="small">一般にはBMDの変化量＝SFDの符号付き面積。SFDが四角形なら、高さ×横幅。</text>
+</svg>

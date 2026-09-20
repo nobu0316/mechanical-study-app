@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">摩擦のないピン結合Dとは？</title>
+  <desc id="desc">内部ピンDは力を伝えるがモーメントを伝えない。左右に切り分けるとDの力は同じ大きさで逆向き。D点のBMDは0だがSFDは0とは限らず右側のBMDの傾きはSFDで決まる。</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#f4fafb"/><stop offset="1" stop-color="#edf3f7"/></linearGradient>
+    <marker id="up" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#087064"/></marker>
+    <marker id="down" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#ad4f20"/></marker>
+    <style>text{font-family:Arial,'Yu Gothic',Meiryo,sans-serif;fill:#102a36}.title{font-size:44px;font-weight:900}.lead{font-size:29px;font-weight:800}.term{font-size:32px;font-weight:900}.label{font-size:24px;font-weight:800}.small{font-size:18px;font-weight:700}.teal{fill:#087064}.orange{fill:#ad4f20}.blue{fill:#145c86}</style>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <text x="48" y="68" class="title">摩擦のないピン結合Dとは？</text>
+  <text x="48" y="114" class="lead teal">力は通す。モーメントは通さない。</text>
+  <rect x="42" y="144" width="690" height="294" rx="24" fill="#fff" stroke="#72a8c5" stroke-width="3"/>
+  <text x="72" y="180" class="label blue">つながった梁</text>
+  <line x1="100" y1="226" x2="674" y2="226" stroke="#536b75" stroke-width="13"/>
+  <circle cx="387" cy="226" r="16" fill="#fff" stroke="#145c86" stroke-width="5"/>
+  <text x="177" y="214" class="small">左梁</text><text x="564" y="214" class="small">右梁</text>
+  <text x="387" y="272" text-anchor="middle" class="label blue">ピンD</text>
+  <text x="72" y="310" class="small">左右に切り分ける（鉛直成分の例）</text>
+  <line x1="95" y1="362" x2="314" y2="362" stroke="#536b75" stroke-width="10"/>
+  <line x1="460" y1="362" x2="679" y2="362" stroke="#536b75" stroke-width="10"/>
+  <circle cx="314" cy="362" r="11" fill="#fff" stroke="#145c86" stroke-width="4"/>
+  <circle cx="460" cy="362" r="11" fill="#fff" stroke="#145c86" stroke-width="4"/>
+  <line x1="314" y1="407" x2="314" y2="316" stroke="#087064" stroke-width="5" marker-end="url(#up)"/>
+  <line x1="460" y1="316" x2="460" y2="407" stroke="#ad4f20" stroke-width="5" marker-end="url(#down)"/>
+  <text x="245" y="344" class="label teal">R<tspan baseline-shift="sub" font-size="17">D</tspan></text>
+  <text x="485" y="395" class="label orange">R<tspan baseline-shift="sub" font-size="17">D</tspan></text>
+  <text x="78" y="415" class="small">同じ大きさ・逆向き</text>
+  <rect x="754" y="144" width="404" height="294" rx="24" fill="#fff" stroke="#6db3a7" stroke-width="3"/>
+  <text x="781" y="189" class="label teal">力　　　　○ 伝わる</text>
+  <text x="781" y="233" class="label orange">モーメント × 伝わらない</text>
+  <rect x="775" y="258" width="362" height="76" rx="14" fill="#e0f4ef"/>
+  <text x="956" y="306" text-anchor="middle" class="term teal">D点のBMD＝0</text>
+  <text x="781" y="378" class="label orange">D点のSFD＝0</text>
+  <text x="781" y="411" class="label orange">とは限らない</text>
+  <rect x="42" y="459" width="1116" height="167" rx="22" fill="#fff" stroke="#b7cbd2" stroke-width="3"/>
+  <text x="69" y="504" class="lead orange">×「ピンだから、その後のBMDもずっと0」</text>
+  <text x="69" y="551" class="lead teal">○「0になるのはD点。</text>
+  <text x="112" y="593" class="lead teal">D以降のBMDの傾きはSFDで決まる」</text>
+  <text x="600" y="657" text-anchor="middle" class="small">内部ピンに外から偶力を加えない理想化した梁を考える</text>
+</svg>

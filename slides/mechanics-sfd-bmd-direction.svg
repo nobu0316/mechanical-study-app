@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">SFDがBMDの進む方向を決める</title>
+  <desc id="desc">SFDがプラスならBMDは上がる、マイナスなら下がる、0なら水平。一定SFDの図とBMDの傾きを3列で比較し、ピンDから再び上がる例を示す。</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#f4fafb"/><stop offset="1" stop-color="#edf3f7"/></linearGradient>
+    <marker id="axis" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="#536b75"/></marker>
+    <style>text{font-family:Arial,'Yu Gothic',Meiryo,sans-serif;fill:#102a36}.title{font-size:44px;font-weight:900}.lead{font-size:28px;font-weight:800}.term{font-size:32px;font-weight:900}.label{font-size:22px;font-weight:800}.small{font-size:18px;font-weight:700}.teal{fill:#087064}.orange{fill:#ad4f20}.blue{fill:#145c86}.axis{fill:none;stroke:#82959d;stroke-width:2}.curve{fill:none;stroke-width:6}</style>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <text x="48" y="68" class="title">SFDがBMDの進む方向を決める</text>
+  <text x="48" y="116" class="lead">＋なら上がる、－なら下がる、0なら水平。</text>
+  <g transform="translate(42 148)">
+    <rect width="350" height="333" rx="24" fill="#fff" stroke="#6db3a7" stroke-width="3"/>
+    <text x="175" y="46" text-anchor="middle" class="term teal">SFD＝＋20 kN</text>
+    <path d="M60 146H302" class="axis"/><text x="36" y="152" class="small">0</text>
+    <rect x="72" y="94" width="212" height="52" fill="#dff3ef"/>
+    <path d="M72 146V94H284V146" class="curve" stroke="#087064"/>
+    <text x="175" y="194" text-anchor="middle" class="term teal">BMD 上がる ↗</text>
+    <path d="M60 218V299H302" class="axis"/>
+    <path d="M78 283L280 221" class="curve" stroke="#087064"/>
+    <text x="285" y="322" class="small">右へ</text>
+  </g>
+  <g transform="translate(425 148)">
+    <rect width="350" height="333" rx="24" fill="#fff" stroke="#dc9a70" stroke-width="3"/>
+    <text x="175" y="46" text-anchor="middle" class="term orange">SFD＝－20 kN</text>
+    <path d="M60 94H302" class="axis"/><text x="36" y="100" class="small">0</text>
+    <rect x="72" y="94" width="212" height="52" fill="#fff0e7"/>
+    <path d="M72 94V146H284V94" class="curve" stroke="#ad4f20"/>
+    <text x="175" y="194" text-anchor="middle" class="term orange">BMD 下がる ↘</text>
+    <path d="M60 218V299H302" class="axis"/>
+    <path d="M78 221L280 283" class="curve" stroke="#ad4f20"/>
+    <text x="285" y="322" class="small">右へ</text>
+  </g>
+  <g transform="translate(808 148)">
+    <rect width="350" height="333" rx="24" fill="#fff" stroke="#72a8c5" stroke-width="3"/>
+    <text x="175" y="46" text-anchor="middle" class="term blue">SFD＝0</text>
+    <path d="M60 120H302" class="axis"/><text x="36" y="126" class="small">0</text>
+    <path d="M72 120H284" class="curve" stroke="#145c86"/>
+    <text x="175" y="194" text-anchor="middle" class="term blue">BMD 水平 →</text>
+    <path d="M60 218V299H302" class="axis"/>
+    <path d="M78 249H280" class="curve" stroke="#145c86"/>
+    <text x="175" y="322" text-anchor="middle" class="small">現在値を保つ（0とは限らない）</text>
+  </g>
+  <rect x="42" y="501" width="1116" height="115" rx="22" fill="#fff" stroke="#b7cbd2" stroke-width="3"/>
+  <text x="67" y="539" class="label">D点でBMD＝0でも、右側のSFDが＋なら</text>
+  <text x="67" y="577" class="lead teal">BMDは再び上がる。</text>
+  <path d="M825 591V523M825 580H1108" class="axis" marker-end="url(#axis)"/>
+  <path d="M843 580L1083 525" class="curve" stroke="#087064"/>
+  <circle cx="843" cy="580" r="6" fill="#087064"/>
+  <text x="850" y="605" class="small">D：0</text><text x="929" y="537" class="small teal">SFD ＋</text>
+  <text x="600" y="644" text-anchor="middle" class="small">左から歩く、力の残高。上向きは足す、下向きは引く。</text>
+  <text x="600" y="667" text-anchor="middle" class="small">この図では右向きに進み、正のBMDを上へ描く（増減方向を確認する図）</text>
+</svg>
