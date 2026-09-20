@@ -546,5 +546,38 @@
       "BMDの変化量＝SFDの符号付き面積。SFDが四角形なら高さ×横幅。負の面積は減少分"
     ],
     "relatedQuestionIds": ["M_R7_M3_Q011", "M_R7_M3_Q012", "M_R7_M3_Q013", "M_R7_M3_Q014", "M_R7_M3_Q015", "M_R7_M3_Q022", "M_R7_M3_Q023"]
+  },
+  {
+    "id": "SLIDE_ENV_R5_ES1_POLLUTION_001",
+    "field": "環境・安全",
+    "topic": "公害",
+    "title": "公害・PCB 混同防止",
+    "description": "病名と原因物質の対応を整理。水俣系は両方メチル水銀、油症はPCB",
+    "image": "slides/environment-safety-r5-pollution-pcb.svg",
+    "priority": "high",
+    "summary": [
+      "水俣病・新潟水俣病＝メチル水銀。イタイイタイ病＝カドミウム",
+      "四日市ぜんそく＝硫黄酸化物 SOx。ぜんそく→空気→SOx",
+      "試験の対応：カネミ油症＝PCB。実際にはPCDF等のダイオキシン類も関与",
+      "PCB＝ポリ塩化ビフェニル。昔は変圧器・コンデンサなどの絶縁油。有害で蓄積しやすい"
+    ],
+    "relatedQuestionIds": ["ENV_R5_ES1_Q001", "ENV_R5_ES1_Q002", "ENV_R5_ES1_Q003", "ENV_R5_ES1_Q009", "ENV_R5_ES1_Q010", "ENV_R7_ES1_Q001", "ENV_R5_ES1_Q011"]
+  },
+  {
+    "id": "SLIDE_ENV_R5_ES1_DISTINCTION_001",
+    "field": "環境・安全",
+    "topic": "省エネ・リサイクル法",
+    "title": "ZEH・ZEB・リサイクル法 混同防止",
+    "description": "H＝HouseとB＝Building、容器包装と小型電子機器の法律を比較する",
+    "image": "slides/environment-safety-r5-zeh-recycling.svg",
+    "priority": "high",
+    "summary": [
+      "ZEHのH＝House＝住宅。ZEBのB＝Building＝建築物",
+      "省エネ＋創エネで年間のエネルギー収支を実質ゼロへ",
+      "容器・包装→容器包装リサイクル法。携帯電話・デジカメなど→小型家電リサイクル法",
+      "家電4品目は家電リサイクル法。小型家電とは区別する",
+      "R5出題の数値：冷蔵庫の消費電力量は10年前比で約40％減。温室効果ガスがない地球の平均気温は約-20℃"
+    ],
+    "relatedQuestionIds": ["ENV_R5_ES1_Q004", "ENV_R5_ES1_Q005", "ENV_R5_ES1_Q006", "ENV_R5_ES1_Q007", "ENV_R5_ES1_Q008", "ENV_R5_ES1_Q012", "ENV_R5_ES1_Q013", "ENV_R5_ES1_Q014", "ENV_R5_ES1_Q015", "ENV_R5_ES1_Q016", "ENV_R5_ES1_Q017", "ENV_R7_ES1_Q006"]
   }
 ]

@@ -78,7 +78,26 @@ const QUESTION_PRACTICE = {
   M_R7_M3_Q021: { tags: ["pin-bmd-confusion", "pin-sfd-confusion"] },
   M_R7_M3_Q022: { tags: ["pin-bmd-confusion", "sfd-bmd-direction", "bmd-sign"], inputUnit: "kN・m" },
   M_R7_M3_Q023: { tags: ["bmd-sign"], inputUnit: "kN・m" },
-  M_R7_M3_Q024: { tags: ["pin-bmd-confusion", "sfd-bmd-direction"] }
+  M_R7_M3_Q024: { tags: ["pin-bmd-confusion", "sfd-bmd-direction"] },
+  // R5環境・安全①：同じ知識は既存IDを再利用し、履歴は変更しない。
+  ENV_R7_ES1_Q001: { inputPrompt: "イタイイタイ病の原因物質は？", inputAnswers: ["カドミウム", "Cd"] },
+  ENV_R5_ES1_Q001: { inputAnswers: ["PCB", "ポリ塩化ビフェニル", "ポリ塩化ビフェニール"] },
+  ENV_R5_ES1_Q002: { inputAnswers: ["ポリ塩化ビフェニル", "ポリ塩化ビフェニール"] },
+  ENV_R5_ES1_Q003: { inputAnswers: ["絶縁油", "変圧器やコンデンサなどの絶縁油", "変圧器・コンデンサの絶縁油", "変圧器やコンデンサーの絶縁油", "絶縁用の油"] },
+  ENV_R5_ES1_Q004: { inputAnswers: ["House", "ハウス"] },
+  ENV_R5_ES1_Q005: { inputAnswers: ["年間のエネルギー収支", "年間エネルギー収支", "年間の一次エネルギー収支", "年間一次エネルギー収支", "エネルギー収支", "一次エネルギー収支"] },
+  ENV_R5_ES1_Q006: { inputAnswers: ["Building", "ビルディング", "ビル"] },
+  ENV_R5_ES1_Q007: { inputAnswers: ["住宅・建築物", "住宅、建築物", "住宅/建築物", "住宅と建築物", "住宅 建築物", "住宅,建築物", "House・Building", "House/Building"] },
+  ENV_R5_ES1_Q008: { inputAnswers: ["40", "40%", "約40%", "40%減", "約40%減", "4割", "約4割", "4割減", "約4割減"] },
+  ENV_R5_ES1_Q009: { inputAnswers: ["メチル水銀", "メチル水銀化合物"] },
+  ENV_R5_ES1_Q010: { inputAnswers: ["メチル水銀", "メチル水銀化合物"] },
+  ENV_R5_ES1_Q011: { inputAnswers: ["硫黄酸化物", "SOx", "硫黄酸化物（SOx）"] },
+  ENV_R5_ES1_Q012: { inputAnswers: ["京都議定書"] },
+  ENV_R5_ES1_Q013: { inputUnit: "℃" },
+  ENV_R5_ES1_Q014: { inputAnswers: ["容器包装リサイクル法", "容器包装に係る分別収集及び再商品化の促進等に関する法律"] },
+  ENV_R5_ES1_Q015: { inputAnswers: ["小型家電リサイクル法", "使用済小型電子機器等の再資源化の促進に関する法律"] },
+  ENV_R5_ES1_Q016: { inputAnswers: ["フードバンク", "フードバンク活動"] },
+  ENV_R5_ES1_Q017: { inputAnswers: ["異なる", "違う", "同じではない", "同じでない", "別", "別の法律"] }
 };
 const WEAK_TOPIC_RATE_LIMIT = 70;
 const QUICK_REVIEW_QUESTION_LIMIT = 5;
@@ -1917,7 +1936,7 @@ function renderQuestion() {
   document.getElementById("fieldBadge").textContent = question.field;
   document.getElementById("topicBadge").textContent = question.topic;
   document.getElementById("levelBadge").textContent = question.level;
-  document.getElementById("questionText").textContent = question.question;
+  document.getElementById("questionText").textContent = question.inputPrompt || question.question;
 
   feedbackArea.className = "feedback hidden";
   feedbackArea.innerHTML = "";
