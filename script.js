@@ -79,6 +79,22 @@ const QUESTION_PRACTICE = {
   M_R7_M3_Q022: { tags: ["pin-bmd-confusion", "sfd-bmd-direction", "bmd-sign"], inputUnit: "kN・m" },
   M_R7_M3_Q023: { tags: ["bmd-sign"], inputUnit: "kN・m" },
   M_R7_M3_Q024: { tags: ["pin-bmd-confusion", "sfd-bmd-direction"] },
+  // R7熱・流体①：Qh = Qc + Lを最優先に、選択肢を隠した短答で定着確認する。
+  T_HP_COP_001: { tags: ["最重要", "QhQcL", "仮○", "長期定着△"], priority: "high", inputAnswers: ["Qh = Qc + L", "Qh=Qc+L"] },
+  T_HP_COP_002: { tags: ["QhQcL", "変形", "仮○"], priority: "high", inputAnswers: ["Qc = Qh - L", "Qc=Qh-L"] },
+  T_HP_COP_003: { tags: ["QhQcL", "変形", "仮○"], priority: "high", inputAnswers: ["L = Qh - Qc", "L=Qh-Qc"] },
+  T_HP_COP_004: { tags: ["COP", "暖房COP", "仮○"], inputAnswers: ["εh = Qh / L", "εh=Qh/L", "ε_h=Qh/L", "eh=Qh/L", "Qh/L"] },
+  T_HP_COP_005: { tags: ["COP計算", "Qh", "短問"], inputUnit: "kW" },
+  T_HP_COP_006: { tags: ["COP計算", "暖房COP", "短問"], inputAnswers: ["5", "5.0"] },
+  T_HP_COP_007: { tags: ["QhQcL", "Qc", "最重要"], priority: "high", inputUnit: "kW" },
+  T_HP_COP_008: { tags: ["QhQcL", "L", "短問"], priority: "high", inputUnit: "kW" },
+  T_HP_COP_009: { tags: ["逆カルノー", "暖房COP", "長期定着△"], inputAnswers: ["εh = Th / (Th - Tc)", "εh=Th/(Th-Tc)", "ε_h=Th/(Th-Tc)", "eh=Th/(Th-Tc)", "Th/(Th-Tc)"] },
+  T_HP_COP_010: { tags: ["逆カルノー", "QcQh", "長期定着△"], inputAnswers: ["Qc / Qh = Tc / Th", "Qc/Qh=Tc/Th"] },
+  T_HP_COP_011: { tags: ["℃K変換", "逆カルノー", "短問"], inputAnswers: ["Th = 343 K、Tc = 293 K", "Th=343K、Tc=293K", "Th=343K,Tc=293K", "343K、293K", "343K,293K"] },
+  T_HP_COP_012: { tags: ["逆カルノー", "計算", "仮○"], inputAnswers: ["6.86", "約6.86"] },
+  T_HP_COP_013: { tags: ["kWkWh", "時間掛け忘れ", "短問"], inputUnit: "kWh" },
+  T_HP_COP_014: { tags: ["kWhMJ", "単位変換", "短問"], inputUnit: "MJ" },
+  T_HP_COP_015: { tags: ["kWkWhMJ", "時間掛け忘れ", "弱点"], inputUnit: "MJ" },
   // R5環境・安全①：同じ知識は既存IDを再利用し、履歴は変更しない。
   ENV_R7_ES1_Q001: { inputPrompt: "イタイイタイ病の原因物質は？", inputAnswers: ["カドミウム", "Cd"] },
   ENV_R5_ES1_Q001: { inputAnswers: ["PCB", "ポリ塩化ビフェニル", "ポリ塩化ビフェニール"] },
@@ -570,11 +586,11 @@ function normalizeField(field, topic) {
   if (rawField === "熱・流体") {
     const fluidKeywords = ["流体", "流量", "流速", "速度水頭", "損失水頭", "圧力損失", "ベルヌーイ", "レイノルズ", "管路", "ポンプ"];
     const thermalKeywords = ["熱", "温度", "冷凍", "COP", "チラー", "カルノー", "エンタルピー", "エントロピー"];
-    if (fluidKeywords.some((keyword) => rawTopic.includes(keyword))) {
-      return "流体工学";
-    }
     if (thermalKeywords.some((keyword) => rawTopic.includes(keyword))) {
       return "熱工学";
+    }
+    if (fluidKeywords.some((keyword) => rawTopic.includes(keyword))) {
+      return "流体工学";
     }
     warnUnknownField(rawField, rawTopic);
     return "未分類";
@@ -1333,6 +1349,7 @@ function compareDailyRetentionItems(a, b) {
 
 function compareDailyPriorityItems(a, b) {
   return Number(b.stat.status === "wrong") - Number(a.stat.status === "wrong")
+    || Number(b.question.priority === "high") - Number(a.question.priority === "high")
     || getDailyReasonPriority(a.stat.reasonCounts) - getDailyReasonPriority(b.stat.reasonCounts)
     || getWeaknessAttemptCount(b.stat) - getWeaknessAttemptCount(a.stat)
     || getQuestionStatTimestamp(a.stat.lastAnsweredAt) - getQuestionStatTimestamp(b.stat.lastAnsweredAt)
@@ -1431,6 +1448,12 @@ function selectQuickReviewQuestions(items) {
       const statusDiff = Number(b.stat.status === "wrong") - Number(a.stat.status === "wrong");
       if (statusDiff !== 0) {
         return statusDiff;
+      }
+
+      const priorityDiff = Number(b.question.priority === "high")
+        - Number(a.question.priority === "high");
+      if (priorityDiff !== 0) {
+        return priorityDiff;
       }
 
       const countDiff = (b.stat.wrongCount + b.stat.unsureCount)

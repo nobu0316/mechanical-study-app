@@ -579,5 +579,41 @@
       "R5出題の数値：冷蔵庫の消費電力量は10年前比で約40％減。温室効果ガスがない地球の平均気温は約-20℃"
     ],
     "relatedQuestionIds": ["ENV_R5_ES1_Q004", "ENV_R5_ES1_Q005", "ENV_R5_ES1_Q006", "ENV_R5_ES1_Q007", "ENV_R5_ES1_Q008", "ENV_R5_ES1_Q012", "ENV_R5_ES1_Q013", "ENV_R5_ES1_Q014", "ENV_R5_ES1_Q015", "ENV_R5_ES1_Q016", "ENV_R5_ES1_Q017", "ENV_R7_ES1_Q006"]
+  },
+  {
+    "id": "heat-pump-qh-qc-l-cop",
+    "field": "熱・流体",
+    "topic": "ヒートポンプCOP",
+    "title": "ヒートポンプ給湯機のQh・Qc・L・COP",
+    "description": "ヒートポンプ給湯機を例に、Qh・Qc・L・COP・逆カルノーCOP・kW/kWh/MJ変換を整理するスライド",
+    "image": "slides/heat-pump-qh-qc-l-cop.png",
+    "priority": "high",
+    "summary": [
+      "Qh は貯湯槽へ渡す熱",
+      "Qc は外気からもらう熱",
+      "L は電気入力・コンプレッサに入れる仕事",
+      "最重要式は Qh = Qc + L",
+      "暖房COPは εh = Qh / L",
+      "暖房側の逆カルノーCOPは εh = Th / (Th - Tc)",
+      "カルノー計算では温度を℃ではなくKで使う",
+      "時間がある問題では kW × h = kWh としてから、1 kWh = 3.6 MJ で変換する"
+    ],
+    "relatedQuestionIds": [
+      "T_HP_COP_001",
+      "T_HP_COP_002",
+      "T_HP_COP_003",
+      "T_HP_COP_004",
+      "T_HP_COP_005",
+      "T_HP_COP_006",
+      "T_HP_COP_007",
+      "T_HP_COP_008",
+      "T_HP_COP_009",
+      "T_HP_COP_010",
+      "T_HP_COP_011",
+      "T_HP_COP_012",
+      "T_HP_COP_013",
+      "T_HP_COP_014",
+      "T_HP_COP_015"
+    ]
   }
 ]
