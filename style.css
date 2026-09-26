@@ -1741,3 +1741,10 @@ textarea {
     white-space: normal;
   }
 }
+.question-diagram {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  margin: 16px auto;
+}

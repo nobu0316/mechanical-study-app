@@ -55,6 +55,19 @@ const SLIDES_JSON = "slides.json";
 // CSVの11列と保存済み履歴は維持し、追加問題の入力形式・内容タグだけを補足する。
 // 内容タグは学習テーマ用。回答後に選ぶ既存の弱点理由タグとは別に扱う。
 const QUESTION_PRACTICE = {
+  // R7応用・総合①：履歴は未回答のまま、既存の短答入力・優先度・復習判定を使う。
+  MOMENT_R7_AP1_Q001: { tags: ["モーメント距離", "作用線", "理解○", "長期定着△"], priority: "high", inputUnit: "mm" },
+  MOMENT_R7_AP1_Q002: { tags: ["モーメント距離", "作用線", "長期定着△"], priority: "high", inputUnit: "N" },
+  MOMENT_R7_AP1_Q003: { tags: ["モーメント距離", "作用線", "長期定着△"], priority: "high", inputUnit: "mm", diagram: { src: "slides/r7-ap1-moment-arm.svg", alt: "支点Oの上180 mmにPの水平作用線、上330 mmにFの水平作用線。Fの作用点はOの右50 mm。" } },
+  F_R7_AP1_Q001: { tags: ["シリンダ引き込み", "ロッド面積", "理解○", "長期定着△"], priority: "high", inputAnswers: ["ピストン全面積", "ピストン全断面積", "ピストンの全面積", "ピストン面積", "全面積", "全断面積"] },
+  F_R7_AP1_Q002: { tags: ["シリンダ引き込み", "ロッド面積", "長期定着△"], priority: "high", inputAnswers: ["π(Dc²-Dr²)/4", "π(Dc^2-Dr^2)/4", "pi*(Dc^2-Dr^2)/4", "pi(Dc^2-Dr^2)/4", "π*(Dc^2-Dr^2)/4", "π×(Dc²-Dr²)/4", "π×(Dc^2-Dr^2)/4", "pi(Dc²-Dr²)/4", "pi*(Dc²-Dr²)/4", "pi×(Dc²-Dr²)/4", "pi×(Dc^2-Dr^2)/4", "π*(Dc²-Dr²)/4", "(Dc²-Dr²)π/4", "(πDc²-πDr²)/4", "πDc²/4-πDr²/4", "πDc^2/4-πDr^2/4", "π/4*(Dc^2-Dr^2)"] },
+  F_R7_AP1_Q003: { tags: ["シリンダ引き込み", "ロッド面積", "長期定着△"], priority: "high", inputUnit: "mm²" },
+  M_R7_AP1_Q001: { tags: ["二面せん断", "×2忘れ", "理解○", "長期定着△"], priority: "high", inputUnit: "mm²" },
+  M_R7_AP1_Q002: { tags: ["二面せん断", "×2忘れ", "長期定着△"], priority: "high", inputUnit: "mm" },
+  F_R7_AP1_Q004: { tags: ["メータイン", "初回誤答", "要復習"], priority: "normal", inputAnswers: ["メータイン", "メーターイン", "メータイン回路", "メーターイン回路", "メータイン制御", "メーターイン制御", "meter-in", "meter in"] },
+  F_R7_AP1_Q005: { tags: ["メータイン", "自由流れ方向", "要復習"], priority: "normal", inputAnswers: ["B", "B方向", "Bの方向", "シリンダ→切換弁", "シリンダから切換弁", "シリンダ→排気側", "シリンダから排気側"] },
+  E_R7_AP1_Q001: { tags: ["ブレーキトルク", "×2忘れ", "要復習"], priority: "normal", inputAnswers: ["μPr", "μ×P×r", "μ*P*r", "mu*P*r", "muPr", "Pμr", "Prμ", "μrP"] },
+  E_R7_AP1_Q002: { tags: ["ブレーキトルク", "×2忘れ", "要復習"], priority: "normal", inputUnit: "N・m" },
   M_R7_M3_Q001: { tags: ["pin-bmd-confusion"], inputAnswers: ["伝えない", "伝わらない", "伝達しない", "通さない"] },
   M_R7_M3_Q002: { tags: ["pin-bmd-confusion"], inputUnit: "kN・m" },
   M_R7_M3_Q003: { tags: ["pin-sfd-confusion"], inputAnswers: ["×", "x", "バツ", "ばつ", "誤り", "正しくない"] },
@@ -1959,6 +1972,15 @@ function renderQuestion() {
   document.getElementById("topicBadge").textContent = question.topic;
   document.getElementById("levelBadge").textContent = question.level;
   document.getElementById("questionText").textContent = question.inputPrompt || question.question;
+  // 図付きの追加問題だけに表示し、次の問題へ図を持ち越さない。
+  document.querySelector(".question-diagram")?.remove();
+  if (question.diagram) {
+    const diagram = document.createElement("img");
+    diagram.className = "question-diagram";
+    diagram.src = question.diagram.src;
+    diagram.alt = question.diagram.alt;
+    document.getElementById("questionText").after(diagram);
+  }
 
   feedbackArea.className = "feedback hidden";
   feedbackArea.innerHTML = "";
