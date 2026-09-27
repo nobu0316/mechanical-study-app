@@ -137,6 +137,14 @@ const QUESTION_PRACTICE = {
   MTRL_R5_MP2_Q013: { tags: ["超硬合金", "WC-Co"], inputAnswers: ["超硬合金", "超硬"] },
   MTRL_R5_MP2_Q014: { tags: ["エポキシ"], inputAnswers: ["エポキシ樹脂", "エポキシ"] },
   MTRL_R5_MP2_Q015: { tags: ["ポリカーボネート"], inputAnswers: ["ポリカーボネート", "ポリカーボネート樹脂", "PC"] },
+  // R5材料・加工③・④：初回正解だが迷いのあった3論点を短答と3日後・7日後の再確認で定着させる。
+  MTRL_R5_MP3_Q001: { tags: ["APC", "パレット交換", "理解○", "長期定着△"], priority: "high", reviewIntervals: [3, 7], inputAnswers: ["APC", "Automatic Pallet Changer", "オートマチックパレットチェンジャー", "自動パレット交換装置"] },
+  MTRL_R5_MP3_Q002: { tags: ["APC", "ATC_APC混同", "パレット交換", "理解○", "長期定着△"], priority: "high", reviewIntervals: [3, 7], inputAnswers: ["Automatic Pallet Changer", "AutomaticPalletChanger", "オートマチックパレットチェンジャー"] },
+  MTRL_R5_MP3_Q003: { tags: ["オートローダ", "搬送装置", "ワーク供給", "理解○", "長期定着△"], priority: "high", reviewIntervals: [3, 7], inputAnswers: ["オートローダ", "オートローダー", "Auto Loader", "Autoloader"] },
+  MTRL_R5_MP3_Q004: { tags: ["オートローダ", "搬送装置", "ワーク供給", "理解○", "長期定着△"], priority: "high", reviewIntervals: [3, 7], inputAnswers: ["AGVは工場内を移動して運びオートローダは加工機へワークを投入・取り出す", "AGVは工場内を移動して搬送しオートローダは加工機へワークを供給・取り出す", "AGVは移動搬送でオートローダは投入・取り出し", "AGVは運搬でオートローダはロード・アンロード"] },
+  MTRL_R5_MP4_Q001: { tags: ["ドリル加工", "深穴", "穴深さ5D", "理解○", "長期定着△"], priority: "high", reviewIntervals: [3, 7], inputAnswers: ["5", "5倍", "5倍以下", "5D", "5D以下", "L≦5D", "L<=5D"] },
+  MTRL_R5_MP4_Q002: { tags: ["ドリル加工", "深穴", "穴深さ5D", "理解○", "長期定着△"], priority: "high", reviewIntervals: [3, 7], inputUnit: "mm" },
+  MTRL_R5_MP4_Q003: { tags: ["ドリル加工", "深穴", "穴深さ5D", "理解○", "長期定着△"], priority: "high", reviewIntervals: [3, 7], inputAnswers: ["7.5で超えている", "7.5・超えている", "7.5なので超えている", "7.5で5Dを超えている", "7.5・5Dを超えている", "7.5で深い"] },
   // R5環境・安全①：同じ知識は既存IDを再利用し、履歴は変更しない。
   ENV_R7_ES1_Q001: { inputPrompt: "イタイイタイ病の原因物質は？", inputAnswers: ["カドミウム", "Cd"] },
   ENV_R5_ES1_Q001: { inputAnswers: ["PCB", "ポリ塩化ビフェニル", "ポリ塩化ビフェニール"] },
@@ -1378,7 +1386,7 @@ function selectDailyReviewItems(items, today = getLocalDateKey()) {
 
 function isWaitingForRetentionReview(stat, today = getLocalDateKey()) {
   const nextReviewAt = normalizeQuestionStatDate(stat?.nextReviewAt);
-  return stat?.consecutiveCorrect === 1 && Boolean(nextReviewAt) && today < nextReviewAt;
+  return stat?.consecutiveCorrect >= 1 && Boolean(nextReviewAt) && today < nextReviewAt;
 }
 
 function compareDailyRetentionItems(a, b) {
@@ -1673,7 +1681,7 @@ function buildWeaknessAnalysis(items, today = getLocalDateKey()) {
     groups: rankedGroups,
     topGroups: rankedGroups.slice(0, 3),
     weaknessCount: currentItems.length,
-    waitingCount: currentItems.filter((item) => item.stat.consecutiveCorrect === 1
+    waitingCount: currentItems.filter((item) => item.stat.consecutiveCorrect >= 1
       && Boolean(normalizeQuestionStatDate(item.stat.nextReviewAt))
       && today < item.stat.nextReviewAt).length,
     dueCount: currentItems.filter((item) => isRetentionReviewDue(item.stat, today)).length
@@ -1885,14 +1893,15 @@ function renderWeaknessQuestionItem(item) {
     ? truncateText(item.question.title || item.question.question || item.stat.questionId, 30)
     : item.stat.questionId;
   const today = getLocalDateKey();
-  const isWaitingForRetention = item.stat.consecutiveCorrect === 1;
+  const isWaitingForRetention = item.stat.consecutiveCorrect >= 1;
   const isRetentionDue = isRetentionReviewDue(item.stat, today);
+  const hasFurtherRetentionCheck = item.stat.consecutiveCorrect < getQuestionRetentionIntervals(item.stat.questionId).length;
   const statusLabel = isWaitingForRetention
     ? isRetentionDue ? "定着確認可能" : "定着確認待ち"
     : item.stat.status === "wrong" ? "間違えた" : "迷った";
   const retentionProgress = isWaitingForRetention
     ? isRetentionDue
-      ? `<p class="retention-list-progress">定着確認できます　もう一度正解で弱点卒業</p>`
+      ? `<p class="retention-list-progress">定着確認できます　${hasFurtherRetentionCheck ? "正解後も間隔を空けて再確認" : "もう一度正解で弱点卒業"}</p>`
       : `<p class="retention-list-progress">次回：${escapeHtml(formatLocalDate(item.stat.nextReviewAt))}以降</p>`
     : "";
   return `
@@ -2463,12 +2472,12 @@ function normalizeQuestionStats(rawStats) {
     };
 
     const stat = normalized[questionId];
-    if (stat.consecutiveCorrect === 1 && !stat.nextReviewAt) {
+    if (stat.consecutiveCorrect >= 1 && !stat.nextReviewAt) {
       const inferredFrom = stat.lastCorrectAt || stat.lastAnsweredAt;
       const inferredDate = parseStoredDate(inferredFrom);
       if (inferredDate) {
         stat.lastCorrectAt ||= inferredDate.toISOString();
-        stat.nextReviewAt = getNextLocalDateKey(inferredDate);
+        stat.nextReviewAt = getNextLocalDateKey(inferredDate, getRetentionDelayDays(questionId, stat.consecutiveCorrect));
       }
     }
   });
@@ -2519,14 +2528,29 @@ function getLocalDateKey(date = new Date()) {
   return `${year}-${month}-${day}`;
 }
 
-function getNextLocalDateKey(date = new Date()) {
+function getNextLocalDateKey(date = new Date(), days = 1) {
   const nextDate = new Date(date.getTime());
-  nextDate.setDate(nextDate.getDate() + 1);
+  const normalizedDays = Number.isInteger(days) && days > 0 ? days : 1;
+  nextDate.setDate(nextDate.getDate() + normalizedDays);
   return getLocalDateKey(nextDate);
 }
 
+function getQuestionRetentionIntervals(questionId) {
+  const configured = QUESTION_PRACTICE[String(questionId || "")]?.reviewIntervals;
+  if (!Array.isArray(configured)) {
+    return [1];
+  }
+  const intervals = configured.filter((days) => Number.isInteger(days) && days > 0);
+  return intervals.length > 0 ? intervals : [1];
+}
+
+function getRetentionDelayDays(questionId, completedChecks) {
+  const intervals = getQuestionRetentionIntervals(questionId);
+  return intervals[Math.max(0, completedChecks - 1)] || intervals[intervals.length - 1] || 1;
+}
+
 function isRetentionReviewDue(stat, today = getLocalDateKey()) {
-  return stat?.consecutiveCorrect === 1
+  return stat?.consecutiveCorrect >= 1
     && Boolean(normalizeQuestionStatDate(stat.nextReviewAt))
     && today >= stat.nextReviewAt;
 }
@@ -2610,13 +2634,23 @@ function applyQuestionResult(stat, isCorrect, answeredAt = new Date()) {
     stat.correctCount += 1;
     if (wasWeakness) {
       if (isRetentionReviewDue(stat, today)) {
-        stat.consecutiveCorrect = 2;
-        stat.status = "mastered";
-        retentionState = "mastered";
-      } else if (stat.consecutiveCorrect !== 1 || !normalizeQuestionStatDate(stat.nextReviewAt)) {
+        const nextConsecutiveCorrect = stat.consecutiveCorrect + 1;
+        const intervals = getQuestionRetentionIntervals(stat.questionId);
+        if (nextConsecutiveCorrect <= intervals.length) {
+          stat.consecutiveCorrect = nextConsecutiveCorrect;
+          stat.lastCorrectAt = answeredAt.toISOString();
+          stat.nextReviewAt = getNextLocalDateKey(answeredAt, getRetentionDelayDays(stat.questionId, nextConsecutiveCorrect));
+          retentionState = "scheduled";
+        } else {
+          stat.consecutiveCorrect = nextConsecutiveCorrect;
+          stat.status = "mastered";
+          stat.nextReviewAt = null;
+          retentionState = "mastered";
+        }
+      } else if (stat.consecutiveCorrect < 1 || !normalizeQuestionStatDate(stat.nextReviewAt)) {
         stat.consecutiveCorrect = 1;
         stat.lastCorrectAt = answeredAt.toISOString();
-        stat.nextReviewAt = getNextLocalDateKey(answeredAt);
+        stat.nextReviewAt = getNextLocalDateKey(answeredAt, getRetentionDelayDays(stat.questionId, 1));
         retentionState = "scheduled";
       } else {
         retentionState = "waiting";
@@ -2656,7 +2690,7 @@ function renderRetentionFeedback(result) {
   }
   return `
     <div class="retention-feedback confirming" data-retention-feedback>
-      <strong>${result.retentionState === "waiting" ? "今日は定着確認済みです" : "1回目の定着確認OK"}</strong>
+      <strong>${result.retentionState === "waiting" ? "今日は定着確認済みです" : `${result.consecutiveCorrect}回目の定着確認OK`}</strong>
       <span>次回は${escapeHtml(formatLocalDate(result.nextReviewAt))}以降に再確認します</span>
     </div>
   `;
