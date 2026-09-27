@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" role="img" aria-labelledby="title desc">
+  <title id="title">フライホイールの実トルク曲線と平均トルク線</title>
+  <desc id="desc">実トルクTqはθaで平均トルクTqmを下から上へ横切り、θbで最大、θcで上から下へ横切り、θdで最小となり、θaダッシュで平均線へ戻る。</desc>
+  <rect width="720" height="360" rx="14" fill="#f4f7fb"/>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#334155"/>
+    </marker>
+  </defs>
+  <g font-family="sans-serif" fill="#172b4d">
+    <path d="M70 300V42 M70 300H690" fill="none" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <text x="24" y="45" font-size="20">Tq</text>
+    <text x="680" y="330" font-size="20">θ</text>
+    <path d="M70 180H685" stroke="#64748b" stroke-width="2.5" stroke-dasharray="9 7"/>
+    <text x="82" y="169" font-size="18">平均トルク Tqm</text>
+    <path d="M70 248 C84 230 99 204 115 180 C165 112 220 72 270 78 C330 85 370 137 415 180 C465 228 510 284 555 286 C607 286 655 229 680 180" fill="none" stroke="#0f766e" stroke-width="5" stroke-linecap="round"/>
+    <text x="586" y="245" font-size="18" fill="#0f766e">実トルク Tq</text>
+    <g stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 5">
+      <path d="M115 180V300"/><path d="M270 78V300"/><path d="M415 180V300"/><path d="M555 286V300"/><path d="M680 180V300"/>
+    </g>
+    <g font-size="18" text-anchor="middle">
+      <circle cx="115" cy="180" r="5" fill="#be123c"/><text x="115" y="326">θa</text>
+      <circle cx="270" cy="78" r="5" fill="#be123c"/><text x="270" y="326">θb</text>
+      <circle cx="415" cy="180" r="5" fill="#be123c"/><text x="415" y="326">θc</text>
+      <circle cx="555" cy="286" r="5" fill="#be123c"/><text x="555" y="326">θd</text>
+      <circle cx="680" cy="180" r="5" fill="#be123c"/><text x="680" y="326">θa′</text>
+    </g>
+    <g font-size="16" font-weight="700">
+      <text x="230" y="151" fill="#047857">Tq &gt; Tqm</text>
+      <text x="492" y="215" fill="#b45309">Tq &lt; Tqm</text>
+    </g>
+  </g>
+</svg>
