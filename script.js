@@ -81,6 +81,17 @@ const QUESTION_PRACTICE = {
   M_DESIGN_R7_AP2_Q002: { tags: ["慣性力", "リニアガイド", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "N" },
   M_DESIGN_R7_AP2_Q003: { tags: ["慣性力", "重心", "モーメント", "リニアガイド", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "N・mm" },
   M_DESIGN_R7_AP2_Q004: { tags: ["モーメント", "荷重分担", "リニアガイド", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "N" },
+  // R7熱・流体：管路計算の単位・桁・式選択を短答と1日後・3日後・7日後の再確認で定着させる。
+  F_R7_PIPE_Q001: { tags: ["流量単位変換", "L/min_m3/s", "桁ミス", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "m³/s", inputAnswers: ["5.0×10^-4 m³/s", "5×10^-4 m³/s", "5.0×10^-4", "5×10^-4", "5.0e-4 m³/s", "5e-4 m³/s", "5.0e-4", "5e-4"] },
+  F_R7_PIPE_Q002: { tags: ["流量単位変換", "L/min_m3/s", "桁ミス", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "m³/s", inputAnswers: ["4.0×10^-4 m³/s", "4×10^-4 m³/s", "4.0×10^-4", "4×10^-4", "4.0e-4 m³/s", "4e-4 m³/s", "4.0e-4", "4e-4"] },
+  F_R7_PIPE_Q003: { tags: ["レイノルズ数", "桁ミス", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["251", "約251", "250.8", "約250.8"] },
+  F_R7_PIPE_Q004: { tags: ["レイノルズ数", "桁ミス", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["250", "約250", "2.5×10²", "2.5*10^2", "2.5e2"] },
+  F_R7_PIPE_Q005: { tags: ["レイノルズ数", "層流乱流", "管摩擦係数", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["層流・λ=64/Re", "層流、λ=64/Re", "層流λ=64/Re", "層流・64/Re", "層流64/Re"] },
+  F_R7_PIPE_Q006: { tags: ["レイノルズ数", "層流乱流", "管摩擦係数", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["λ=0.3164/Re^(1/4)", "0.3164/Re^(1/4)", "λ=0.3164/Re^0.25", "0.3164/Re^0.25", "λ=0.3164/Re^(0.25)", "0.3164/Re^(0.25)"] },
+  F_R7_PIPE_Q007: { tags: ["レイノルズ数", "管摩擦係数", "圧力損失", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["Q→u→Re→λ→Δp", "Q→u→Re→λ→dp", "Q-u-Re-λ-Δp", "Q/u/Re/λ/Δp"] },
+  F_R7_PIPE_Q008: { tags: ["レイノルズ数", "層流乱流", "管摩擦係数", "圧力損失", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "Pa" },
+  F_R7_PIPE_Q009: { tags: ["Pa_MPa変換", "桁ミス", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "MPa" },
+  F_R7_PIPE_Q010: { tags: ["Pa_MPa変換", "桁ミス", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "Pa" },
   // R7機械設計②：トルク曲線と角速度の関係を図と短答で定着確認する。
   M_DESIGN_R7_MD2_Q001: { tags: ["フライホイール", "余剰エネルギー", "平均トルク", "理解○", "長期定着△"], priority: "high", inputAnswers: ["吸収する", "吸収", "蓄える", "貯める", "エネルギーを吸収する", "余剰エネルギーを吸収する"] },
   M_DESIGN_R7_MD2_Q002: { tags: ["フライホイール", "余剰エネルギー", "平均トルク", "理解○", "長期定着△"], priority: "high", inputAnswers: ["放出する", "放出", "取り出す", "エネルギーを放出する", "蓄えたエネルギーを放出する"] },
@@ -2058,6 +2069,9 @@ function normalizeRecallAnswer(value) {
 
 function isRecallAnswerCorrect(question, value) {
   const normalized = normalizeRecallAnswer(value);
+  if ((question.inputAnswers || []).some((answer) => normalizeRecallAnswer(answer) === normalized)) {
+    return true;
+  }
   if (question.inputUnit) {
     // 符号は必須の判定対象。全角・単位省略は許容し、別単位や式は受け付けない。
     const match = normalized.match(/^([+-]?(?:\d+(?:\.\d+)?|\.\d+))(.*)$/);
@@ -2067,7 +2081,7 @@ function isRecallAnswerCorrect(question, value) {
     const expected = Number.parseFloat(normalizeRecallAnswer(question.choices[question.answer - 1]));
     return Number(match[1]) === expected;
   }
-  return (question.inputAnswers || []).some((answer) => normalizeRecallAnswer(answer) === normalized);
+  return false;
 }
 
 function renderRecallQuestion(question) {
