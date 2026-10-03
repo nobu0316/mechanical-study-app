@@ -92,6 +92,13 @@ const QUESTION_PRACTICE = {
   F_R7_PIPE_Q008: { tags: ["レイノルズ数", "層流乱流", "管摩擦係数", "圧力損失", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "Pa" },
   F_R7_PIPE_Q009: { tags: ["Pa_MPa変換", "桁ミス", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "MPa" },
   F_R7_PIPE_Q010: { tags: ["Pa_MPa変換", "桁ミス", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "Pa" },
+  // R7熱・流体：すべり軸受の油膜を、片側すきま→せん断応力→粘性抵抗→動力の順で定着確認する。
+  F_R7_BEARING_Q001: { tags: ["すべり軸受", "油膜", "油膜すきま", "理解○"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "mm" },
+  F_R7_BEARING_Q002: { tags: ["すべり軸受", "油膜", "粘性", "せん断応力", "理解○"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["2倍", "2", "二倍"] },
+  F_R7_BEARING_Q003: { tags: ["すべり軸受", "油膜", "粘性抵抗", "F_tauA", "乾性摩擦混同", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["F = τA", "F=τA", "F=tauA", "τA"] },
+  F_R7_BEARING_Q004: { tags: ["すべり軸受", "油膜", "粘性抵抗", "乾性摩擦混同", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["不適切", "適切でない", "誤り", "間違い", "×", "x"] },
+  F_R7_BEARING_Q005: { tags: ["すべり軸受", "油膜", "せん断応力", "粘性抵抗", "F_tauA", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "N" },
+  F_R7_BEARING_Q006: { tags: ["すべり軸受", "油膜", "粘性抵抗", "動力", "P_Fu", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "W" },
   // R7機械設計②：トルク曲線と角速度の関係を図と短答で定着確認する。
   M_DESIGN_R7_MD2_Q001: { tags: ["フライホイール", "余剰エネルギー", "平均トルク", "理解○", "長期定着△"], priority: "high", inputAnswers: ["吸収する", "吸収", "蓄える", "貯める", "エネルギーを吸収する", "余剰エネルギーを吸収する"] },
   M_DESIGN_R7_MD2_Q002: { tags: ["フライホイール", "余剰エネルギー", "平均トルク", "理解○", "長期定着△"], priority: "high", inputAnswers: ["放出する", "放出", "取り出す", "エネルギーを放出する", "蓄えたエネルギーを放出する"] },
