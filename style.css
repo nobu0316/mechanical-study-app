@@ -1525,6 +1525,23 @@ textarea {
   gap: 12px;
 }
 
+.ranking-item[data-review-field][data-review-topic] {
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+
+.ranking-item[data-review-field][data-review-topic]:hover,
+.ranking-item[data-review-field][data-review-topic]:focus-visible {
+  border-color: var(--primary);
+  background: #f1f8f8;
+  outline: 2px solid transparent;
+  transform: translateY(-1px);
+}
+
+.ranking-item[data-review-field][data-review-topic]:active {
+  transform: translateY(0);
+}
+
 .rank-badge {
   display: grid;
   width: 36px;

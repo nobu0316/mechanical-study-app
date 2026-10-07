@@ -559,6 +559,8 @@ function bindEvents() {
   addEvent("showMoreQuestionsBtn", "click", () => showMoreStatsItems("question"));
   addEvent("showMoreInsufficientBtn", "click", () => showMoreStatsItems("insufficient"));
   addEvent("reviewVisibleWeaknessBtn", "click", startVisibleWeaknessReview);
+  addEvent("weaknessRanking", "click", handleWeaknessRankingAction);
+  addEvent("weaknessRanking", "keydown", handleWeaknessRankingAction);
   addEvent("exportHistoryBtn", "click", exportHistory);
   addEvent("importMergeBtn", "click", () => chooseImportFile("merge"));
   addEvent("importReplaceBtn", "click", () => chooseImportFile("replace"));
@@ -2060,6 +2062,39 @@ function startVisibleWeaknessReview() {
   startQuiz(selectNormalQuizQuestions(pool, getSelectedCount()));
 }
 
+function handleWeaknessRankingAction(event, startTopic = startWeaknessTopicReview) {
+  const rankingItem = event.target.closest?.("[data-review-field][data-review-topic]");
+  if (!rankingItem) {
+    return;
+  }
+  if (event.type === "keydown" && event.key !== "Enter" && event.key !== " ") {
+    return;
+  }
+  event.preventDefault?.();
+  if (rankingItem.dataset.reviewStarting === "true") {
+    return;
+  }
+  rankingItem.dataset.reviewStarting = "true";
+  startTopic(rankingItem.dataset.reviewField, rankingItem.dataset.reviewTopic);
+}
+
+function startWeaknessTopicReview(field, topic, start = startQuiz) {
+  const normalizedField = normalizeField(field, topic);
+  const targetKey = getTopicKey(normalizedField, topic);
+  const pool = questions.filter((question) =>
+    getTopicKey(normalizeField(question.field, question.topic), question.topic) === targetKey
+  );
+
+  if (pool.length === 0) {
+    showMessage("この弱点トピックに対応する問題が見つかりませんでした。");
+    return false;
+  }
+
+  reviewMode = true;
+  start(pool);
+  return true;
+}
+
 function startQuiz(selectedQuestions, mode = "normal") {
   if (!selectedQuestions || selectedQuestions.length === 0) {
     showMessage("出題できる問題がありません。条件や関連問題IDを確認してください。");
@@ -3127,7 +3162,14 @@ function renderWeaknessTab() {
   weaknessRanking.innerHTML = visibleRows.map((stat, index) => {
     const rate = getRate(stat);
     return `
-      <div class="ranking-item">
+      <div
+        class="ranking-item"
+        data-review-field="${escapeHtml(stat.field)}"
+        data-review-topic="${escapeHtml(stat.topic)}"
+        role="button"
+        tabindex="0"
+        aria-label="${escapeHtml(`${stat.field}の${stat.topic}をまとめて復習`)}"
+      >
         <div class="rank-badge">${index + 1}</div>
         <div class="ranking-body">
           <div class="ranking-title">${escapeHtml(stat.field)} / ${escapeHtml(stat.topic)}</div>
