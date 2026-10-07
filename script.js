@@ -77,6 +77,15 @@ const QUESTION_PRACTICE = {
   E_R5_AP1_Q006: { tags: ["応用総合", "トルク", "ドラム", "直径半径", "巻上げ", "計算ミス", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "m" },
   E_R5_AP1_Q007: { tags: ["応用総合", "トルク", "ドラム", "直径半径", "巻上げ", "計算ミス", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "N・m" },
   E_R5_AP1_Q008: { tags: ["応用総合", "減速比", "歯車", "トルク", "巻上げ", "理解○", "長期定着△"], reviewIntervals: [1, 3, 7], inputAnswers: ["4倍", "4", "4.0倍", "四倍"] },
+  // R5機械設計①：ねじ・ボルトの弱点を選択肢なし短答と1日後・3日後・7日後の再確認で定着させる。
+  M_DESIGN_R5_MD1_Q001: { tags: ["機械設計", "ねじ", "ナット", "強度区分", "保証荷重応力", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["保証荷重応力"] },
+  M_DESIGN_R5_MD1_Q002: { tags: ["機械設計", "ねじ", "ナット", "強度区分", "保証荷重応力", "最大降伏応力", "用語混同", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["最大降伏応力"] },
+  M_DESIGN_R5_MD1_Q003: { tags: ["機械設計", "ねじ", "ナット", "強度区分", "保証荷重応力", "5T", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "MPa" },
+  M_DESIGN_R5_MD1_Q004: { tags: ["機械設計", "ねじ", "ボルト", "伸びボルト", "応力集中", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["軸部を伸びやすくして応力集中を緩和するため", "伸びやすくして応力集中を緩和するため", "弾性的に伸びやすくして応力集中を緩和するため", "軸部を伸びやすくして応力集中を和らげるため", "伸びやすくして応力集中を和らげるため", "軸部をしなやかにして応力集中を和らげるため", "伸びやすくして応力の集中を緩和するため"] },
+  M_DESIGN_R5_MD1_Q005: { tags: ["機械設計", "ねじ", "ボルト", "伸びボルト", "応力集中", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["誤り", "×", "不適切", "正しくない"] },
+  M_DESIGN_R5_MD1_Q006: { tags: ["機械設計", "ねじ", "ボルト", "押えボルト", "ねじ込み長さ", "締結", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["押えボルト", "押さえボルト"] },
+  M_DESIGN_R5_MD1_Q007: { tags: ["機械設計", "ねじ", "ボルト", "押えボルト", "ねじ込み長さ", "締結", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["誤り", "×", "不適切", "正しくない"] },
+  M_DESIGN_R5_MD1_Q008: { tags: ["機械設計", "ねじ", "ボルト", "通しボルト", "植込みボルト", "ナット", "締結", "理解○", "長期定着△"], reviewIntervals: [1, 3, 7], inputAnswers: ["通しボルト・植込みボルト", "通しボルト、植込みボルト", "通しボルトと植込みボルト", "通しボルト 植込みボルト"] },
   // R7応用・総合②：搬送装置の計算順序を短答と1日後・3日後・7日後の再確認で定着させる。
   D_R7_AP2_Q001: { tags: ["加速度速度距離", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "m/s" },
   D_R7_AP2_Q002: { tags: ["加速度速度距離", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["速度", "定速区間の速度", "搬送速度", "加速終了時の速度"] },
