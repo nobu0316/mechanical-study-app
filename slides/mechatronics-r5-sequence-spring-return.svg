@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" role="img" aria-labelledby="title desc">
+  <title id="title">ばね復帰スイッチの図記号</title>
+  <desc id="desc">令和5年度機械設計技術者試験2級 メカトロニクス3の1 図Dを基準にした図記号</desc>
+  <rect width="360" height="220" fill="#fff"/>
+  <g fill="none" stroke="#111827" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M62 82H126M122 112L176 82H258"/>
+    <path d="M150 98V158M160 92V158"/>
+    <path d="M132 184C134 166 148 158 155 158C164 158 178 166 180 184"/>
+  </g>
+</svg>

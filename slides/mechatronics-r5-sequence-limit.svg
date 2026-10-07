@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" role="img" aria-labelledby="title desc">
+  <title id="title">リミットスイッチの図記号</title>
+  <desc id="desc">令和5年度機械設計技術者試験2級 メカトロニクス3の1 図Cを基準にした図記号</desc>
+  <rect width="360" height="220" fill="#fff"/>
+  <g fill="none" stroke="#111827" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M58 154H132V82"/>
+    <path d="M112 74L250 154H294"/>
+    <path d="M174 110L160 154H250Z"/>
+  </g>
+</svg>

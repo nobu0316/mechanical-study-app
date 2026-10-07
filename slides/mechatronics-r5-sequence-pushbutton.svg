@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" role="img" aria-labelledby="title desc">
+  <title id="title">押しボタンスイッチの図記号</title>
+  <desc id="desc">令和5年度機械設計技術者試験2級 メカトロニクス3の1 図Bを基準にした図記号</desc>
+  <rect width="360" height="220" fill="#fff"/>
+  <g fill="none" stroke="#111827" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M62 80H126M122 112L176 82H258"/>
+    <path d="M150 106V126M150 141V164" stroke-dasharray="14 10"/>
+    <path d="M128 164V188H172V164M150 164V188"/>
+  </g>
+</svg>
