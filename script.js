@@ -483,6 +483,8 @@ function bindEvents() {
   addEvent("weaknessPriorityList", "click", handleWeaknessAnalysisSelection);
   addEvent("weaknessMatrixBody", "click", handleWeaknessAnalysisSelection);
   addEvent("weaknessAnalysisQuestionList", "click", handleWeaknessQuestionAction);
+  addEvent("weaknessQuestionList", "click", handleWeaknessQuestionAction);
+  addEvent("weaknessQuestionList", "keydown", handleWeaknessQuestionAction);
   addEvent("startSelectedWeaknessBtn", "click", startSelectedWeaknessReview);
   addEvent("startImmediateReviewBtn", "click", () => startWeaknessReview("all"));
   addEvent("startFieldReviewBtn", "click", () => startWeaknessReview("field"));
@@ -1891,18 +1893,32 @@ function startSelectedWeaknessReview() {
   startQuiz(pool);
 }
 
-function handleWeaknessQuestionAction(event) {
-  const button = event.target.closest?.("[data-solve-question]");
-  if (!button) {
+function handleWeaknessQuestionAction(event, startQuestion = startWeaknessQuestionReview) {
+  const actionElement = event.target.closest?.("[data-solve-question]");
+  if (!actionElement) {
     return;
   }
-  const question = questions.find((item) => item.id === button.dataset.solveQuestion);
+  if (event.type === "keydown" && event.key !== "Enter" && event.key !== " ") {
+    return;
+  }
+  event.preventDefault?.();
+  if (actionElement.dataset.solveStarting === "true") {
+    return;
+  }
+  // クリックとキー操作が続けて発火しても、同じカードから二重起動しない。
+  actionElement.dataset.solveStarting = "true";
+  startQuestion(actionElement.dataset.solveQuestion);
+}
+
+function startWeaknessQuestionReview(questionId, start = startQuiz) {
+  const question = questions.find((item) => item.id === questionId);
   if (!question) {
     showMessage("この問題のデータが見つかりませんでした。");
-    return;
+    return false;
   }
   reviewMode = true;
-  startQuiz([question]);
+  start([question]);
+  return true;
 }
 
 function setupWeaknessListFieldFilter(fields) {
@@ -1981,7 +1997,13 @@ function renderWeaknessQuestionItem(item) {
       : `<p class="retention-list-progress">次回：${escapeHtml(formatLocalDate(item.stat.nextReviewAt))}以降</p>`
     : "";
   return `
-    <article class="weakness-question-item ${item.stat.status}">
+    <article
+      class="weakness-question-item ${item.stat.status}"
+      data-solve-question="${escapeHtml(item.stat.questionId)}"
+      role="button"
+      tabindex="0"
+      aria-label="${escapeHtml(`${questionText}を1問復習`)}"
+    >
       <div class="weakness-question-title">
         <strong>${escapeHtml(item.stat.questionId)}</strong>
         <span class="weakness-status-label">${statusLabel}</span>

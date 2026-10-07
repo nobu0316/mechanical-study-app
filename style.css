@@ -752,11 +752,26 @@ textarea {
   border-radius: 8px;
   background: #fffdf7;
   padding: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+
+.weakness-question-item:hover,
+.weakness-question-item:focus-visible {
+  border-color: var(--primary);
+  background: #fff9e9;
+  outline: 2px solid transparent;
+  transform: translateY(-1px);
 }
 
 .weakness-question-item.wrong {
   border-left-color: var(--error);
   background: #fff8f7;
+}
+
+.weakness-question-item.wrong:hover,
+.weakness-question-item.wrong:focus-visible {
+  background: #fff1ef;
 }
 
 .weakness-question-title,
