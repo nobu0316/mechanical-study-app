@@ -68,6 +68,15 @@ const QUESTION_PRACTICE = {
   F_R7_AP1_Q005: { tags: ["メータイン", "自由流れ方向", "要復習"], priority: "normal", inputAnswers: ["B", "B方向", "Bの方向", "シリンダ→切換弁", "シリンダから切換弁", "シリンダ→排気側", "シリンダから排気側"] },
   E_R7_AP1_Q001: { tags: ["ブレーキトルク", "×2忘れ", "要復習"], priority: "normal", inputAnswers: ["μPr", "μ×P×r", "μ*P*r", "mu*P*r", "muPr", "Pμr", "Prμ", "μrP"] },
   E_R7_AP1_Q002: { tags: ["ブレーキトルク", "×2忘れ", "要復習"], priority: "normal", inputUnit: "N・m" },
+  // R5応用・総合①：巻上げ機構の効率・角速度・トルクを短答と1日後・3日後・7日後の再確認でつなげる。
+  E_R5_AP1_Q001: { tags: ["応用総合", "モータ", "動力", "機械効率", "効率", "P=Fv", "巻上げ", "計算ミス", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "kW" },
+  E_R5_AP1_Q002: { tags: ["応用総合", "モータ", "動力", "機械効率", "効率", "P=Fv", "巻上げ", "計算ミス", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "kW" },
+  E_R5_AP1_Q003: { tags: ["応用総合", "モータ", "角速度", "rpm", "rad_s", "巻上げ", "単位ミス", "計算ミス", "理解△", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "rad/s" },
+  E_R5_AP1_Q004: { tags: ["応用総合", "角速度", "rpm", "rad_s", "巻上げ", "単位ミス", "理解△", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["rad/s", "rad・s^-1", "rad・s⁻¹", "ラジアン毎秒", "ラジアン/秒"] },
+  E_R5_AP1_Q005: { tags: ["応用総合", "モータ", "動力", "P=Tω", "角速度", "rpm", "rad_s", "トルク", "巻上げ", "計算ミス", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "N・m" },
+  E_R5_AP1_Q006: { tags: ["応用総合", "トルク", "ドラム", "直径半径", "巻上げ", "計算ミス", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "m" },
+  E_R5_AP1_Q007: { tags: ["応用総合", "トルク", "ドラム", "直径半径", "巻上げ", "計算ミス", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "N・m" },
+  E_R5_AP1_Q008: { tags: ["応用総合", "減速比", "歯車", "トルク", "巻上げ", "理解○", "長期定着△"], reviewIntervals: [1, 3, 7], inputAnswers: ["4倍", "4", "4.0倍", "四倍"] },
   // R7応用・総合②：搬送装置の計算順序を短答と1日後・3日後・7日後の再確認で定着させる。
   D_R7_AP2_Q001: { tags: ["加速度速度距離", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "m/s" },
   D_R7_AP2_Q002: { tags: ["加速度速度距離", "要復習", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["速度", "定速区間の速度", "搬送速度", "加速終了時の速度"] },
