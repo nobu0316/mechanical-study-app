@@ -173,6 +173,12 @@ const QUESTION_PRACTICE = {
   MECH_R5_MT2_Q010: { tags: ["シーケンス制御", "有接点リレー", "シーケンス図", "要復習", "長期定着△"], reviewIntervals: [1, 3, 7], inputAnswers: ["有接点リレー・シーケンス図", "有接点リレー、シーケンス図", "有接点リレーとシーケンス図"] },
   MECH_R5_MT2_Q011: { tags: ["シーケンス制御", "無接点リレー", "論理回路図", "要復習", "長期定着△"], reviewIntervals: [1, 3, 7], inputAnswers: ["無接点リレー・論理回路図", "無接点リレー、論理回路図", "無接点リレーと論理回路図"] },
   MECH_R5_MT2_Q012: { tags: ["シーケンス制御", "PLC", "ラダー図", "要復習", "長期定着△"], reviewIntervals: [1, 3, 7], inputAnswers: ["ラダー図", "ラダーダイアグラム", "ラダー回路図", "ラダー"] },
+  // R5メカトロニクス③(1)：公式問題の図記号を見て、選択肢なしで機器名を想起する。
+  MECH_R5_MT3_Q001: { tags: ["メカトロニクス", "シーケンス制御", "図記号", "スイッチ", "近接スイッチ", "理解○", "長期定着△"], reviewIntervals: [1, 3, 7], inputPrompt: "図記号が表す制御用機器名を答えよ。", inputAnswers: ["近接スイッチ"], diagram: { src: "slides/mechatronics-r5-sequence-proximity.svg", alt: "円内にPXSと二つの端子を示す近接スイッチの図記号" } },
+  MECH_R5_MT3_Q002: { tags: ["メカトロニクス", "シーケンス制御", "図記号", "スイッチ", "押しボタンスイッチ", "理解○", "長期定着△"], reviewIntervals: [1, 3, 7], inputPrompt: "図記号が表す制御用機器名を答えよ。", inputAnswers: ["押しボタンスイッチ"], diagram: { src: "slides/mechatronics-r5-sequence-pushbutton.svg", alt: "押し操作部と接点を示す押しボタンスイッチの図記号" } },
+  MECH_R5_MT3_Q003: { tags: ["メカトロニクス", "シーケンス制御", "図記号", "スイッチ", "リミットスイッチ", "理解○", "長期定着△"], reviewIntervals: [1, 3, 7], inputPrompt: "図記号が表す制御用機器名を答えよ。", inputAnswers: ["リミットスイッチ"], diagram: { src: "slides/mechatronics-r5-sequence-limit.svg", alt: "機械的な接触操作部を示すリミットスイッチの図記号" } },
+  MECH_R5_MT3_Q004: { tags: ["メカトロニクス", "シーケンス制御", "図記号", "スイッチ", "ばね復帰スイッチ", "理解○", "長期定着△"], reviewIntervals: [1, 3, 7], inputPrompt: "図記号が表す制御用機器名を答えよ。", inputAnswers: ["ばね復帰スイッチ"], diagram: { src: "slides/mechatronics-r5-sequence-spring-return.svg", alt: "ばねによる復帰機構と接点を示すばね復帰スイッチの図記号" } },
+  MECH_R5_MT3_Q005: { tags: ["メカトロニクス", "シーケンス制御", "図記号", "スイッチ", "残留接点付きスイッチ", "用語精度", "理解△", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputPrompt: "図記号が表す制御用機器名を答えよ。", inputAnswers: ["残留接点付きスイッチ"], diagram: { src: "slides/mechatronics-r5-sequence-maintained-contact.svg", alt: "NOとNCとCOMおよび残留機構を示す残留接点付きスイッチの図記号" } },
   // R5材料・加工②：初回誤答3論点は選択肢なし・高優先度で多方向から定着確認する。
   MTRL_R5_MP2_Q001: { tags: ["SCM420", "クロモリ鋼", "仮○", "長期定着△"], priority: "high", inputAnswers: ["SCM"] },
   MTRL_R5_MP2_Q002: { tags: ["SCM420", "クロモリ鋼", "仮○", "長期定着△"], priority: "high", inputAnswers: ["クロムモリブデン鋼", "クロム・モリブデン鋼", "クロムモリブデン合金鋼", "クロモリ鋼"] },
@@ -2024,7 +2030,9 @@ function startQuiz(selectedQuestions, mode = "normal") {
   if (questionsLoadedFromFallback) {
     showMessage("questions.csvを読み込めなかったため、画面確認用のサンプル問題で出題しています。");
   }
-  currentQuiz = selectedQuestions;
+  // 今回の図記号問題を含む復習では、A→Eの登録順を手掛かりにしない。
+  const includesR5SwitchSymbols = selectedQuestions.some((question) => question.id.startsWith("MECH_R5_MT3_"));
+  currentQuiz = reviewMode && includesR5SwitchSymbols ? shuffle(selectedQuestions) : [...selectedQuestions];
   currentIndex = 0;
   quizAnswers = [];
   quizStartTime = Date.now();
