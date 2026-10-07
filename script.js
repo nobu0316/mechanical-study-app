@@ -2138,6 +2138,23 @@ function isRecallAnswerCorrect(question, value) {
   return false;
 }
 
+function canManuallyOverrideRecallAnswer(question, isCorrect) {
+  return !isCorrect && Boolean(question?.inputAnswers) && !question?.inputUnit;
+}
+
+function renderManualAnswerOverrideAction(question, isCorrect) {
+  if (!canManuallyOverrideRecallAnswer(question, isCorrect)) {
+    return "";
+  }
+  return `
+    <div class="manual-answer-override" data-manual-answer-override>
+      <button class="manual-answer-override-btn" type="button" data-manual-answer-override-btn>
+        入力揺れなら正解として扱う
+      </button>
+    </div>
+  `;
+}
+
 function renderRecallQuestion(question) {
   const form = document.createElement("form");
   form.className = "recall-form";
@@ -2396,18 +2413,30 @@ function answerQuestion(selectedNumber) {
     }
   });
 
+  const preAnswerSnapshot = canManuallyOverrideRecallAnswer(question, isCorrect)
+    ? captureQuestionAnswerSnapshot(question)
+    : null;
   const questionResult = recordQuestionResult(question, isCorrect);
-  const answer = { question, selectedNumber, isCorrect, unsureRecorded: false, questionResult };
+  const answer = {
+    question,
+    selectedNumber,
+    isCorrect,
+    unsureRecorded: false,
+    manualOverride: false,
+    preAnswerSnapshot,
+    questionResult
+  };
   quizAnswers.push(answer);
   // 既存の学習履歴形式を維持し、自己申告を待たずに正誤を記録する。
   saveAnswer(question, isCorrect, selectedNumber, isCorrect ? "わかった" : "間違えた");
 
   feedbackArea.className = `feedback ${isCorrect ? "correct" : "wrong"}`;
   feedbackArea.innerHTML = `
-    <strong>${isCorrect ? "✅ 正解" : "不正解です"}</strong>
+    <strong data-answer-result-title>${isCorrect ? "✅ 正解" : "不正解です"}</strong>
     ${renderRetentionFeedback(questionResult)}
     <div>正解：${question.inputAnswers || question.inputUnit ? "" : `${question.answer}. `}${question.choices[question.answer - 1]}</div>
     <div>${question.explanation}</div>
+    ${renderManualAnswerOverrideAction(question, isCorrect)}
     <div class="feedback-actions">
       ${isCorrect ? '<button class="unsure-review-btn" type="button" data-mark-unsure>まだ不安</button>' : ""}
       <button class="note-link-btn" type="button" data-add-note-from-current>この問題の要点カードを追加</button>
@@ -2416,6 +2445,12 @@ function answerQuestion(selectedNumber) {
     <div data-weakness-reason-host></div>
   `;
   feedbackArea.querySelector("[data-add-note-from-current]").addEventListener("click", () => showNoteForm(null, question));
+  feedbackArea.querySelector("[data-manual-answer-override-btn]")?.addEventListener("click", () => {
+    if (!applyManualAnswerOverride(answer)) {
+      return;
+    }
+    renderManualAnswerOverrideComplete(answer);
+  });
   feedbackArea.querySelector("[data-mark-unsure]")?.addEventListener("click", (event) => {
     const latestAnswer = quizAnswers[quizAnswers.length - 1];
     if (latestAnswer !== answer || !isCorrect || answer.unsureRecorded) {
@@ -2438,6 +2473,96 @@ function answerQuestion(selectedNumber) {
   }
   nextQuestionBtn.textContent = currentIndex === currentQuiz.length - 1 ? "結果を見る" : "次の問題へ";
   nextQuestionBtn.classList.remove("hidden");
+}
+
+function captureQuestionAnswerSnapshot(question) {
+  const questionId = String(question?.id || "");
+  const stats = loadQuestionStats();
+  const studyHistory = getStudyHistory();
+  return {
+    questionStat: stats[questionId] ? JSON.parse(JSON.stringify(stats[questionId])) : null,
+    studyHistory: studyHistory[questionId] ? JSON.parse(JSON.stringify(studyHistory[questionId])) : null
+  };
+}
+
+function restoreQuestionAnswerSnapshot(question, snapshot) {
+  if (!question?.id || !snapshot) {
+    return false;
+  }
+  const questionId = String(question.id);
+  const stats = loadQuestionStats();
+  const studyHistory = getStudyHistory();
+
+  if (snapshot.questionStat) {
+    stats[questionId] = JSON.parse(JSON.stringify(snapshot.questionStat));
+  } else {
+    delete stats[questionId];
+  }
+  if (snapshot.studyHistory) {
+    studyHistory[questionId] = JSON.parse(JSON.stringify(snapshot.studyHistory));
+  } else {
+    delete studyHistory[questionId];
+  }
+
+  saveQuestionStats(stats);
+  saveStudyHistory(studyHistory);
+  return true;
+}
+
+function applyManualAnswerOverride(answer) {
+  const question = answer?.question;
+  if (
+    !answer
+    || answer.manualOverride
+    || answer.isCorrect
+    || !answer.preAnswerSnapshot
+    || !canManuallyOverrideRecallAnswer(question, false)
+    || quizAnswers[quizAnswers.length - 1] !== answer
+    || currentQuiz[currentIndex] !== question
+  ) {
+    return false;
+  }
+
+  // 先にフラグを立て、連打でも統計と履歴を二重に追加しない。
+  answer.manualOverride = true;
+  try {
+    restoreQuestionAnswerSnapshot(question, answer.preAnswerSnapshot);
+    const questionResult = recordQuestionResult(question, true);
+    saveAnswer(question, true, question.answer, "わかった");
+    answer.selectedNumber = question.answer;
+    answer.isCorrect = true;
+    answer.questionResult = questionResult;
+    return true;
+  } catch (error) {
+    answer.manualOverride = false;
+    throw error;
+  }
+}
+
+function renderManualAnswerOverrideComplete(answer) {
+  feedbackArea.className = "feedback correct";
+  const title = feedbackArea.querySelector("[data-answer-result-title]");
+  if (title) {
+    title.textContent = "✅ 正解として扱いました";
+  }
+  feedbackArea.querySelector("[data-retention-feedback]")?.remove();
+  const retentionFeedback = renderRetentionFeedback(answer.questionResult);
+  if (title && retentionFeedback) {
+    title.insertAdjacentHTML("afterend", retentionFeedback);
+  }
+
+  const overrideArea = feedbackArea.querySelector("[data-manual-answer-override]");
+  if (overrideArea) {
+    overrideArea.innerHTML = `
+      <p class="manual-answer-override-message" role="status">
+        入力揺れとして手動で正解に変更しました
+      </p>
+    `;
+  }
+  const weaknessReasonHost = feedbackArea.querySelector("[data-weakness-reason-host]");
+  if (weaknessReasonHost) {
+    weaknessReasonHost.innerHTML = "";
+  }
 }
 
 function renderWeaknessReasonPrompt(question, title = "何が原因でしたか？") {
