@@ -39,6 +39,8 @@ const NOTE_CARDS_STORAGE_KEY = "mechanicalStudyNoteCards";
 const IMPORTANT_SLIDES_STORAGE_KEY = "mechanicalExamImportantSlides";
 const QUESTION_STATS_STORAGE_KEY = "mechanicalExamQuestionStats";
 const DAILY_REVIEW_STORAGE_KEY = "mechanicalExamDailyReview";
+const KNOWN_QUESTION_IDS_STORAGE_KEY = "mechanicalExamKnownQuestionIds";
+const NEW_QUESTION_IDS_STORAGE_KEY = "mechanicalExamNewQuestionIds";
 const BACKUP_APP_ID = "mechanical-design-exam";
 const BACKUP_VERSION = 1;
 const BACKUP_STORAGE_ITEMS = [
@@ -47,7 +49,9 @@ const BACKUP_STORAGE_ITEMS = [
   { key: NOTE_CARDS_STORAGE_KEY, emptyValue: [], type: "objectArray" },
   { key: IMPORTANT_SLIDES_STORAGE_KEY, emptyValue: [], type: "stringArray" },
   { key: QUESTION_STATS_STORAGE_KEY, emptyValue: {}, type: "record" },
-  { key: DAILY_REVIEW_STORAGE_KEY, emptyValue: {}, type: "object" }
+  { key: DAILY_REVIEW_STORAGE_KEY, emptyValue: {}, type: "object" },
+  { key: KNOWN_QUESTION_IDS_STORAGE_KEY, emptyValue: [], type: "stringArray" },
+  { key: NEW_QUESTION_IDS_STORAGE_KEY, emptyValue: [], type: "stringArray" }
 ];
 const BACKUP_STORAGE_KEYS = BACKUP_STORAGE_ITEMS.map((item) => item.key);
 const QUESTIONS_CSV = "questions.csv";
@@ -620,6 +624,7 @@ function loadQuestions() {
       if (questions.length === 0) {
         showMessage("questions.csvに問題がありません。ヘッダー行と問題データを確認してください。");
       } else {
+        syncQuestionCatalog(questions);
         setupTopicFilter();
         renderDailyReviewCard();
         hideMessage();
@@ -644,6 +649,7 @@ function loadQuestionsWithXhr() {
       if (questions.length === 0) {
         showMessage("questions.csvに問題がありません。ヘッダー行と問題データを確認してください。");
       } else {
+        syncQuestionCatalog(questions);
         setupTopicFilter();
         renderDailyReviewCard();
         hideMessage();
@@ -1432,7 +1438,7 @@ function startDailyReview() {
     return;
   }
   const today = getLocalDateKey();
-  if (isDailyReviewCompleted(loadDailyReviewState(), today)) {
+  if (isDailyReviewCompleted(loadDailyReviewState(), today) && getNewQuestionReviewItems().length === 0) {
     renderDailyReviewCard(today);
     return;
   }
@@ -1448,9 +1454,19 @@ function startDailyReview() {
   startQuiz(plan.items.map((item) => item.question), "dailyReview");
 }
 
-function selectDailyReviewItems(items, today = getLocalDateKey()) {
-  const uniqueItems = [];
+function selectDailyReviewItems(items, today = getLocalDateKey(), newItems = getNewQuestionReviewItems()) {
+  const selectedNewItems = [];
   const seenQuestionIds = new Set();
+  (Array.isArray(newItems) ? newItems : []).forEach((item) => {
+    const questionId = String(item?.question?.id || item?.stat?.questionId || "").trim();
+    if (!questionId || !item?.question || seenQuestionIds.has(questionId)) {
+      return;
+    }
+    seenQuestionIds.add(questionId);
+    selectedNewItems.push(item);
+  });
+
+  const uniqueItems = [];
   (Array.isArray(items) ? items : []).forEach((item) => {
     const questionId = String(item?.stat?.questionId || item?.question?.id || "").trim();
     if (!questionId || !item?.question || seenQuestionIds.has(questionId)) {
@@ -1466,18 +1482,19 @@ function selectDailyReviewItems(items, today = getLocalDateKey()) {
   const retentionItems = uniqueItems
     .filter((item) => isRetentionReviewDue(item.stat, today))
     .sort(compareDailyRetentionItems)
-    .slice(0, DAILY_REVIEW_QUESTION_LIMIT);
+    .slice(0, Math.max(0, DAILY_REVIEW_QUESTION_LIMIT - selectedNewItems.length));
   const selectedIds = new Set(retentionItems.map((item) => item.stat.questionId));
   const priorityItems = uniqueItems
     .filter((item) => !selectedIds.has(item.stat.questionId))
     .filter((item) => !isWaitingForRetentionReview(item.stat, today))
     .sort(compareDailyPriorityItems)
-    .slice(0, DAILY_REVIEW_QUESTION_LIMIT - retentionItems.length);
+    .slice(0, Math.max(0, DAILY_REVIEW_QUESTION_LIMIT - selectedNewItems.length - retentionItems.length));
 
   return {
+    newItems: selectedNewItems.slice(0, DAILY_REVIEW_QUESTION_LIMIT),
     retentionItems,
     priorityItems,
-    items: [...retentionItems, ...priorityItems]
+    items: [...selectedNewItems, ...retentionItems, ...priorityItems].slice(0, DAILY_REVIEW_QUESTION_LIMIT)
   };
 }
 
@@ -1522,7 +1539,8 @@ function renderDailyReviewCard(today = getLocalDateKey()) {
     return;
   }
   const state = loadDailyReviewState();
-  const completedToday = isDailyReviewCompleted(state, today);
+  const plan = selectDailyReviewItems(getWeaknessReviewItems(), today);
+  const completedToday = isDailyReviewCompleted(state, today) && plan.newItems.length === 0;
   pending.classList.toggle("hidden", completedToday);
   completed.classList.toggle("hidden", !completedToday);
 
@@ -1531,9 +1549,8 @@ function renderDailyReviewCard(today = getLocalDateKey()) {
     return;
   }
 
-  const plan = selectDailyReviewItems(getWeaknessReviewItems(), today);
   document.getElementById("dailyReviewRetentionCount").textContent = `${plan.retentionItems.length}問`;
-  document.getElementById("dailyReviewPriorityCount").textContent = `${plan.priorityItems.length}問`;
+  document.getElementById("dailyReviewPriorityCount").textContent = `${plan.newItems.length + plan.priorityItems.length}問`;
   document.getElementById("dailyReviewTotalCount").textContent = `${plan.items.length}問`;
   const empty = plan.items.length === 0;
   document.getElementById("dailyReviewEmptyMessage").classList.toggle("hidden", !empty);
@@ -1580,9 +1597,26 @@ function saveDailyReviewCompletion(questionIds, completedAt = new Date(), storag
   return state;
 }
 
-function selectQuickReviewQuestions(items) {
+function selectQuickReviewQuestions(items, newItems = getNewQuestionReviewItems()) {
   const today = getLocalDateKey();
-  return items
+  const selectedNewItems = [];
+  const seenQuestionIds = new Set();
+  (Array.isArray(newItems) ? newItems : []).forEach((item) => {
+    const questionId = String(item?.question?.id || item?.stat?.questionId || "").trim();
+    if (!questionId || !item?.question || seenQuestionIds.has(questionId)) {
+      return;
+    }
+    seenQuestionIds.add(questionId);
+    selectedNewItems.push({ ...item, randomOrder: Math.random() });
+  });
+  const selectedNewQuestions = selectedNewItems
+    .sort((a, b) => a.randomOrder - b.randomOrder)
+    .slice(0, QUICK_REVIEW_QUESTION_LIMIT)
+    .map((item) => item.question);
+  const remainingLimit = QUICK_REVIEW_QUESTION_LIMIT - selectedNewQuestions.length;
+
+  const existingQuestions = (Array.isArray(items) ? items : [])
+    .filter((item) => !seenQuestionIds.has(String(item?.stat?.questionId || item?.question?.id || "").trim()))
     .filter((item) => isQuickReviewEligible(item.stat, today))
     .map((item) => ({ ...item, randomOrder: Math.random() }))
     .sort((a, b) => {
@@ -1614,8 +1648,9 @@ function selectQuickReviewQuestions(items) {
         - getQuickReviewDateBucket(b.stat.lastAnsweredAt);
       return dateDiff || a.randomOrder - b.randomOrder;
     })
-    .slice(0, QUICK_REVIEW_QUESTION_LIMIT)
+    .slice(0, remainingLimit)
     .map((item) => item.question);
+  return [...selectedNewQuestions, ...existingQuestions];
 }
 
 function getQuickReviewDateBucket(value) {
@@ -2716,6 +2751,122 @@ function loadQuestionStats() {
   }
 }
 
+function normalizeQuestionIds(rawIds) {
+  return [...new Set((Array.isArray(rawIds) ? rawIds : [])
+    .map((id) => String(id || "").trim())
+    .filter(Boolean))];
+}
+
+function loadQuestionIds(storageKey, storage = localStorage) {
+  try {
+    return normalizeQuestionIds(JSON.parse(storage.getItem(storageKey)));
+  } catch (error) {
+    console.error(`問題ID一覧を読み込めませんでした: ${storageKey}`, error);
+    return [];
+  }
+}
+
+function hasQuestionBeenAnswered(questionId, stats = loadQuestionStats(), history = getStudyHistory()) {
+  const id = String(questionId || "").trim();
+  const stat = stats[id];
+  const historyItem = history[id];
+  return Boolean(
+    normalizeQuestionStatCount(stat?.correctCount)
+      + normalizeQuestionStatCount(stat?.wrongCount)
+      + normalizeQuestionStatCount(stat?.unsureCount) >= 1
+    || stat?.lastAnsweredAt
+    || normalizeQuestionStatCount(historyItem?.correctCount) + normalizeQuestionStatCount(historyItem?.incorrectCount) >= 1
+    || historyItem?.lastAnsweredAt
+    || (Array.isArray(historyItem?.history) && historyItem.history.length > 0)
+  );
+}
+
+function syncQuestionCatalog(loadedQuestions, storage = localStorage) {
+  const currentIds = normalizeQuestionIds((Array.isArray(loadedQuestions) ? loadedQuestions : [])
+    .map((question) => question?.id));
+  if (currentIds.length === 0) {
+    return [];
+  }
+
+  try {
+    const storedKnownIds = storage.getItem(KNOWN_QUESTION_IDS_STORAGE_KEY);
+    if (storedKnownIds === null) {
+      // 機能導入直後は現行CSVを基準にし、既存問題を一括で新規扱いしない。
+      storage.setItem(KNOWN_QUESTION_IDS_STORAGE_KEY, JSON.stringify(currentIds));
+      storage.setItem(NEW_QUESTION_IDS_STORAGE_KEY, JSON.stringify([]));
+      return [];
+    }
+
+    const parsedKnownIds = JSON.parse(storedKnownIds);
+    if (!Array.isArray(parsedKnownIds)) {
+      throw new Error("既知問題ID一覧の形式が不正です。");
+    }
+    const knownIds = normalizeQuestionIds(parsedKnownIds);
+    const knownIdSet = new Set(knownIds);
+    const newlyDiscoveredIds = currentIds.filter((id) => !knownIdSet.has(id));
+    const currentIdSet = new Set(currentIds);
+    const stats = loadQuestionStats();
+    const history = getStudyHistory();
+    const pendingIds = normalizeQuestionIds([
+      ...loadQuestionIds(NEW_QUESTION_IDS_STORAGE_KEY, storage),
+      ...newlyDiscoveredIds
+    ]).filter((id) => currentIdSet.has(id) && !hasQuestionBeenAnswered(id, stats, history));
+
+    storage.setItem(KNOWN_QUESTION_IDS_STORAGE_KEY, JSON.stringify(normalizeQuestionIds([...knownIds, ...currentIds])));
+    storage.setItem(NEW_QUESTION_IDS_STORAGE_KEY, JSON.stringify(pendingIds));
+    return pendingIds;
+  } catch (error) {
+    // 壊れた台帳から全問が新規化することを避け、安全側で現行CSVを基準登録する。
+    console.error("新規問題の判定情報を更新できませんでした。", error);
+    try {
+      storage.setItem(KNOWN_QUESTION_IDS_STORAGE_KEY, JSON.stringify(currentIds));
+      storage.setItem(NEW_QUESTION_IDS_STORAGE_KEY, JSON.stringify([]));
+    } catch {
+      // localStorage自体が利用できない場合も、問題の通常利用は継続する。
+    }
+    return [];
+  }
+}
+
+function getNewQuestionReviewItems(storage = localStorage) {
+  const pendingIdSet = new Set(loadQuestionIds(NEW_QUESTION_IDS_STORAGE_KEY, storage));
+  if (pendingIdSet.size === 0) {
+    return [];
+  }
+  const stats = loadQuestionStats();
+  const history = getStudyHistory();
+  return questions
+    .filter((question) => pendingIdSet.has(question.id) && !hasQuestionBeenAnswered(question.id, stats, history))
+    .map((question) => ({
+      question,
+      stat: stats[question.id] || {
+        questionId: question.id,
+        field: question.field,
+        status: "",
+        wrongCount: 0,
+        unsureCount: 0,
+        correctCount: 0,
+        consecutiveCorrect: 0,
+        lastCorrectAt: null,
+        nextReviewAt: null,
+        lastAnsweredAt: "",
+        reasonCounts: createDefaultReasonCounts()
+      }
+    }));
+}
+
+function removeNewQuestionPriority(questionId, storage = localStorage) {
+  const id = String(questionId || "").trim();
+  if (!id) {
+    return;
+  }
+  const pendingIds = loadQuestionIds(NEW_QUESTION_IDS_STORAGE_KEY, storage);
+  if (!pendingIds.includes(id)) {
+    return;
+  }
+  storage.setItem(NEW_QUESTION_IDS_STORAGE_KEY, JSON.stringify(pendingIds.filter((item) => item !== id)));
+}
+
 function saveQuestionStats(stats) {
   localStorage.setItem(QUESTION_STATS_STORAGE_KEY, JSON.stringify(normalizeQuestionStats(stats)));
 }
@@ -2901,6 +3052,7 @@ function recordQuestionResult(question, isCorrect) {
 
   stat.lastAnsweredAt = answeredAt.toISOString();
   saveQuestionStats(stats);
+  removeNewQuestionPriority(question.id);
   return result;
 }
 
@@ -2985,6 +3137,7 @@ function recordQuestionUnsure(question) {
   applyQuestionUnsure(stat);
   stat.lastAnsweredAt = new Date().toISOString();
   saveQuestionStats(stats);
+  removeNewQuestionPriority(question.id);
 }
 
 function applyQuestionUnsure(stat) {
@@ -3884,6 +4037,7 @@ function confirmBackupRestore() {
 
   try {
     restoreBackupDataAtomically(pendingBackupRestore);
+    syncQuestionCatalog(questions);
     noteCards = loadNoteCards();
     importantSlideIds = loadImportantSlideIds();
     closeBackupPreview();
