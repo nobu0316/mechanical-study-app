@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 390" role="img" aria-labelledby="title desc">
+  <title id="title">シャルピー衝撃試験機の高さと鉛直成分</title>
+  <desc id="desc">支点Oから重心Gまでの距離rを鉛直方向へ射影するとr cosθになり、最下点からの高さはr-r cosθになる。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#245b78"/>
+    </marker>
+    <style>
+      .main{stroke:#173f5f;stroke-width:6;stroke-linecap:round;fill:none}.guide{stroke:#6f8290;stroke-width:2;stroke-dasharray:8 7;fill:none}.measure{stroke:#245b78;stroke-width:2.5;fill:none;marker-start:url(#arrow);marker-end:url(#arrow)}.point{fill:#f28e2b;stroke:#173f5f;stroke-width:3}.label{font:700 22px sans-serif;fill:#173f5f}.note{font:18px sans-serif;fill:#324b5c}.formula{font:700 24px sans-serif;fill:#a23b2a}.arc{stroke:#a23b2a;stroke-width:3;fill:none}
+    </style>
+  </defs>
+  <rect width="640" height="390" rx="18" fill="#f7fbfd"/>
+  <circle class="point" cx="300" cy="55" r="10"/>
+  <text class="label" x="318" y="62">支点 O</text>
+  <line class="guide" x1="300" y1="55" x2="300" y2="315"/>
+  <line class="main" x1="300" y1="55" x2="150" y2="238"/>
+  <circle class="point" cx="150" cy="238" r="11"/>
+  <text class="label" x="92" y="232">重心 G</text>
+  <circle class="point" cx="300" cy="315" r="9"/>
+  <text class="label" x="318" y="322">最下点 G₀</text>
+  <path class="arc" d="M300 108 A53 53 0 0 1 266 96"/>
+  <text class="label" x="265" y="127">θ</text>
+  <text class="label" x="205" y="137">r</text>
+  <line class="guide" x1="150" y1="238" x2="300" y2="238"/>
+  <line class="measure" x1="330" y1="61" x2="330" y2="232"/>
+  <text class="note" x="345" y="152">r cosθ</text>
+  <line class="measure" x1="520" y1="244" x2="520" y2="309"/>
+  <text class="note" x="535" y="284">h</text>
+  <text class="formula" x="48" y="363">h = r − r cosθ = r(1 − cosθ)</text>
+  <text class="note" x="390" y="95">角度が鉛直から</text>
+  <text class="note" x="390" y="122">→ 縦成分は cos</text>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" role="img" aria-labelledby="title desc">
+  <title id="title">シャルピー衝撃試験機のrとeとk</title>
+  <desc id="desc">支点Oから重心Gまでがr、重心Gから衝撃点Pまでがe。回転半径kは実寸法ではなく質量の広がりを表す仮想半径である。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#245b78"/>
+    </marker>
+    <marker id="force" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#a23b2a"/>
+    </marker>
+    <style>
+      .bar{stroke:#173f5f;stroke-width:12;stroke-linecap:round}.measure{stroke:#245b78;stroke-width:2.5;marker-start:url(#arrow);marker-end:url(#arrow)}.guide{stroke:#6f8290;stroke-width:2;stroke-dasharray:7 6;fill:none}.force{stroke:#a23b2a;stroke-width:4;marker-end:url(#force)}.point{fill:#f28e2b;stroke:#173f5f;stroke-width:3}.label{font:700 22px sans-serif;fill:#173f5f}.note{font:18px sans-serif;fill:#324b5c}.formula{font:700 23px sans-serif;fill:#a23b2a}
+    </style>
+  </defs>
+  <rect width="720" height="360" rx="18" fill="#f7fbfd"/>
+  <line class="bar" x1="100" y1="175" x2="610" y2="175"/>
+  <circle class="point" cx="100" cy="175" r="13"/>
+  <circle class="point" cx="385" cy="175" r="15"/>
+  <circle class="point" cx="610" cy="175" r="13"/>
+  <text class="label" x="77" y="148">O</text>
+  <text class="label" x="373" y="148">G</text>
+  <text class="label" x="599" y="148">P</text>
+  <line class="guide" x1="100" y1="185" x2="100" y2="248"/>
+  <line class="guide" x1="385" y1="190" x2="385" y2="286"/>
+  <line class="guide" x1="610" y1="185" x2="610" y2="248"/>
+  <line class="measure" x1="108" y1="235" x2="377" y2="235"/>
+  <text class="label" x="234" y="225">r</text>
+  <text class="note" x="185" y="270">支点 → 重心</text>
+  <line class="measure" x1="393" y1="235" x2="602" y2="235"/>
+  <text class="label" x="488" y="225">e</text>
+  <text class="note" x="432" y="270">重心 → 衝撃点</text>
+  <ellipse class="guide" cx="385" cy="175" rx="82" ry="92"/>
+  <text class="note" x="318" y="55">k：質量の広がり</text>
+  <text class="note" x="300" y="80">（実寸法ではない）</text>
+  <line class="force" x1="610" y1="65" x2="610" y2="130"/>
+  <text class="formula" x="625" y="103">力積 F</text>
+  <text class="formula" x="235" y="326">Gまわり：Fe = Iω</text>
+</svg>
