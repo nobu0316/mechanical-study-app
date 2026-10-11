@@ -221,6 +221,14 @@ const QUESTION_PRACTICE = {
   MTRL_R5_MP4_Q001: { tags: ["ドリル加工", "深穴", "穴深さ5D", "理解○", "長期定着△"], priority: "high", reviewIntervals: [3, 7], inputAnswers: ["5", "5倍", "5倍以下", "5D", "5D以下", "L≦5D", "L<=5D"] },
   MTRL_R5_MP4_Q002: { tags: ["ドリル加工", "深穴", "穴深さ5D", "理解○", "長期定着△"], priority: "high", reviewIntervals: [3, 7], inputUnit: "mm" },
   MTRL_R5_MP4_Q003: { tags: ["ドリル加工", "深穴", "穴深さ5D", "理解○", "長期定着△"], priority: "high", reviewIntervals: [3, 7], inputAnswers: ["7.5で超えている", "7.5・超えている", "7.5なので超えている", "7.5で5Dを超えている", "7.5・5Dを超えている", "7.5で深い"] },
+  // R5力学①：シャルピー衝撃試験の図・距離・式の意味を、短答と1日・3日・7日後の再確認で定着させる。
+  D_R5_M1_Q001: { tags: ["力学", "シャルピー衝撃試験", "位置エネルギー", "三角関数", "cos", "図から高さ", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "m", diagram: { src: "slides/mechanics-r5-charpy-height.svg", alt: "支点Oから鉛直下向きに最下点G0があり、鉛直線から角度θだけ傾いた重心Gまでの距離がr。現在位置までの鉛直成分がr cosθで、最下点からの高さがhイコールr引くr cosθである図。" } },
+  D_R5_M1_Q002: { tags: ["力学", "シャルピー衝撃試験", "三角関数", "cos", "図から高さ", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["r cosθ", "rcosθ", "r*cosθ", "r×cosθ", "r cos theta", "rcostheta"], diagram: { src: "slides/mechanics-r5-charpy-height.svg", alt: "支点Oから鉛直線に対して角度θだけ傾いた重心Gへ長さrの腕が伸び、鉛直方向成分がr cosθである図。" } },
+  D_R5_M1_Q003: { tags: ["力学", "シャルピー衝撃試験", "位置エネルギー", "式変形", "符号", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["cosβ-cosα", "cosβ − cosα", "cosβ－cosα", "cos beta-cos alpha", "cosbeta-cosalpha"] },
+  D_R5_M1_Q004: { tags: ["力学", "シャルピー衝撃試験", "慣性モーメント", "回転半径", "r/e/k区別", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["r・e・k", "r、e、k", "r e k", "r/e/k", "r→e→k"], diagram: { src: "slides/mechanics-r5-charpy-distances.svg", alt: "支点Oから重心Gまでをr、重心Gから衝撃点Pまでをeとし、回転半径kは図上の実寸法ではなく質量の広がりを表す仮想半径であることを示す図。" } },
+  D_R5_M1_Q005: { tags: ["力学", "シャルピー衝撃試験", "力積", "慣性モーメント", "Fe=Iω", "r/e/k区別", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["Fe=Iω", "F e = I ω", "F*e=I*ω", "F×e=I×ω", "Fe=Iw", "F e = I w"], diagram: { src: "slides/mechanics-r5-charpy-distances.svg", alt: "重心Gから距離eの衝撃点Pへ力積Fが作用し、重心Gまわりの腕の長さにはrでなくeを使うことを示す図。" } },
+  D_R5_M1_Q006: { tags: ["力学", "シャルピー衝撃試験", "打撃中心", "回転半径", "I=mk²", "式変形", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["s=k²/e", "s = k² / e", "s=k^2/e", "s=k2/e", "k²/e", "k^2/e"] },
+  D_R5_M1_Q007: { tags: ["力学", "シャルピー衝撃試験", "平行軸", "回転半径", "I=mk²", "式変形", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["kG²=kO²-r²", "kG^2=kO^2-r^2", "k_G²=k_O²-r²", "k_G^2=k_O^2-r^2", "kG2=kO2-r2"] },
   // R5環境・安全①：同じ知識は既存IDを再利用し、履歴は変更しない。
   ENV_R7_ES1_Q001: { inputPrompt: "イタイイタイ病の原因物質は？", inputAnswers: ["カドミウム", "Cd"] },
   ENV_R5_ES1_Q001: { inputAnswers: ["PCB", "ポリ塩化ビフェニル", "ポリ塩化ビフェニール"] },
