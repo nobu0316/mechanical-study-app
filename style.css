@@ -299,6 +299,33 @@ textarea {
   font-weight: 700;
 }
 
+.daily-critical-review-list {
+  display: grid;
+  gap: 7px;
+  margin: -4px 0 14px;
+  padding: 10px 12px;
+  border-left: 4px solid #b42318;
+  background: #fff5f3;
+}
+
+.daily-critical-review-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.9rem;
+}
+
+.daily-critical-review-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daily-critical-review-item strong {
+  flex: 0 0 auto;
+  color: #9f2018;
+}
+
 .daily-review-start-btn {
   width: 100%;
   min-height: 54px;
@@ -808,6 +835,16 @@ textarea {
   color: var(--error);
 }
 
+.weakness-status-label.critical {
+  background: #fee4e2;
+  color: #9f2018;
+}
+
+.critical-list-progress {
+  color: #9f2018;
+  font-weight: 700;
+}
+
 .weakness-question-counts,
 .weakness-question-item time {
   color: var(--muted);
@@ -1252,6 +1289,27 @@ textarea {
   align-items: center;
   gap: 8px;
   margin-top: 12px;
+}
+
+.critical-weakness-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(159, 32, 24, 0.2);
+}
+
+.critical-weakness-action button {
+  border-color: #b42318;
+  color: #9f2018;
+  font-weight: 700;
+}
+
+.critical-weakness-action span {
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .manual-answer-override {

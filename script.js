@@ -41,6 +41,7 @@ const QUESTION_STATS_STORAGE_KEY = "mechanicalExamQuestionStats";
 const DAILY_REVIEW_STORAGE_KEY = "mechanicalExamDailyReview";
 const KNOWN_QUESTION_IDS_STORAGE_KEY = "mechanicalExamKnownQuestionIds";
 const NEW_QUESTION_IDS_STORAGE_KEY = "mechanicalExamNewQuestionIds";
+const CRITICAL_WEAKNESSES_STORAGE_KEY = "mechanicalExamCriticalWeaknesses";
 const BACKUP_APP_ID = "mechanical-design-exam";
 const BACKUP_VERSION = 1;
 const BACKUP_STORAGE_ITEMS = [
@@ -51,7 +52,8 @@ const BACKUP_STORAGE_ITEMS = [
   { key: QUESTION_STATS_STORAGE_KEY, emptyValue: {}, type: "record" },
   { key: DAILY_REVIEW_STORAGE_KEY, emptyValue: {}, type: "object" },
   { key: KNOWN_QUESTION_IDS_STORAGE_KEY, emptyValue: [], type: "stringArray" },
-  { key: NEW_QUESTION_IDS_STORAGE_KEY, emptyValue: [], type: "stringArray" }
+  { key: NEW_QUESTION_IDS_STORAGE_KEY, emptyValue: [], type: "stringArray" },
+  { key: CRITICAL_WEAKNESSES_STORAGE_KEY, emptyValue: {}, type: "record" }
 ];
 const BACKUP_STORAGE_KEYS = BACKUP_STORAGE_ITEMS.map((item) => item.key);
 const QUESTIONS_CSV = "questions.csv";
@@ -316,7 +318,7 @@ MOMENT_LINE_003 MOMENT_LINE_004 MOMENT_LINE_005 MOMENT_SIN_002 MOMENT_SIN_003 MO
 MOMENT_SIGN_003 MOMENT_SIGN_004 MOMENT_SUM_001 MOMENT_SUM_002 MOMENT_SUM_003 CONTROL_DELAY_004 MATH_RADIAN_004 MATH_RADIAN_005
 M_DESIGN_TORQUE_001 M_DESIGN_TORQUE_003 M_DESIGN_TORQUE_004 M_DESIGN_TORQUE_005 M_DESIGN_TORQUE_007 M_DESIGN_TORSION_STRESS_003 M_DESIGN_TORSION_STRESS_004 M_DESIGN_TORSION_STRESS_005
 M_DESIGN_TORSION_STRESS_006 M_DESIGN_TORSION_STRESS_007 M_DESIGN_TORSION_STRESS_009 T_COP_002 T_COP_003 T_COP_006 T_HEAT_002 T_HEAT_003
-T_HEAT_004 T_POWER_002 T_POWER_003 T_POWER_004 T_POWER_005 F_HEAD_002 F_HEAD_004 F_HEAD_005
+T_HEAT_004 T_POWER_002 T_POWER_003 T_POWER_004 T_POWER_005 T_POWER_006 T_POWER_007 F_HEAD_002 F_HEAD_004 F_HEAD_005
 F_HEAD_006 F_R7_PIPE_Q001 F_R7_PIPE_Q002 F_R7_PIPE_Q003 F_R7_PIPE_Q004 F_R7_PIPE_Q008 F_R7_PIPE_Q009 F_R7_PIPE_Q010
 M_TENSILE_001 M_TENSILE_002 M_TENSILE_004 MACHINE_ELEMENT_SHAFT_POWER_002 MACHINE_ELEMENT_TORQUE_KEY_002 MACHINE_ELEMENT_KEY_SHEAR_002 MACHINE_ELEMENT_KEY_SHEAR_003 M_R7_M3_Q011
 M_R7_M3_Q012 M_R7_M3_Q013 M_R7_M3_Q014 M_R7_M3_Q015 M_R7_M3_Q016 M_R7_M3_Q017 M_R7_M3_Q018 M_R7_M3_Q019
@@ -332,6 +334,15 @@ const STUDY_TYPE_WARNINGS = new Set();
 const WEAK_TOPIC_RATE_LIMIT = 70;
 const QUICK_REVIEW_QUESTION_LIMIT = 5;
 const DAILY_REVIEW_QUESTION_LIMIT = 5;
+const CRITICAL_WEAKNESS_GRADUATION_DAYS = 3;
+const INITIAL_CRITICAL_QUESTION_IDS = new Set([
+  "T_POWER_001",
+  "T_POWER_002",
+  "T_POWER_006",
+  "T_POWER_007",
+  "T_HP_COP_013",
+  "T_HP_COP_014"
+]);
 const WEAKNESS_REASONS = [
   { key: "formula", label: "公式忘れ" },
   { key: "understanding", label: "理解不足" },
@@ -701,6 +712,7 @@ function loadQuestions() {
         showMessage("questions.csvに問題がありません。ヘッダー行と問題データを確認してください。");
       } else {
         syncQuestionCatalog(questions);
+        initializeCriticalWeaknesses(questions);
         setupTopicFilter();
         renderDailyReviewCard();
         hideMessage();
@@ -726,6 +738,7 @@ function loadQuestionsWithXhr() {
         showMessage("questions.csvに問題がありません。ヘッダー行と問題データを確認してください。");
       } else {
         syncQuestionCatalog(questions);
+        initializeCriticalWeaknesses(questions);
         setupTopicFilter();
         renderDailyReviewCard();
         hideMessage();
@@ -1564,7 +1577,11 @@ function startDailyReview() {
   }
   const today = getLocalDateKey();
   const plan = selectDailyReviewItems(getWeaknessReviewItems(), today);
-  if (isDailyReviewCompleted(loadDailyReviewState(), today) && plan.newItems.length === 0) {
+  if (
+    isDailyReviewCompleted(loadDailyReviewState(), today)
+    && plan.newItems.length === 0
+    && plan.newCriticalItems.length === 0
+  ) {
     renderDailyReviewCard(today);
     return;
   }
@@ -1583,10 +1600,26 @@ function selectDailyReviewItems(
   items,
   today = getLocalDateKey(),
   newItems = getNewQuestionReviewItems(),
-  studyType = reviewStudyType
+  studyType = reviewStudyType,
+  criticalItems = getCriticalReviewItems()
 ) {
-  const selectedNewItems = [];
+  const selectedCriticalItems = [];
   const seenQuestionIds = new Set();
+  (Array.isArray(criticalItems) ? criticalItems : [])
+    .filter((item) => matchesReviewStudyType(item?.question, studyType))
+    .forEach((item) => {
+      const questionId = String(item?.question?.id || item?.stat?.questionId || "").trim();
+      if (!questionId || !item?.question || seenQuestionIds.has(questionId)) {
+        return;
+      }
+      seenQuestionIds.add(questionId);
+      selectedCriticalItems.push(item);
+    });
+
+  const pendingNewIdSet = new Set((Array.isArray(newItems) ? newItems : [])
+    .map((item) => String(item?.question?.id || item?.stat?.questionId || "").trim())
+    .filter(Boolean));
+  const selectedNewItems = [];
   (Array.isArray(newItems) ? newItems : [])
     .filter((item) => matchesReviewStudyType(item?.question, studyType))
     .forEach((item) => {
@@ -1615,20 +1648,31 @@ function selectDailyReviewItems(
 
   const retentionItems = uniqueItems
     .filter((item) => isRetentionReviewDue(item.stat, today))
-    .sort(compareDailyRetentionItems)
-    .slice(0, Math.max(0, DAILY_REVIEW_QUESTION_LIMIT - selectedNewItems.length));
+    .sort(compareDailyRetentionItems);
   const selectedIds = new Set(retentionItems.map((item) => item.stat.questionId));
   const priorityItems = uniqueItems
     .filter((item) => !selectedIds.has(item.stat.questionId))
     .filter((item) => !isWaitingForRetentionReview(item.stat, today))
-    .sort(compareDailyPriorityItems)
-    .slice(0, Math.max(0, DAILY_REVIEW_QUESTION_LIMIT - selectedNewItems.length - retentionItems.length));
+    .sort(compareDailyPriorityItems);
+
+  const normalItems = [...selectedNewItems, ...retentionItems, ...priorityItems];
+  const criticalCapacity = selectedCriticalItems.length >= DAILY_REVIEW_QUESTION_LIMIT && normalItems.length > 0
+    ? DAILY_REVIEW_QUESTION_LIMIT - 1
+    : Math.min(selectedCriticalItems.length, DAILY_REVIEW_QUESTION_LIMIT);
+  const selectedCritical = selectedCriticalItems.slice(0, criticalCapacity);
+  const selectedNormal = normalItems.slice(0, DAILY_REVIEW_QUESTION_LIMIT - selectedCritical.length);
+  const selectedNormalIds = new Set(selectedNormal.map((item) => item.stat.questionId));
+  const selectedNew = selectedNewItems.filter((item) => selectedNormalIds.has(item.stat.questionId));
+  const selectedRetention = retentionItems.filter((item) => selectedNormalIds.has(item.stat.questionId));
+  const selectedPriority = priorityItems.filter((item) => selectedNormalIds.has(item.stat.questionId));
 
   return {
-    newItems: selectedNewItems.slice(0, DAILY_REVIEW_QUESTION_LIMIT),
-    retentionItems,
-    priorityItems,
-    items: [...selectedNewItems, ...retentionItems, ...priorityItems].slice(0, DAILY_REVIEW_QUESTION_LIMIT)
+    criticalItems: selectedCritical,
+    newCriticalItems: selectedCriticalItems.filter((item) => pendingNewIdSet.has(item.question.id)),
+    newItems: selectedNew,
+    retentionItems: selectedRetention,
+    priorityItems: selectedPriority,
+    items: [...selectedCritical, ...selectedNormal]
   };
 }
 
@@ -1674,7 +1718,9 @@ function renderDailyReviewCard(today = getLocalDateKey()) {
   }
   const state = loadDailyReviewState();
   const plan = selectDailyReviewItems(getWeaknessReviewItems(), today);
-  const completedToday = isDailyReviewCompleted(state, today) && plan.newItems.length === 0;
+  const completedToday = isDailyReviewCompleted(state, today)
+    && plan.newItems.length === 0
+    && plan.newCriticalItems.length === 0;
   pending.classList.toggle("hidden", completedToday);
   completed.classList.toggle("hidden", !completedToday);
 
@@ -1683,9 +1729,18 @@ function renderDailyReviewCard(today = getLocalDateKey()) {
     return;
   }
 
+  document.getElementById("dailyReviewCriticalCount").textContent = `${plan.criticalItems.length}問`;
   document.getElementById("dailyReviewRetentionCount").textContent = `${plan.retentionItems.length}問`;
   document.getElementById("dailyReviewPriorityCount").textContent = `${plan.newItems.length + plan.priorityItems.length}問`;
   document.getElementById("dailyReviewTotalCount").textContent = `${plan.items.length}問`;
+  const criticalList = document.getElementById("dailyCriticalReviewList");
+  criticalList.innerHTML = plan.criticalItems.map((item) => `
+    <div class="daily-critical-review-item">
+      <span>${escapeHtml(item.question.question)}</span>
+      <strong>${item.critical.retentionCount}/${CRITICAL_WEAKNESS_GRADUATION_DAYS}日</strong>
+    </div>
+  `).join("");
+  criticalList.classList.toggle("hidden", plan.criticalItems.length === 0);
   const empty = plan.items.length === 0;
   const emptyMessage = document.getElementById("dailyReviewEmptyMessage");
   emptyMessage.textContent = reviewStudyType === "all"
@@ -1806,6 +1861,7 @@ function getQuickReviewDateBucket(value) {
 function showWeaknessReview() {
   const listItems = getWeaknessListItems();
   const reviewItems = listItems.filter((item) => item.question);
+  const criticalCount = listItems.filter((item) => item.critical?.isCritical).length;
   const wrongCount = listItems.filter((item) => item.stat.status === "wrong").length;
   const unsureCount = listItems.filter((item) => item.stat.status === "unsure").length;
   const fields = getWeaknessFields(listItems);
@@ -1813,6 +1869,7 @@ function showWeaknessReview() {
   const fieldSelect = document.getElementById("weaknessFieldSelect");
 
   document.getElementById("weaknessReviewSummary").innerHTML = `
+    <span>最重要弱点 <strong>${criticalCount}問</strong></span>
     <span>間違えた問題 <strong>${wrongCount}問</strong></span>
     <span>迷った問題 <strong>${unsureCount}問</strong></span>
     <span>弱点対象合計 <strong>${listItems.length}問</strong></span>
@@ -1838,13 +1895,27 @@ function getWeaknessReviewItems() {
 
 function getWeaknessListItems() {
   const stats = loadQuestionStats();
-  return Object.values(stats)
+  const criticalRecords = loadCriticalWeaknesses();
+  const itemsById = new Map(Object.values(stats)
     .filter((stat) => stat.status === "wrong" || stat.status === "unsure")
-    .map((stat) => ({
+    .map((stat) => [stat.questionId, {
       stat,
       question: questions.find((question) => question.id === stat.questionId) || null,
-      field: getWeaknessItemField(stat)
-    }))
+      field: getWeaknessItemField(stat),
+      critical: criticalRecords[stat.questionId] || null
+    }]));
+  getCriticalReviewItems().forEach((item) => {
+    const existing = itemsById.get(item.question.id);
+    if (existing) {
+      existing.critical = item.critical;
+      return;
+    }
+    itemsById.set(item.question.id, {
+      ...item,
+      field: item.question.field
+    });
+  });
+  return [...itemsById.values()]
     .sort((a, b) => {
       const fieldDiff = getWeaknessFieldRank(a.field) - getWeaknessFieldRank(b.field)
         || a.field.localeCompare(b.field, "ja");
@@ -2155,7 +2226,8 @@ function renderWeaknessQuestionList() {
   const statusFilter = document.getElementById("weaknessStatusFilter").value || "all";
   const fieldFilter = document.getElementById("weaknessListFieldFilter").value || "all";
   const visibleItems = getWeaknessListItems().filter((item) => {
-    const matchesStatus = statusFilter === "all" || item.stat.status === statusFilter;
+    const matchesStatus = statusFilter === "all"
+      || (statusFilter === "critical" ? item.critical?.isCritical : item.stat.status === statusFilter);
     const matchesField = fieldFilter === "all" || item.field === fieldFilter;
     return matchesStatus && matchesField;
   });
@@ -2189,7 +2261,14 @@ function renderWeaknessQuestionItem(item) {
   const hasFurtherRetentionCheck = item.stat.consecutiveCorrect < getQuestionRetentionIntervals(item.stat.questionId).length;
   const statusLabel = isWaitingForRetention
     ? isRetentionDue ? "定着確認可能" : "定着確認待ち"
-    : item.stat.status === "wrong" ? "間違えた" : "迷った";
+    : item.stat.status === "wrong" ? "間違えた"
+      : item.stat.status === "unsure" ? "迷った" : "通常管理";
+  const criticalBadge = item.critical?.isCritical
+    ? `<span class="weakness-status-label critical">最重要 ${item.critical.retentionCount}/${CRITICAL_WEAKNESS_GRADUATION_DAYS}日</span>`
+    : "";
+  const criticalProgress = item.critical?.isCritical
+    ? `<p class="critical-list-progress">${item.critical.registrationReason === "auto" ? "自動判定" : "手動指定"}・異なる日の正解 ${item.critical.retentionCount}/${CRITICAL_WEAKNESS_GRADUATION_DAYS}</p>`
+    : "";
   const retentionProgress = isWaitingForRetention
     ? isRetentionDue
       ? `<p class="retention-list-progress">定着確認できます　${hasFurtherRetentionCheck ? "正解後も間隔を空けて再確認" : "もう一度正解で弱点卒業"}</p>`
@@ -2205,6 +2284,7 @@ function renderWeaknessQuestionItem(item) {
     >
       <div class="weakness-question-title">
         <strong>${escapeHtml(item.stat.questionId)}</strong>
+        ${criticalBadge}
         <span class="weakness-status-label">${statusLabel}</span>
       </div>
       <p>${escapeHtml(questionText)}</p>
@@ -2214,6 +2294,7 @@ function renderWeaknessQuestionItem(item) {
         <span>正解 ${item.stat.correctCount}回</span>
       </div>
       ${retentionProgress}
+      ${criticalProgress}
       <time datetime="${escapeHtml(item.stat.lastAnsweredAt)}">最終回答：${escapeHtml(formatDateTime(item.stat.lastAnsweredAt))}</time>
     </article>
   `;
@@ -2697,7 +2778,9 @@ function answerQuestion(selectedNumber) {
       <span class="unsure-review-message hidden" data-unsure-message aria-live="polite"></span>
     </div>
     <div data-weakness-reason-host></div>
+    <div data-critical-weakness-action-host></div>
   `;
+  renderCriticalWeaknessAction(question);
   feedbackArea.querySelector("[data-add-note-from-current]").addEventListener("click", () => showNoteForm(null, question));
   feedbackArea.querySelector("[data-manual-answer-override-btn]")?.addEventListener("click", () => {
     if (!applyManualAnswerOverride(answer)) {
@@ -2713,6 +2796,7 @@ function answerQuestion(selectedNumber) {
 
     recordQuestionUnsure(question);
     updateLatestAnswerStatus(question.id, "迷った");
+    renderCriticalWeaknessAction(question);
     latestAnswer.unsureRecorded = true;
     feedbackArea.querySelector("[data-retention-feedback]")?.remove();
     event.currentTarget.disabled = true;
@@ -2733,9 +2817,13 @@ function captureQuestionAnswerSnapshot(question) {
   const questionId = String(question?.id || "");
   const stats = loadQuestionStats();
   const studyHistory = getStudyHistory();
+  const criticalWeaknesses = loadCriticalWeaknesses();
   return {
     questionStat: stats[questionId] ? JSON.parse(JSON.stringify(stats[questionId])) : null,
-    studyHistory: studyHistory[questionId] ? JSON.parse(JSON.stringify(studyHistory[questionId])) : null
+    studyHistory: studyHistory[questionId] ? JSON.parse(JSON.stringify(studyHistory[questionId])) : null,
+    criticalWeakness: criticalWeaknesses[questionId]
+      ? JSON.parse(JSON.stringify(criticalWeaknesses[questionId]))
+      : null
   };
 }
 
@@ -2746,6 +2834,7 @@ function restoreQuestionAnswerSnapshot(question, snapshot) {
   const questionId = String(question.id);
   const stats = loadQuestionStats();
   const studyHistory = getStudyHistory();
+  const criticalWeaknesses = loadCriticalWeaknesses();
 
   if (snapshot.questionStat) {
     stats[questionId] = JSON.parse(JSON.stringify(snapshot.questionStat));
@@ -2757,9 +2846,15 @@ function restoreQuestionAnswerSnapshot(question, snapshot) {
   } else {
     delete studyHistory[questionId];
   }
+  if (snapshot.criticalWeakness) {
+    criticalWeaknesses[questionId] = JSON.parse(JSON.stringify(snapshot.criticalWeakness));
+  } else {
+    delete criticalWeaknesses[questionId];
+  }
 
   saveQuestionStats(stats);
   saveStudyHistory(studyHistory);
+  saveCriticalWeaknesses(criticalWeaknesses);
   return true;
 }
 
@@ -2817,6 +2912,29 @@ function renderManualAnswerOverrideComplete(answer) {
   if (weaknessReasonHost) {
     weaknessReasonHost.innerHTML = "";
   }
+  renderCriticalWeaknessAction(answer.question);
+}
+
+function renderCriticalWeaknessAction(question, root = feedbackArea) {
+  const host = root?.querySelector?.("[data-critical-weakness-action-host]");
+  if (!host || !question?.id) {
+    return;
+  }
+  const record = loadCriticalWeaknesses()[question.id] || null;
+  const isCritical = record?.isCritical === true;
+  const detail = isCritical
+    ? `${record.registrationReason === "auto" ? "自動判定" : "手動指定"}・定着 ${record.retentionCount}/${CRITICAL_WEAKNESS_GRADUATION_DAYS}日`
+    : record?.status === "graduated" ? "最重要弱点を卒業済み" : "";
+  host.innerHTML = `
+    <div class="critical-weakness-action">
+      <button type="button" data-toggle-critical-weakness>${isCritical ? "最重要を解除" : "最重要に指定"}</button>
+      ${detail ? `<span>${escapeHtml(detail)}</span>` : ""}
+    </div>
+  `;
+  host.querySelector("[data-toggle-critical-weakness]")?.addEventListener("click", () => {
+    toggleCriticalWeakness(question);
+    renderCriticalWeaknessAction(question, root);
+  });
 }
 
 function renderWeaknessReasonPrompt(question, title = "何が原因でしたか？") {
@@ -3010,6 +3128,283 @@ function removeNewQuestionPriority(questionId, storage = localStorage) {
     return;
   }
   storage.setItem(NEW_QUESTION_IDS_STORAGE_KEY, JSON.stringify(pendingIds.filter((item) => item !== id)));
+}
+
+function normalizeCriticalWeaknessRecord(questionId, item = {}) {
+  const id = String(questionId || item?.questionId || "").trim();
+  const isCritical = item?.isCritical === true;
+  const registrationReason = item?.registrationReason === "auto" || item?.registrationReason === "manual"
+    ? item.registrationReason
+    : null;
+  const status = isCritical
+    ? "critical"
+    : item?.status === "graduated" ? "graduated" : "normal";
+  const normalizeHistory = (history) => (Array.isArray(history) ? history : [])
+    .filter((entry) => isPlainObject(entry) && normalizeQuestionStatDateTime(entry.at))
+    .map((entry) => ({
+      at: String(entry.at),
+      reason: entry.reason === "auto" ? "auto" : "manual"
+    }));
+  return {
+    questionId: id,
+    isCritical,
+    registrationReason,
+    registeredAt: normalizeQuestionStatDateTime(item?.registeredAt),
+    retentionCount: Math.min(
+      CRITICAL_WEAKNESS_GRADUATION_DAYS,
+      normalizeQuestionStatCount(item?.retentionCount)
+    ),
+    lastReviewDate: normalizeQuestionStatDate(item?.lastReviewDate),
+    status,
+    autoEvaluationResetAt: normalizeQuestionStatDateTime(item?.autoEvaluationResetAt),
+    graduatedAt: normalizeQuestionStatDateTime(item?.graduatedAt),
+    registrationHistory: normalizeHistory(item?.registrationHistory),
+    graduationHistory: (Array.isArray(item?.graduationHistory) ? item.graduationHistory : [])
+      .filter((entry) => isPlainObject(entry) && normalizeQuestionStatDateTime(entry.graduatedAt))
+      .map((entry) => ({
+        graduatedAt: String(entry.graduatedAt),
+        registeredAt: normalizeQuestionStatDateTime(entry.registeredAt),
+        registrationReason: entry.registrationReason === "auto" ? "auto" : "manual",
+        previousAutoEvaluationResetAt: normalizeQuestionStatDateTime(entry.previousAutoEvaluationResetAt)
+      }))
+  };
+}
+
+function normalizeCriticalWeaknesses(rawRecords) {
+  const normalized = {};
+  if (!isPlainObject(rawRecords)) {
+    return normalized;
+  }
+  Object.entries(rawRecords).forEach(([key, item]) => {
+    if (!isPlainObject(item)) {
+      return;
+    }
+    const record = normalizeCriticalWeaknessRecord(key, item);
+    if (record.questionId) {
+      normalized[record.questionId] = record;
+    }
+  });
+  return normalized;
+}
+
+function loadCriticalWeaknesses(storage = localStorage) {
+  try {
+    return normalizeCriticalWeaknesses(JSON.parse(storage.getItem(CRITICAL_WEAKNESSES_STORAGE_KEY)));
+  } catch (error) {
+    console.error("最重要弱点情報を読み込めませんでした。", error);
+    return {};
+  }
+}
+
+function saveCriticalWeaknesses(records, storage = localStorage) {
+  storage.setItem(CRITICAL_WEAKNESSES_STORAGE_KEY, JSON.stringify(normalizeCriticalWeaknesses(records)));
+}
+
+function initializeCriticalWeaknesses(loadedQuestions, storage = localStorage, registeredAt = new Date()) {
+  const availableIds = new Set((Array.isArray(loadedQuestions) ? loadedQuestions : [])
+    .map((question) => String(question?.id || "").trim())
+    .filter(Boolean));
+  const records = loadCriticalWeaknesses(storage);
+  let changed = false;
+  INITIAL_CRITICAL_QUESTION_IDS.forEach((questionId) => {
+    if (!availableIds.has(questionId) || records[questionId]) {
+      return;
+    }
+    records[questionId] = createCriticalWeaknessRecord(questionId, "manual", registeredAt);
+    changed = true;
+  });
+  if (changed) {
+    saveCriticalWeaknesses(records, storage);
+  }
+  return records;
+}
+
+function createCriticalWeaknessRecord(questionId, reason = "manual", registeredAt = new Date(), previous = null) {
+  const at = parseStoredDate(registeredAt) || new Date();
+  const existing = normalizeCriticalWeaknessRecord(questionId, previous || {});
+  const normalizedReason = reason === "auto" ? "auto" : "manual";
+  return {
+    ...existing,
+    questionId: String(questionId),
+    isCritical: true,
+    registrationReason: normalizedReason,
+    registeredAt: at.toISOString(),
+    retentionCount: 0,
+    lastReviewDate: null,
+    status: "critical",
+    graduatedAt: null,
+    registrationHistory: [
+      ...existing.registrationHistory,
+      { at: at.toISOString(), reason: normalizedReason }
+    ]
+  };
+}
+
+function setCriticalWeakness(questionId, reason = "manual", registeredAt = new Date(), storage = localStorage) {
+  const id = String(questionId || "").trim();
+  if (!id) {
+    return null;
+  }
+  const records = loadCriticalWeaknesses(storage);
+  if (records[id]?.isCritical) {
+    return records[id];
+  }
+  records[id] = createCriticalWeaknessRecord(id, reason, registeredAt, records[id]);
+  saveCriticalWeaknesses(records, storage);
+  return records[id];
+}
+
+function releaseCriticalWeakness(questionId, releasedAt = new Date(), storage = localStorage) {
+  const id = String(questionId || "").trim();
+  const records = loadCriticalWeaknesses(storage);
+  if (!id || !records[id]?.isCritical) {
+    return records[id] || null;
+  }
+  const at = parseStoredDate(releasedAt) || new Date();
+  records[id] = {
+    ...records[id],
+    isCritical: false,
+    retentionCount: 0,
+    status: "normal",
+    autoEvaluationResetAt: at.toISOString()
+  };
+  saveCriticalWeaknesses(records, storage);
+  return records[id];
+}
+
+function toggleCriticalWeakness(question, changedAt = new Date()) {
+  const questionId = String(question?.id || "").trim();
+  if (!questionId) {
+    return null;
+  }
+  const current = loadCriticalWeaknesses()[questionId];
+  const next = current?.isCritical
+    ? releaseCriticalWeakness(questionId, changedAt)
+    : setCriticalWeakness(questionId, "manual", changedAt);
+  renderDailyReviewCard();
+  return next;
+}
+
+function getRecentCriticalEvaluations(questionId, record, history = getStudyHistory()) {
+  const resetTimestamp = parseStoredDate(record?.autoEvaluationResetAt)?.getTime() || 0;
+  const answerHistory = Array.isArray(history?.[questionId]?.history) ? history[questionId].history : [];
+  return answerHistory
+    .filter((answer) => {
+      const answeredAt = parseStoredDate(answer?.answeredAt);
+      return answeredAt && answeredAt.getTime() > resetTimestamp;
+    })
+    .slice(-5);
+}
+
+function shouldAutoPromoteCriticalWeakness(questionId, record, history = getStudyHistory()) {
+  const evaluations = getRecentCriticalEvaluations(questionId, record, history);
+  const wrongCount = evaluations.filter((answer) => answer.status === "間違えた").length;
+  const unsureCount = evaluations.filter((answer) => answer.status === "迷った").length;
+  return wrongCount >= 2 || unsureCount >= 3;
+}
+
+function graduateCriticalWeakness(record, graduatedAt) {
+  const at = parseStoredDate(graduatedAt) || new Date();
+  return {
+    ...record,
+    isCritical: false,
+    retentionCount: CRITICAL_WEAKNESS_GRADUATION_DAYS,
+    status: "graduated",
+    graduatedAt: at.toISOString(),
+    autoEvaluationResetAt: at.toISOString(),
+    graduationHistory: [
+      ...record.graduationHistory,
+      {
+        graduatedAt: at.toISOString(),
+        registeredAt: record.registeredAt,
+        registrationReason: record.registrationReason,
+        previousAutoEvaluationResetAt: record.autoEvaluationResetAt
+      }
+    ]
+  };
+}
+
+function updateCriticalWeaknessAfterAnswer(question, status, answeredAt = new Date(), storage = localStorage) {
+  const questionId = String(question?.id || "").trim();
+  if (!questionId || !["わかった", "迷った", "間違えた"].includes(status)) {
+    return null;
+  }
+  const at = parseStoredDate(answeredAt) || new Date();
+  const today = getLocalDateKey(at);
+  const records = loadCriticalWeaknesses(storage);
+  let record = records[questionId] || normalizeCriticalWeaknessRecord(questionId);
+  const latestGraduation = record.graduationHistory[record.graduationHistory.length - 1];
+
+  // 正解直後の「まだ不安」は同じ回答の評価変更なので、その回答で成立した卒業を取り消す。
+  if (
+    status === "迷った"
+    && record.status === "graduated"
+    && record.graduatedAt === at.toISOString()
+  ) {
+    record = {
+      ...record,
+      isCritical: true,
+      status: "critical",
+      retentionCount: Math.max(0, CRITICAL_WEAKNESS_GRADUATION_DAYS - 1),
+      graduatedAt: null,
+      autoEvaluationResetAt: latestGraduation?.previousAutoEvaluationResetAt || null,
+      graduationHistory: record.graduationHistory.slice(0, -1)
+    };
+  }
+
+  if (record.isCritical) {
+    if (status === "わかった") {
+      if (record.lastReviewDate !== today) {
+        record.retentionCount = Math.min(
+          CRITICAL_WEAKNESS_GRADUATION_DAYS,
+          record.retentionCount + 1
+        );
+      }
+    } else {
+      record.retentionCount = 0;
+    }
+    record.lastReviewDate = today;
+    if (record.retentionCount >= CRITICAL_WEAKNESS_GRADUATION_DAYS) {
+      record = graduateCriticalWeakness(record, at);
+    }
+    records[questionId] = record;
+    saveCriticalWeaknesses(records, storage);
+  }
+
+  if (!record.isCritical && shouldAutoPromoteCriticalWeakness(questionId, record)) {
+    record = setCriticalWeakness(questionId, "auto", at, storage);
+    record.lastReviewDate = today;
+    records[questionId] = record;
+    saveCriticalWeaknesses(records, storage);
+  }
+  return record;
+}
+
+function getCriticalReviewItems() {
+  const records = loadCriticalWeaknesses();
+  const stats = loadQuestionStats();
+  return questions
+    .filter((question) => records[question.id]?.isCritical)
+    .map((question) => ({
+      question,
+      critical: records[question.id],
+      stat: stats[question.id] || {
+        questionId: question.id,
+        field: question.field,
+        status: "",
+        wrongCount: 0,
+        unsureCount: 0,
+        correctCount: 0,
+        consecutiveCorrect: 0,
+        lastCorrectAt: null,
+        nextReviewAt: null,
+        lastAnsweredAt: "",
+        reasonCounts: createDefaultReasonCounts()
+      }
+    }))
+    .sort((a, b) => String(a.critical.lastReviewDate || "").localeCompare(String(b.critical.lastReviewDate || ""))
+      || String(a.critical.registeredAt || "").localeCompare(String(b.critical.registeredAt || ""))
+      || a.question.id.localeCompare(b.question.id));
 }
 
 function saveQuestionStats(stats) {
@@ -3729,6 +4124,7 @@ function saveAnswer(question, isCorrect, selectedNumber, status) {
   });
 
   saveStudyHistory(studyHistory);
+  updateCriticalWeaknessAfterAnswer(question, status, now);
 }
 
 function updateLatestAnswerStatus(questionId, status) {
@@ -3745,6 +4141,12 @@ function updateLatestAnswerStatus(questionId, status) {
   questionStat.status = status;
   questionStat.lastSelectedStatus = status;
   saveStudyHistory(studyHistory);
+  const question = questions.find((item) => item.id === questionId) || {
+    id: questionId,
+    field: questionStat.field,
+    topic: questionStat.topic
+  };
+  updateCriticalWeaknessAfterAnswer(question, status, latestRecord?.answeredAt || new Date());
 }
 
 function addAggregate(target, key, isCorrect) {
@@ -4183,6 +4585,7 @@ function confirmBackupRestore() {
   try {
     restoreBackupDataAtomically(pendingBackupRestore);
     syncQuestionCatalog(questions);
+    initializeCriticalWeaknesses(questions);
     noteCards = loadNoteCards();
     importantSlideIds = loadImportantSlideIds();
     closeBackupPreview();
