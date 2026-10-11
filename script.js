@@ -262,6 +262,73 @@ const QUESTION_PRACTICE = {
   ENV_R5_ES1_Q016: { inputAnswers: ["フードバンク", "フードバンク活動"] },
   ENV_R5_ES1_Q017: { inputAnswers: ["異なる", "違う", "同じではない", "同じでない", "別", "別の法律"] }
 };
+const MEMORY_QUESTION_IDS = new Set(`
+M001 M002 D001 D002 T001 T002 F001 F002
+E001 E002 DR001 DR002 MA001 MA002 P001 P002
+C001 C002 S001 S002 M003 D003 T003 F003
+E003 DR003 MA003 P003 C003 S003 D004 F004
+E004 DR004 MA004 P004 C004 S004 T005 T006
+T007 T009 F005 F006 F007 F008 C005 C006
+C007 C008 C009 T010 T011 T012 T013 F010
+F011 F012 F013 C010 C011 C012 C013 C014
+E005 E006 E007 E008 E009 E010 M_DESIGN_CAM_001 M_DESIGN_CAM_002
+M_DESIGN_CAM_003 M_DESIGN_CAM_004 M_DESIGN_CAM_005 M_DESIGN_CAM_006 MATH_TRIG_001 MATH_TRIG_002 MOMENT_BASIC_001 MOMENT_LINE_001
+MOMENT_LINE_002 MOMENT_SIN_001 MOMENT_SIGN_005 CONTROL_DELAY_001 CONTROL_DELAY_002 CONTROL_DELAY_003 CONTROL_DELAY_005 CONTROL_DELAY_006
+CONTROL_DELAY_007 CONTROL_DELAY_008 CONTROL_DELAY_009 CONTROL_DELAY_010 MATH_RADIAN_001 MATH_RADIAN_002 MATH_RADIAN_003 C_TRANSFER_001
+C_TRANSFER_002 C_TRANSFER_003 C_TRANSFER_004 C_TRANSFER_005 C_TRANSFER_006 C_FEEDBACK_001 C_FEEDBACK_002 C_FEEDBACK_003
+C_FEEDBACK_004 C_FEEDBACK_005 C_FEEDBACK_006 M_DESIGN_TORQUE_002 M_DESIGN_TORQUE_006 M_DESIGN_TORQUE_008 M_DESIGN_TORSION_STRESS_001 M_DESIGN_TORSION_STRESS_002
+M_DESIGN_TORSION_STRESS_008 MTRL_HT_001 MTRL_HT_002 MTRL_HT_003 MTRL_HT_004 MTRL_HT_005 MTRL_HT_006 MTRL_HT_007
+MTRL_HT_008 MTRL_HT_009 MTRL_HT_010 MTRL_HT_011 MTRL_HT_012 MTRL_HT_013 MTRL_HT_014 MTRL_HT_015
+T_COP_001 T_COP_004 T_COP_005 T_COP_007 T_COP_008 MTRL_4THEMES_Q001 MTRL_4THEMES_Q002 MTRL_4THEMES_Q003
+MTRL_4THEMES_Q004 MTRL_4THEMES_Q005 MTRL_4THEMES_Q006 MTRL_4THEMES_Q007 MTRL_4THEMES_Q008 MTRL_4THEMES_Q009 MTRL_4THEMES_Q010 MTRL_4THEMES_Q011
+MTRL_4THEMES_Q012 MTRL_4THEMES_Q013 MTRL_4THEMES_Q014 MTRL_4THEMES_Q015 T_HEAT_001 T_POWER_001 F_HEAD_001 F_HEAD_003
+F_R7_PIPE_Q005 F_R7_PIPE_Q006 F_R7_PIPE_Q007 M_TENSILE_003 M_BEND_SIZE_001 M_BEND_SIZE_002 M_BEND_SIZE_003 M_TORSION_SHEAR_001
+M_TORSION_SHEAR_002 M_TORSION_SHEAR_003 D_NATURAL_FREQ_001 D_NATURAL_FREQ_002 D_NATURAL_FREQ_003 D_NATURAL_FREQ_004 MACHINE_ELEMENT_SHAFT_POWER_001 MACHINE_ELEMENT_TORQUE_KEY_001
+MACHINE_ELEMENT_TORQUE_KEY_003 MACHINE_ELEMENT_KEY_SHEAR_001 MACHINE_ELEMENT_KEY_SHEAR_004 MACHINE_ELEMENT_POWER_KEY_FLOW_001 MTRL_C1720_Q001 MTRL_C1720_Q002 MTRL_C1720_Q003 MTRL_C1720_Q004
+MTRL_C1720_Q005 MTRL_C1720_Q006 MTRL_C1720_Q007 MTRL_R7_MP2_Q001 MTRL_R7_MP2_Q002 MTRL_R7_MP2_Q003 MTRL_R7_MP2_Q004 MTRL_R7_MP2_Q005
+MTRL_R7_MP3_Q001 MTRL_R7_MP3_Q002 MTRL_R7_MP3_Q003 MTRL_R7_MP3_Q004 MTRL_R7_MP3_Q005 ENV_R7_ES1_Q001 ENV_R7_ES1_Q002 ENV_R7_ES1_Q003
+ENV_R7_ES1_Q004 ENV_R7_ES1_Q005 ENV_R7_ES1_Q006 ENV_R7_ES1_Q007 ENV_R7_ES1_Q008 ENV_R7_ES1_Q009 ENV_R7_ES1_Q010 ENV_R7_ES1_Q011
+ENV_R7_ES1_Q012 ENV_R7_ES1_Q013 ENV_R7_ES1_Q014 ENV_R7_ES1_Q015 ENV_R7_ES1_Q016 MECH_R7_MT_Q001 MECH_R7_MT_Q002 MECH_R7_MT_Q003
+MECH_R7_MT_Q004 MECH_R7_MT_Q005 MECH_R7_MT_Q006 MECH_R7_MT_Q007 MECH_R7_MT_Q008 MECH_R7_MT_Q009 MECH_R7_MT_Q010 MECH_R7_MT_Q011
+MECH_R7_MT_Q012 MECH_R7_MT_Q013 MECH_R7_MT_Q014 MECH_R7_MT_Q015 MECH_R7_MT_Q016 MECH_R7_MT_Q017 MECH_R7_MT_Q018 MECH_R7_MT_Q019
+MECH_R7_MT_Q020 MECH_R7_MT_Q021 MECH_R7_MT_Q022 MECH_R7_MT_Q023 MECH_R7_MT_Q024 MECH_R7_MT_Q025 MECH_R7_MT_Q026 MECH_R7_MT_Q027
+MECH_R7_MT_Q028 MECH_R7_MT_Q029 MECH_R7_MT_Q030 MECH_R7_MT_Q031 MECH_R7_MT_Q032 MECH_R7_MT_Q033 MECH_R7_MT_Q034 MECH_R7_MT_Q035
+MECH_R7_MT_Q036 MECH_R7_MT_Q037 MECH_R7_MT_Q038 MECH_R7_MT_Q039 M_R7_M3_Q001 M_R7_M3_Q002 M_R7_M3_Q003 M_R7_M3_Q004
+M_R7_M3_Q005 M_R7_M3_Q006 M_R7_M3_Q007 M_R7_M3_Q008 M_R7_M3_Q009 M_R7_M3_Q010 M_R7_M3_Q021 M_R7_M3_Q024
+ENV_R5_ES1_Q001 ENV_R5_ES1_Q002 ENV_R5_ES1_Q003 ENV_R5_ES1_Q004 ENV_R5_ES1_Q005 ENV_R5_ES1_Q006 ENV_R5_ES1_Q007 ENV_R5_ES1_Q008
+ENV_R5_ES1_Q009 ENV_R5_ES1_Q010 ENV_R5_ES1_Q011 ENV_R5_ES1_Q012 ENV_R5_ES1_Q013 ENV_R5_ES1_Q014 ENV_R5_ES1_Q015 ENV_R5_ES1_Q016
+ENV_R5_ES1_Q017 T_HP_COP_001 T_HP_COP_002 T_HP_COP_003 T_HP_COP_004 T_HP_COP_009 T_HP_COP_010 T_R5_TF1_Q003
+T_R5_TF1_Q004 T_R5_TF1_Q005 MOMENT_R7_AP1_Q001 MOMENT_R7_AP1_Q003 F_R7_AP1_Q001 F_R7_AP1_Q002 F_R7_AP1_Q004 F_R7_AP1_Q005
+E_R7_AP1_Q001 E_R5_AP1_Q004 D_R7_AP2_Q002 MTRL_R5_MP2_Q001 MTRL_R5_MP2_Q002 MTRL_R5_MP2_Q003 MTRL_R5_MP2_Q004 MTRL_R5_MP2_Q005
+MTRL_R5_MP2_Q006 MTRL_R5_MP2_Q007 MTRL_R5_MP2_Q008 MTRL_R5_MP2_Q009 MTRL_R5_MP2_Q010 MTRL_R5_MP2_Q011 MTRL_R5_MP2_Q012 MTRL_R5_MP2_Q013
+MTRL_R5_MP2_Q014 MTRL_R5_MP2_Q015 MTRL_R5_MP3_Q001 MTRL_R5_MP3_Q002 MTRL_R5_MP3_Q003 MTRL_R5_MP3_Q004 MTRL_R5_MP4_Q001 M_DESIGN_R7_MD2_Q001
+M_DESIGN_R7_MD2_Q002 M_DESIGN_R7_MD2_Q003 M_DESIGN_R7_MD2_Q004 M_DESIGN_R7_MD2_Q005 M_DESIGN_R7_MD2_Q006 M_DESIGN_R7_MD2_Q007 M_DESIGN_R7_MD2_Q008 M_DESIGN_R7_MD2_Q009
+M_DESIGN_R7_MD2_Q010 F_R7_BEARING_Q003 F_R7_BEARING_Q004 MECH_R5_MT2_Q001 MECH_R5_MT2_Q002 MECH_R5_MT2_Q003 MECH_R5_MT2_Q004 MECH_R5_MT2_Q005
+MECH_R5_MT2_Q006 MECH_R5_MT2_Q007 MECH_R5_MT2_Q008 MECH_R5_MT2_Q009 MECH_R5_MT2_Q010 MECH_R5_MT2_Q011 MECH_R5_MT2_Q012 MECH_R5_MT3_Q001
+MECH_R5_MT3_Q002 MECH_R5_MT3_Q003 MECH_R5_MT3_Q004 MECH_R5_MT3_Q005 M_DESIGN_R5_MD1_Q001 M_DESIGN_R5_MD1_Q002 M_DESIGN_R5_MD1_Q003 M_DESIGN_R5_MD1_Q004
+M_DESIGN_R5_MD1_Q005 M_DESIGN_R5_MD1_Q006 M_DESIGN_R5_MD1_Q007 M_DESIGN_R5_MD1_Q008 D_R5_M1_Q002 D_R5_M1_Q004 D_R5_M1_Q005 MTRL_R4_MP1_Q001
+MTRL_R4_MP1_Q002 MTRL_R4_MP1_Q003 MTRL_R4_MP1_Q004 MTRL_R4_MP1_Q005 MTRL_R4_MP1_Q006 MTRL_R4_MP1_Q007 MTRL_R4_MP1_Q008
+`.trim().split(/\s+/));
+const CALCULATION_QUESTION_IDS = new Set(`
+M004 T004 T008 T014 F009 F014 MATH_TRIG_003 MATH_TRIG_004
+MATH_TRIG_005 MATH_TRIG_006 MATH_TRIG_007 MATH_TRIG_008 MOMENT_BASIC_002 MOMENT_BASIC_003 MOMENT_BASIC_004 MOMENT_BASIC_005
+MOMENT_LINE_003 MOMENT_LINE_004 MOMENT_LINE_005 MOMENT_SIN_002 MOMENT_SIN_003 MOMENT_SIN_004 MOMENT_SIGN_001 MOMENT_SIGN_002
+MOMENT_SIGN_003 MOMENT_SIGN_004 MOMENT_SUM_001 MOMENT_SUM_002 MOMENT_SUM_003 CONTROL_DELAY_004 MATH_RADIAN_004 MATH_RADIAN_005
+M_DESIGN_TORQUE_001 M_DESIGN_TORQUE_003 M_DESIGN_TORQUE_004 M_DESIGN_TORQUE_005 M_DESIGN_TORQUE_007 M_DESIGN_TORSION_STRESS_003 M_DESIGN_TORSION_STRESS_004 M_DESIGN_TORSION_STRESS_005
+M_DESIGN_TORSION_STRESS_006 M_DESIGN_TORSION_STRESS_007 M_DESIGN_TORSION_STRESS_009 T_COP_002 T_COP_003 T_COP_006 T_HEAT_002 T_HEAT_003
+T_HEAT_004 T_POWER_002 T_POWER_003 T_POWER_004 T_POWER_005 F_HEAD_002 F_HEAD_004 F_HEAD_005
+F_HEAD_006 F_R7_PIPE_Q001 F_R7_PIPE_Q002 F_R7_PIPE_Q003 F_R7_PIPE_Q004 F_R7_PIPE_Q008 F_R7_PIPE_Q009 F_R7_PIPE_Q010
+M_TENSILE_001 M_TENSILE_002 M_TENSILE_004 MACHINE_ELEMENT_SHAFT_POWER_002 MACHINE_ELEMENT_TORQUE_KEY_002 MACHINE_ELEMENT_KEY_SHEAR_002 MACHINE_ELEMENT_KEY_SHEAR_003 M_R7_M3_Q011
+M_R7_M3_Q012 M_R7_M3_Q013 M_R7_M3_Q014 M_R7_M3_Q015 M_R7_M3_Q016 M_R7_M3_Q017 M_R7_M3_Q018 M_R7_M3_Q019
+M_R7_M3_Q020 M_R7_M3_Q022 M_R7_M3_Q023 T_HP_COP_005 T_HP_COP_006 T_HP_COP_007 T_HP_COP_008 T_HP_COP_011
+T_HP_COP_012 T_HP_COP_013 T_HP_COP_014 T_HP_COP_015 T_R5_TF1_Q001 T_R5_TF1_Q002 T_R5_TF1_Q006 T_R5_TF1_Q007
+MOMENT_R7_AP1_Q002 F_R7_AP1_Q003 M_R7_AP1_Q001 M_R7_AP1_Q002 E_R7_AP1_Q002 E_R5_AP1_Q001 E_R5_AP1_Q002 E_R5_AP1_Q003
+E_R5_AP1_Q005 E_R5_AP1_Q006 E_R5_AP1_Q007 E_R5_AP1_Q008 D_R7_AP2_Q001 D_R7_AP2_Q003 D_R7_AP2_Q004 D_R7_AP2_Q005
+D_R7_AP2_Q006 E_R7_AP2_Q001 E_R7_AP2_Q002 M_DESIGN_R7_AP2_Q001 M_DESIGN_R7_AP2_Q002 M_DESIGN_R7_AP2_Q003 M_DESIGN_R7_AP2_Q004 MTRL_R5_MP4_Q002
+MTRL_R5_MP4_Q003 M_DESIGN_R7_MD2_Q011 M_DESIGN_R7_MD2_Q012 F_R7_BEARING_Q001 F_R7_BEARING_Q002 F_R7_BEARING_Q005 F_R7_BEARING_Q006 D_R5_M1_Q001
+D_R5_M1_Q003 D_R5_M1_Q006 D_R5_M1_Q007
+`.trim().split(/\s+/));
+const STUDY_TYPE_WARNINGS = new Set();
 const WEAK_TOPIC_RATE_LIMIT = 70;
 const QUICK_REVIEW_QUESTION_LIMIT = 5;
 const DAILY_REVIEW_QUESTION_LIMIT = 5;
@@ -403,6 +470,7 @@ let appInitialized = false;
 let calculatorState = createCalculatorState();
 let selectedWeaknessAnalysis = null;
 let currentDailyReviewDueIds = new Set();
+let reviewStudyType = "all";
 
 const screens = {
   home: document.getElementById("homeScreen"),
@@ -459,6 +527,11 @@ function initApp() {
   appInitialized = true;
 
   try {
+    reviewStudyType = "all";
+    const allReviewTypeInput = document.querySelector("input[name='reviewStudyType'][value='all']");
+    if (allReviewTypeInput) {
+      allReviewTypeInput.checked = true;
+    }
     bindEvents();
     setupFields();
     setupNoteFormFields();
@@ -489,6 +562,9 @@ function bindEvents() {
   addEvent("startDailyReviewBtn", "click", startDailyReview);
   addEvent("startExtraQuickReviewBtn", "click", startQuickReview);
   addEvent("startQuickReviewBtn", "click", startQuickReview);
+  document.querySelectorAll("input[name='reviewStudyType']").forEach((input) => {
+    input.addEventListener("change", handleReviewStudyTypeChange);
+  });
   addEvent("reviewMistakesBtn", "click", showWeaknessReview);
   addEvent("showSlidesBtn", "click", showSlides);
   addEvent("showStatsBtn", "click", showStats);
@@ -725,8 +801,51 @@ function parseCsv(csvText) {
 function normalizeQuestionField(question) {
   return {
     ...question,
-    field: normalizeField(question?.field, question?.topic)
+    field: normalizeField(question?.field, question?.topic),
+    studyType: getQuestionStudyType(question)
   };
+}
+
+function getQuestionStudyType(question) {
+  const configuredType = String(question?.studyType || "");
+  if (configuredType === "memory" || configuredType === "calculation") {
+    return configuredType;
+  }
+  const questionId = String(question?.id || "").trim();
+  if (MEMORY_QUESTION_IDS.has(questionId)) {
+    return "memory";
+  }
+  if (CALCULATION_QUESTION_IDS.has(questionId)) {
+    return "calculation";
+  }
+  if (questionId && !STUDY_TYPE_WARNINGS.has(questionId)) {
+    STUDY_TYPE_WARNINGS.add(questionId);
+    console.warn(`studyType未設定: ${questionId}`);
+  }
+  return "";
+}
+
+function matchesReviewStudyType(question, studyType = reviewStudyType) {
+  return studyType === "all" || getQuestionStudyType(question) === studyType;
+}
+
+function getReviewStudyTypeLabel(studyType = reviewStudyType) {
+  if (studyType === "memory") {
+    return "暗記・理解";
+  }
+  if (studyType === "calculation") {
+    return "計算";
+  }
+  return "すべて";
+}
+
+function handleReviewStudyTypeChange(event) {
+  const nextType = String(event?.target?.value || "");
+  if (!["all", "memory", "calculation"].includes(nextType)) {
+    return;
+  }
+  reviewStudyType = nextType;
+  renderDailyReviewCard();
 }
 
 function normalizeField(field, topic) {
@@ -1423,6 +1542,12 @@ function startQuickReview() {
   const selectedQuestions = selectQuickReviewQuestions(getWeaknessReviewItems());
   if (selectedQuestions.length === 0) {
     hideMessage();
+    const emptyTitle = document.getElementById("quickReviewEmptyTitle");
+    if (emptyTitle) {
+      emptyTitle.textContent = reviewStudyType === "all"
+        ? "現在、復習対象の弱点問題はありません"
+        : `現在、復習対象の${getReviewStudyTypeLabel()}問題はありません`;
+    }
     showScreen("quickReviewEmpty");
     return;
   }
@@ -1438,11 +1563,11 @@ function startDailyReview() {
     return;
   }
   const today = getLocalDateKey();
-  if (isDailyReviewCompleted(loadDailyReviewState(), today) && getNewQuestionReviewItems().length === 0) {
+  const plan = selectDailyReviewItems(getWeaknessReviewItems(), today);
+  if (isDailyReviewCompleted(loadDailyReviewState(), today) && plan.newItems.length === 0) {
     renderDailyReviewCard(today);
     return;
   }
-  const plan = selectDailyReviewItems(getWeaknessReviewItems(), today);
   if (plan.items.length === 0) {
     renderDailyReviewCard(today);
     return;
@@ -1454,30 +1579,39 @@ function startDailyReview() {
   startQuiz(plan.items.map((item) => item.question), "dailyReview");
 }
 
-function selectDailyReviewItems(items, today = getLocalDateKey(), newItems = getNewQuestionReviewItems()) {
+function selectDailyReviewItems(
+  items,
+  today = getLocalDateKey(),
+  newItems = getNewQuestionReviewItems(),
+  studyType = reviewStudyType
+) {
   const selectedNewItems = [];
   const seenQuestionIds = new Set();
-  (Array.isArray(newItems) ? newItems : []).forEach((item) => {
-    const questionId = String(item?.question?.id || item?.stat?.questionId || "").trim();
-    if (!questionId || !item?.question || seenQuestionIds.has(questionId)) {
-      return;
-    }
-    seenQuestionIds.add(questionId);
-    selectedNewItems.push(item);
-  });
+  (Array.isArray(newItems) ? newItems : [])
+    .filter((item) => matchesReviewStudyType(item?.question, studyType))
+    .forEach((item) => {
+      const questionId = String(item?.question?.id || item?.stat?.questionId || "").trim();
+      if (!questionId || !item?.question || seenQuestionIds.has(questionId)) {
+        return;
+      }
+      seenQuestionIds.add(questionId);
+      selectedNewItems.push(item);
+    });
 
   const uniqueItems = [];
-  (Array.isArray(items) ? items : []).forEach((item) => {
-    const questionId = String(item?.stat?.questionId || item?.question?.id || "").trim();
-    if (!questionId || !item?.question || seenQuestionIds.has(questionId)) {
-      return;
-    }
-    if (item.stat.status !== "wrong" && item.stat.status !== "unsure") {
-      return;
-    }
-    seenQuestionIds.add(questionId);
-    uniqueItems.push(item);
-  });
+  (Array.isArray(items) ? items : [])
+    .filter((item) => matchesReviewStudyType(item?.question, studyType))
+    .forEach((item) => {
+      const questionId = String(item?.stat?.questionId || item?.question?.id || "").trim();
+      if (!questionId || !item?.question || seenQuestionIds.has(questionId)) {
+        return;
+      }
+      if (item.stat.status !== "wrong" && item.stat.status !== "unsure") {
+        return;
+      }
+      seenQuestionIds.add(questionId);
+      uniqueItems.push(item);
+    });
 
   const retentionItems = uniqueItems
     .filter((item) => isRetentionReviewDue(item.stat, today))
@@ -1553,7 +1687,11 @@ function renderDailyReviewCard(today = getLocalDateKey()) {
   document.getElementById("dailyReviewPriorityCount").textContent = `${plan.newItems.length + plan.priorityItems.length}問`;
   document.getElementById("dailyReviewTotalCount").textContent = `${plan.items.length}問`;
   const empty = plan.items.length === 0;
-  document.getElementById("dailyReviewEmptyMessage").classList.toggle("hidden", !empty);
+  const emptyMessage = document.getElementById("dailyReviewEmptyMessage");
+  emptyMessage.textContent = reviewStudyType === "all"
+    ? "現在、優先して復習する弱点はありません。"
+    : `現在、復習対象の${getReviewStudyTypeLabel()}問題はありません。`;
+  emptyMessage.classList.toggle("hidden", !empty);
   const startButton = document.getElementById("startDailyReviewBtn");
   startButton.disabled = empty || questions.length === 0;
   startButton.classList.toggle("hidden", empty);
@@ -1597,18 +1735,24 @@ function saveDailyReviewCompletion(questionIds, completedAt = new Date(), storag
   return state;
 }
 
-function selectQuickReviewQuestions(items, newItems = getNewQuestionReviewItems()) {
+function selectQuickReviewQuestions(
+  items,
+  newItems = getNewQuestionReviewItems(),
+  studyType = reviewStudyType
+) {
   const today = getLocalDateKey();
   const selectedNewItems = [];
   const seenQuestionIds = new Set();
-  (Array.isArray(newItems) ? newItems : []).forEach((item) => {
-    const questionId = String(item?.question?.id || item?.stat?.questionId || "").trim();
-    if (!questionId || !item?.question || seenQuestionIds.has(questionId)) {
-      return;
-    }
-    seenQuestionIds.add(questionId);
-    selectedNewItems.push({ ...item, randomOrder: Math.random() });
-  });
+  (Array.isArray(newItems) ? newItems : [])
+    .filter((item) => matchesReviewStudyType(item?.question, studyType))
+    .forEach((item) => {
+      const questionId = String(item?.question?.id || item?.stat?.questionId || "").trim();
+      if (!questionId || !item?.question || seenQuestionIds.has(questionId)) {
+        return;
+      }
+      seenQuestionIds.add(questionId);
+      selectedNewItems.push({ ...item, randomOrder: Math.random() });
+    });
   const selectedNewQuestions = selectedNewItems
     .sort((a, b) => a.randomOrder - b.randomOrder)
     .slice(0, QUICK_REVIEW_QUESTION_LIMIT)
@@ -1616,6 +1760,7 @@ function selectQuickReviewQuestions(items, newItems = getNewQuestionReviewItems(
   const remainingLimit = QUICK_REVIEW_QUESTION_LIMIT - selectedNewQuestions.length;
 
   const existingQuestions = (Array.isArray(items) ? items : [])
+    .filter((item) => matchesReviewStudyType(item?.question, studyType))
     .filter((item) => !seenQuestionIds.has(String(item?.stat?.questionId || item?.question?.id || "").trim()))
     .filter((item) => isQuickReviewEligible(item.stat, today))
     .map((item) => ({ ...item, randomOrder: Math.random() }))

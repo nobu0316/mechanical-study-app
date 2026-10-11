@@ -22,6 +22,24 @@
 
       <section id="homeScreen" class="screen active-screen">
         <div class="panel">
+          <div class="control-group review-study-type-control">
+            <span class="label-text">復習する問題</span>
+            <div class="segmented review-study-type-segmented" role="radiogroup" aria-label="復習する問題タイプ">
+              <label>
+                <input type="radio" name="reviewStudyType" value="all" checked>
+                <span>すべて</span>
+              </label>
+              <label>
+                <input type="radio" name="reviewStudyType" value="memory">
+                <span>暗記・理解</span>
+              </label>
+              <label>
+                <input type="radio" name="reviewStudyType" value="calculation">
+                <span>計算</span>
+              </label>
+            </div>
+          </div>
+
           <section id="dailyReviewCard" class="daily-review-card" aria-labelledby="dailyReviewTitle">
             <div id="dailyReviewPending">
               <p class="eyebrow">TODAY'S REVIEW</p>
@@ -88,7 +106,7 @@
 
       <section id="quickReviewEmptyScreen" class="screen">
         <div class="panel quick-review-empty">
-          <h2>現在、復習対象の弱点問題はありません</h2>
+          <h2 id="quickReviewEmptyTitle">現在、復習対象の弱点問題はありません</h2>
           <p class="muted">通常問題で、次に復習する問題を見つけましょう。</p>
           <button id="homeFromQuickReviewEmptyBtn" class="primary-btn" type="button">トップへ戻る</button>
         </div>
@@ -641,6 +659,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=20261011-new-question-priority"></script>
+  <script src="script.js?v=20261011-review-study-type"></script>
 </body>
 </html>
