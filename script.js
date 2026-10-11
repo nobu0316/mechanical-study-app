@@ -221,6 +221,15 @@ const QUESTION_PRACTICE = {
   MTRL_R5_MP4_Q001: { tags: ["ドリル加工", "深穴", "穴深さ5D", "理解○", "長期定着△"], priority: "high", reviewIntervals: [3, 7], inputAnswers: ["5", "5倍", "5倍以下", "5D", "5D以下", "L≦5D", "L<=5D"] },
   MTRL_R5_MP4_Q002: { tags: ["ドリル加工", "深穴", "穴深さ5D", "理解○", "長期定着△"], priority: "high", reviewIntervals: [3, 7], inputUnit: "mm" },
   MTRL_R5_MP4_Q003: { tags: ["ドリル加工", "深穴", "穴深さ5D", "理解○", "長期定着△"], priority: "high", reviewIntervals: [3, 7], inputAnswers: ["7.5で超えている", "7.5・超えている", "7.5なので超えている", "7.5で5Dを超えている", "7.5・5Dを超えている", "7.5で深い"] },
+  // R4材料・加工①：正式名称を誤った2論点は最優先で翌日から、直後正解した5論点は3日後から定着確認する。
+  MTRL_R4_MP1_Q001: { tags: ["令和4年度", "材料・加工①", "腐食", "全面腐食", "全体腐食混同", "正式名称", "理解△", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["全面腐食"] },
+  MTRL_R4_MP1_Q002: { tags: ["令和4年度", "材料・加工①", "腐食", "孔食", "孔状腐食混同", "正式名称", "理解△", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["孔食"] },
+  MTRL_R4_MP1_Q003: { tags: ["令和4年度", "材料・加工①", "腐食", "ガルバニック腐食", "異種金属接触", "理解○", "長期定着△"], reviewIntervals: [3, 7] },
+  MTRL_R4_MP1_Q004: { tags: ["令和4年度", "材料・加工①", "腐食", "粒界腐食", "結晶粒界", "理解○", "長期定着△"], reviewIntervals: [3, 7] },
+  MTRL_R4_MP1_Q005: { tags: ["令和4年度", "材料・加工①", "腐食", "すき間腐食", "狭い部分", "理解○", "長期定着△"], reviewIntervals: [3, 7] },
+  MTRL_R4_MP1_Q006: { tags: ["令和4年度", "材料・加工①", "破壊", "クリープ破壊", "高温一定荷重長時間", "理解○", "長期定着△"], reviewIntervals: [3, 7] },
+  MTRL_R4_MP1_Q007: { tags: ["令和4年度", "材料・加工①", "破壊", "静的破壊", "ゆっくり荷重増加", "理解○", "長期定着△"], reviewIntervals: [3, 7] },
+  MTRL_R4_MP1_Q008: { tags: ["令和4年度", "材料・加工①", "腐食", "破壊", "現象比較", "用語識別", "理解△", "長期定着△"], reviewIntervals: [1, 3, 7] },
   // R5力学①：シャルピー衝撃試験の図・距離・式の意味を、短答と1日・3日・7日後の再確認で定着させる。
   D_R5_M1_Q001: { tags: ["力学", "シャルピー衝撃試験", "位置エネルギー", "三角関数", "cos", "図から高さ", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputUnit: "m", diagram: { src: "slides/mechanics-r5-charpy-height.svg", alt: "支点Oから鉛直下向きに最下点G0があり、鉛直線から角度θだけ傾いた重心Gまでの距離がr。現在位置までの鉛直成分がr cosθで、最下点からの高さがhイコールr引くr cosθである図。" } },
   D_R5_M1_Q002: { tags: ["力学", "シャルピー衝撃試験", "三角関数", "cos", "図から高さ", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["r cosθ", "rcosθ", "r*cosθ", "r×cosθ", "r cos theta", "rcostheta"], diagram: { src: "slides/mechanics-r5-charpy-height.svg", alt: "支点Oから鉛直線に対して角度θだけ傾いた重心Gへ長さrの腕が伸び、鉛直方向成分がr cosθである図。" } },
