@@ -255,6 +255,16 @@ const QUESTION_PRACTICE = {
   M_R5_M2_Q008: { tags: ["力学", "仮想荷重", "仮想荷重法", "たわみ", "方向", "理解×", "要復習", "長期定着△"], priority: "high", initialWeakness: "wrong", reviewIntervals: [1, 3, 7], studyType: "memory", diagram: { src: "slides/mechanics-r5-virtual-load-probe.svg", alt: "たわみを知りたい翼端Oへ、知りたい上下方向に単位仮想荷重1を置く探針のイメージ図。" } },
   M_R5_M2_Q009: { tags: ["力学", "仮想荷重", "仮想荷重法", "単位荷重", "曲げモーメント", "Mとm", "たわみ", "理解×", "要復習", "長期定着△"], priority: "high", initialWeakness: "wrong", reviewIntervals: [1, 3, 7], studyType: "memory", inputAnswers: ["m=±x", "m = ±x", "±x", "m=xまたは-x", "m=x又は-x", "m=x・-x"], diagram: { src: "slides/mechanics-r5-virtual-load-probe.svg", alt: "翼端の単位仮想荷重1により、切断位置までの距離xを腕として仮想曲げモーメントmがプラスマイナスxになる図。" } },
   M_R5_M2_Q010: { tags: ["力学", "仮想荷重", "仮想荷重法", "ひずみエネルギ", "たわみ", "Mとm", "EI", "積分基礎", "x^4", "理解×", "要復習", "長期定着△"], priority: "high", initialWeakness: "wrong", reviewIntervals: [1, 3, 7], studyType: "calculation", diagram: { src: "slides/mechanics-r5-virtual-load-probe.svg", alt: "たわみ式δ=∫Mm/(EI)dxと、Mは実際の曲げ、mは知りたい方向への効き、EIは曲がりにくさ、積分は梁全体の足し合わせという対応図。" } },
+  // R4環境・安全①：直後正解は△、FSCは×のまま開始し、既存の1日・3日・7日後確認へつなげる。
+  ENV_R4_ES1_Q001: { tags: ["令和4年度", "環境・安全①", "パリ協定", "環境数値", "理解○", "長期定着△"], initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", inputUnit: "℃" },
+  ENV_R4_ES1_Q002: { tags: ["令和4年度", "環境・安全①", "LED", "環境数値", "理解○", "長期定着△"], initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", inputAnswers: ["40000", "40,000", "40000時間", "40,000時間", "約40000時間", "約40,000時間", "4万時間", "約4万時間"] },
+  ENV_R4_ES1_Q003: { tags: ["令和4年度", "環境・安全①", "FSC", "森林認証", "略語混同", "FRT誤答", "理解×", "要復習", "長期定着△"], priority: "high", criticalPriority: "highest", initialWeakness: "wrong", reviewIntervals: [1, 3, 7], studyType: "memory", inputAnswers: ["FSC"] },
+  ENV_R4_ES1_Q004: { tags: ["令和4年度", "環境・安全①", "FSC", "森林認証", "略語混同", "FRT誤答", "理解×", "要復習", "長期定着△"], priority: "high", initialWeakness: "wrong", reviewIntervals: [1, 3, 7], studyType: "memory" },
+  ENV_R4_ES1_Q005: { tags: ["令和4年度", "環境・安全①", "SBT", "FSC", "森林認証", "略語混同", "FRT誤答", "理解×", "要復習", "長期定着△"], priority: "high", initialWeakness: "wrong", reviewIntervals: [1, 3, 7], studyType: "memory", inputAnswers: ["SBT・FSC", "SBT、FSC", "SBTとFSC", "SBT FSC", "SBT/FSC"] },
+  ENV_R4_ES1_Q006: { tags: ["令和4年度", "環境・安全①", "マイクロプラスチック", "合成繊維", "理解○", "長期定着△"], initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", inputAnswers: ["合成繊維", "衣類の合成繊維", "服の合成繊維"] },
+  ENV_R4_ES1_Q007: { tags: ["令和4年度", "環境・安全①", "CO2濃度", "ppm", "環境数値", "理解○", "長期定着△"], initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", inputAnswers: ["1000ppm", "1000 ppm", "1,000ppm", "1,000 ppm", "1000ppm以下", "1,000ppm以下"] },
+  // SBTは同内容の既存問題を選択肢なし想起へ拡張して再利用する。
+  ENV_R7_ES1_Q010: { tags: ["令和4年度", "環境・安全①", "SBT", "温室効果ガス削減目標", "略語混同", "理解○", "長期定着△"], initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", inputAnswers: ["SBT"] },
   // R5環境・安全①：同じ知識は既存IDを再利用し、履歴は変更しない。
   ENV_R7_ES1_Q001: { inputPrompt: "イタイイタイ病の原因物質は？", inputAnswers: ["カドミウム", "Cd"] },
   ENV_R5_ES1_Q001: { inputAnswers: ["PCB", "ポリ塩化ビフェニル", "ポリ塩化ビフェニール"] },
@@ -356,7 +366,9 @@ const INITIAL_CRITICAL_QUESTION_IDS = new Set([
   // R5力学②の（5）は自己評価×。単なるhighより上の「最重要弱点」で開始する。
   "M_R5_M2_Q008",
   "M_R5_M2_Q009",
-  "M_R5_M2_Q010"
+  "M_R5_M2_Q010",
+  // R4環境・安全①のFSCは「FRT」と誤答した現在×の最優先弱点。
+  "ENV_R4_ES1_Q003"
 ]);
 const WEAKNESS_REASONS = [
   { key: "formula", label: "公式忘れ" },
@@ -3449,7 +3461,8 @@ function getCriticalReviewItems() {
         reasonCounts: createDefaultReasonCounts()
       }
     }))
-    .sort((a, b) => String(a.critical.lastReviewDate || "").localeCompare(String(b.critical.lastReviewDate || ""))
+    .sort((a, b) => Number(b.question.criticalPriority === "highest") - Number(a.question.criticalPriority === "highest")
+      || String(a.critical.lastReviewDate || "").localeCompare(String(b.critical.lastReviewDate || ""))
       || String(a.critical.registeredAt || "").localeCompare(String(b.critical.registeredAt || ""))
       || a.question.id.localeCompare(b.question.id));
 }
