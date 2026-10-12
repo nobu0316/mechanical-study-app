@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="data:,">
   <title>機械設計技術者試験2級 基礎復習ノート</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261011-critical-weakness">
 </head>
 <body>
   <div class="app-shell">
@@ -45,10 +45,12 @@
               <p class="eyebrow">TODAY'S REVIEW</p>
               <h2 id="dailyReviewTitle">今日の復習</h2>
               <div class="daily-review-breakdown">
+                <span>最重要 <strong id="dailyReviewCriticalCount">－</strong></span>
                 <span>定着確認 <strong id="dailyReviewRetentionCount">－</strong></span>
                 <span>優先弱点 <strong id="dailyReviewPriorityCount">－</strong></span>
                 <span class="daily-review-total">合計 <strong id="dailyReviewTotalCount">－</strong></span>
               </div>
+              <div id="dailyCriticalReviewList" class="daily-critical-review-list hidden"></div>
               <p id="dailyReviewEmptyMessage" class="muted hidden">現在、優先して復習する弱点はありません。</p>
               <button id="startDailyReviewBtn" class="primary-btn daily-review-start-btn" type="button" disabled>今日の復習を開始</button>
             </div>
@@ -140,6 +142,7 @@
                   状態
                   <select id="weaknessStatusFilter">
                     <option value="all">全て</option>
+                    <option value="critical">最重要のみ</option>
                     <option value="wrong">間違えた問題のみ</option>
                     <option value="unsure">迷った問題のみ</option>
                   </select>
@@ -659,6 +662,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=20261011-review-study-type"></script>
+  <script src="script.js?v=20261012-r5-mechanics-2"></script>
 </body>
 </html>

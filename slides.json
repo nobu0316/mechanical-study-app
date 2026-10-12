@@ -615,5 +615,72 @@
       "T_HP_COP_014",
       "T_HP_COP_015"
     ]
+  },
+  {
+    "id": "SLIDE_M_R5_M2_RESULTANT_001",
+    "field": "材料力学",
+    "topic": "三角形分布荷重",
+    "title": "三角形分布荷重は1本の力に置き換える",
+    "description": "切断位置の高さ、三角形の面積、太い側から1/3、合力×距離の4ステップを図で固定するスライド",
+    "image": "slides/mechanics-r5-triangular-load-resultant.svg",
+    "priority": "high",
+    "summary": [
+      "STEP1：切断位置での分布荷重の高さを求める",
+      "STEP2：三角形の面積＝合力＝1/2×底辺×高さ",
+      "STEP3：作用位置は三角形の重心。三角形 → 太い側から1/3、細い側から2/3",
+      "STEP4：曲げモーメントM＝合力×切断面から作用点までの距離",
+      "長方形分布荷重は中央x/2。三角形分布荷重のx/3と混同しない"
+    ],
+    "relatedQuestionIds": [
+      "M_R5_M2_Q003",
+      "M_R5_M2_Q004",
+      "M_R5_M2_Q005",
+      "M_R5_M2_Q006",
+      "M_R5_M2_Q007"
+    ]
+  },
+  {
+    "id": "SLIDE_M_R5_M2_PROPORTION_001",
+    "field": "材料力学",
+    "topic": "三角形分布荷重",
+    "title": "途中位置xの荷重は比例で考える",
+    "description": "Oで0、Aでq、OA=lなら途中xはqx/lになることを、半分と4分の1の例から理解するスライド",
+    "image": "slides/mechanics-r5-distributed-load-proportion.svg",
+    "priority": "high",
+    "summary": [
+      "Oで0、Aでq、OA=lなら、Oからxの位置の高さはq×x/l＝qx/l",
+      "半分進む → 荷重も半分：x=l/2ならq/2",
+      "1/4進む → 荷重も1/4：x=l/4ならq/4",
+      "Aで最大q/4なら、途中xは(q/4)(x/l)＝qx/(4l)",
+      "最大値をそのまま使わず、最初に切断位置の高さを決める"
+    ],
+    "relatedQuestionIds": [
+      "M_R5_M2_Q001",
+      "M_R5_M2_Q002",
+      "M_R5_M2_Q006",
+      "M_R5_M2_Q007"
+    ]
+  },
+  {
+    "id": "SLIDE_M_R5_M2_VIRTUAL_LOAD_001",
+    "field": "材料力学",
+    "topic": "仮想荷重法・ひずみエネルギ",
+    "title": "仮想荷重は“変位を見るための探針”",
+    "description": "知りたい場所と方向へ単位荷重1を置き、M・m・EI・積分の役割からたわみ式の意味をつかむスライド",
+    "image": "slides/mechanics-r5-virtual-load-probe.svg",
+    "priority": "high",
+    "summary": [
+      "仮想荷重は実際には存在しない確認用の力。知りたい場所へ、知りたい変位方向に置く",
+      "仮想荷重を1にすると変位そのものを読み取れる。腕がxなら仮想曲げモーメントm＝±x",
+      "M＝実荷重による実際の曲げ、m＝知りたい方向へ1だけ押したときの効き",
+      "EI＝梁の曲がりにくさ。硬い梁ほど同じ曲げでもたわみにくい",
+      "δ＝∫Mm/(EI)dx は、梁全体の小さなたわみへの寄与を足し合わせる式",
+      "計算ルール：∫0からl x⁴dx＝l⁵/5"
+    ],
+    "relatedQuestionIds": [
+      "M_R5_M2_Q008",
+      "M_R5_M2_Q009",
+      "M_R5_M2_Q010"
+    ]
   }
 ]

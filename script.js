@@ -244,6 +244,17 @@ const QUESTION_PRACTICE = {
   D_R5_M1_Q005: { tags: ["力学", "シャルピー衝撃試験", "力積", "慣性モーメント", "Fe=Iω", "r/e/k区別", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["Fe=Iω", "F e = I ω", "F*e=I*ω", "F×e=I×ω", "Fe=Iw", "F e = I w"], diagram: { src: "slides/mechanics-r5-charpy-distances.svg", alt: "重心Gから距離eの衝撃点Pへ力積Fが作用し、重心Gまわりの腕の長さにはrでなくeを使うことを示す図。" } },
   D_R5_M1_Q006: { tags: ["力学", "シャルピー衝撃試験", "打撃中心", "回転半径", "I=mk²", "式変形", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["s=k²/e", "s = k² / e", "s=k^2/e", "s=k2/e", "k²/e", "k^2/e"] },
   D_R5_M1_Q007: { tags: ["力学", "シャルピー衝撃試験", "平行軸", "回転半径", "I=mk²", "式変形", "理解○", "長期定着△"], priority: "high", reviewIntervals: [1, 3, 7], inputAnswers: ["kG²=kO²-r²", "kG^2=kO^2-r^2", "k_G²=k_O²-r²", "k_G^2=k_O^2-r^2", "kG2=kO2-r2"] },
+  // R5力学②：三角形分布荷重と仮想荷重法を、既知の△・×から1日・3日・7日後まで再確認する。
+  M_R5_M2_Q001: { tags: ["力学", "分布荷重", "三角形分布荷重", "比例", "途中位置x", "理解△", "長期定着△"], initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "calculation", inputAnswers: ["qx/l", "q x/l", "q*x/l", "qx÷l", "q×x/l", "q×x÷l"], diagram: { src: "slides/mechanics-r5-distributed-load-proportion.svg", alt: "Oで0、Aでqとなる三角形分布荷重。Oからxの位置の高さがqx/lで、l/2ならq/2、l/4ならq/4と示す図。" } },
+  M_R5_M2_Q002: { tags: ["力学", "分布荷重", "三角形分布荷重", "比例", "途中位置x", "理解△", "長期定着△"], initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "calculation", inputAnswers: ["qx/(4l)", "qx/4l", "q*x/(4*l)", "q×x/(4l)", "(q/4)(x/l)", "q/4*x/l", "q/4×x/l"], diagram: { src: "slides/mechanics-r5-distributed-load-proportion.svg", alt: "Oで0、Aでqとなる比例図を使い、Aの最大荷重がq/4なら途中xではqx/(4l)になることを考える図。" } },
+  M_R5_M2_Q003: { tags: ["力学", "分布荷重", "三角形分布荷重", "合力", "三角形の面積", "理解△", "長期定着△"], initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "calculation", diagram: { src: "slides/mechanics-r5-triangular-load-resultant.svg", alt: "細い側0から太い側qx/lへ増える三角形分布荷重を、面積と同じ大きさの1本の合力へ置き換える図。" } },
+  M_R5_M2_Q004: { tags: ["力学", "分布荷重", "三角形分布荷重", "作用点", "三角形分布荷重の作用点", "x/3", "理解△", "長期定着△"], priority: "high", initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", inputAnswers: ["太い側からx/3", "太い側よりx/3", "太い側から1/3", "太い側より1/3", "最大側からx/3", "最大側から1/3", "細い側から2x/3", "細い側から2/3"], diagram: { src: "slides/mechanics-r5-triangular-load-resultant.svg", alt: "三角形分布荷重の合力位置が太い側へ寄り、太い側からx/3、細い側から2x/3である図。" } },
+  M_R5_M2_Q005: { tags: ["力学", "分布荷重", "三角形分布荷重", "作用点", "三角形分布荷重の作用点", "x/3", "理解△", "長期定着△"], initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", diagram: { src: "slides/mechanics-r5-triangular-load-resultant.svg", alt: "長方形分布荷重は中央、三角形分布荷重は太い側から1/3となる位置の違いを示す図。" } },
+  M_R5_M2_Q006: { tags: ["力学", "分布荷重", "三角形分布荷重", "合力", "作用点", "x/3", "曲げモーメント", "4ステップ", "理解△", "長期定着△"], initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "calculation", inputAnswers: ["M=qx³/(6l)", "qx³/(6l)", "M=qx^3/(6l)", "qx^3/(6l)", "M=qx3/(6l)", "qx3/(6l)"], diagram: { src: "slides/mechanics-r5-triangular-load-resultant.svg", alt: "切断面が三角形分布の太い側にあり、合力と太い側からx/3の腕で曲げモーメントを求める図。" } },
+  M_R5_M2_Q007: { tags: ["力学", "分布荷重", "三角形分布荷重", "比例", "合力", "作用点", "x/3", "曲げモーメント", "曲げ応力", "理解△", "長期定着△"], initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "calculation", diagram: { src: "slides/mechanics-r5-triangular-load-resultant.svg", alt: "最大値q/4の三角形分布荷重を合力へ置き換え、切断面からx/3の腕で負の曲げモーメントを求める図。" } },
+  M_R5_M2_Q008: { tags: ["力学", "仮想荷重", "仮想荷重法", "たわみ", "方向", "理解×", "要復習", "長期定着△"], priority: "high", initialWeakness: "wrong", reviewIntervals: [1, 3, 7], studyType: "memory", diagram: { src: "slides/mechanics-r5-virtual-load-probe.svg", alt: "たわみを知りたい翼端Oへ、知りたい上下方向に単位仮想荷重1を置く探針のイメージ図。" } },
+  M_R5_M2_Q009: { tags: ["力学", "仮想荷重", "仮想荷重法", "単位荷重", "曲げモーメント", "Mとm", "たわみ", "理解×", "要復習", "長期定着△"], priority: "high", initialWeakness: "wrong", reviewIntervals: [1, 3, 7], studyType: "memory", inputAnswers: ["m=±x", "m = ±x", "±x", "m=xまたは-x", "m=x又は-x", "m=x・-x"], diagram: { src: "slides/mechanics-r5-virtual-load-probe.svg", alt: "翼端の単位仮想荷重1により、切断位置までの距離xを腕として仮想曲げモーメントmがプラスマイナスxになる図。" } },
+  M_R5_M2_Q010: { tags: ["力学", "仮想荷重", "仮想荷重法", "ひずみエネルギ", "たわみ", "Mとm", "EI", "積分基礎", "x^4", "理解×", "要復習", "長期定着△"], priority: "high", initialWeakness: "wrong", reviewIntervals: [1, 3, 7], studyType: "calculation", diagram: { src: "slides/mechanics-r5-virtual-load-probe.svg", alt: "たわみ式δ=∫Mm/(EI)dxと、Mは実際の曲げ、mは知りたい方向への効き、EIは曲がりにくさ、積分は梁全体の足し合わせという対応図。" } },
   // R5環境・安全①：同じ知識は既存IDを再利用し、履歴は変更しない。
   ENV_R7_ES1_Q001: { inputPrompt: "イタイイタイ病の原因物質は？", inputAnswers: ["カドミウム", "Cd"] },
   ENV_R5_ES1_Q001: { inputAnswers: ["PCB", "ポリ塩化ビフェニル", "ポリ塩化ビフェニール"] },
@@ -341,7 +352,11 @@ const INITIAL_CRITICAL_QUESTION_IDS = new Set([
   "T_POWER_006",
   "T_POWER_007",
   "T_HP_COP_013",
-  "T_HP_COP_014"
+  "T_HP_COP_014",
+  // R5力学②の（5）は自己評価×。単なるhighより上の「最重要弱点」で開始する。
+  "M_R5_M2_Q008",
+  "M_R5_M2_Q009",
+  "M_R5_M2_Q010"
 ]);
 const WEAKNESS_REASONS = [
   { key: "formula", label: "公式忘れ" },
@@ -712,6 +727,7 @@ function loadQuestions() {
         showMessage("questions.csvに問題がありません。ヘッダー行と問題データを確認してください。");
       } else {
         syncQuestionCatalog(questions);
+        initializeDeclaredWeaknesses(questions);
         initializeCriticalWeaknesses(questions);
         setupTopicFilter();
         renderDailyReviewCard();
@@ -738,6 +754,7 @@ function loadQuestionsWithXhr() {
         showMessage("questions.csvに問題がありません。ヘッダー行と問題データを確認してください。");
       } else {
         syncQuestionCatalog(questions);
+        initializeDeclaredWeaknesses(questions);
         initializeCriticalWeaknesses(questions);
         setupTopicFilter();
         renderDailyReviewCard();
@@ -3014,6 +3031,36 @@ function loadQuestionStats() {
   }
 }
 
+// 問題追加時に明示された自己評価（△・×）だけを初期弱点へ反映する。
+// 既存の回答・履歴がある問題は触らず、その後の卒業判定は既存ロジックへ委ねる。
+function initializeDeclaredWeaknesses(loadedQuestions, storage = localStorage) {
+  let stats;
+  try {
+    stats = normalizeQuestionStats(JSON.parse(storage.getItem(QUESTION_STATS_STORAGE_KEY)));
+  } catch {
+    stats = {};
+  }
+  const history = getStudyHistory();
+  let changed = false;
+
+  (Array.isArray(loadedQuestions) ? loadedQuestions : []).forEach((question) => {
+    const status = question?.initialWeakness;
+    if ((status !== "wrong" && status !== "unsure") || hasQuestionBeenAnswered(question.id, stats, history)) {
+      return;
+    }
+    const stat = getOrCreateQuestionStat(stats, question);
+    stat.status = status;
+    stat.wrongCount = status === "wrong" ? 1 : 0;
+    stat.unsureCount = status === "unsure" ? 1 : 0;
+    changed = true;
+  });
+
+  if (changed) {
+    storage.setItem(QUESTION_STATS_STORAGE_KEY, JSON.stringify(normalizeQuestionStats(stats)));
+  }
+  return stats;
+}
+
 function normalizeQuestionIds(rawIds) {
   return [...new Set((Array.isArray(rawIds) ? rawIds : [])
     .map((id) => String(id || "").trim())
@@ -4585,6 +4632,7 @@ function confirmBackupRestore() {
   try {
     restoreBackupDataAtomically(pendingBackupRestore);
     syncQuestionCatalog(questions);
+    initializeDeclaredWeaknesses(questions);
     initializeCriticalWeaknesses(questions);
     noteCards = loadNoteCards();
     importantSlideIds = loadImportantSlideIds();
