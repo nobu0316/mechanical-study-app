@@ -682,5 +682,72 @@
       "M_R5_M2_Q009",
       "M_R5_M2_Q010"
     ]
+  },
+  {
+    "id": "SLIDE_M_DESIGN_R5_MD2_CAM_LINE_001",
+    "field": "機械設計",
+    "topic": "板カム・カム線図",
+    "title": "カム線図は横と線の形を見る",
+    "description": "横軸の幅と変位線の形を別々に読み、180°と等速度の取り違えを防ぐスライド",
+    "image": "slides/mechanical-design-r5-cam-line.svg",
+    "priority": "high",
+    "summary": [
+      "横軸はカムの回転角。0°→180°の横の幅は180°回転",
+      "変位線が直線なら、回転角に対する変位の増え方が一定なので等速度運動",
+      "最重要：横の幅＝角度",
+      "最重要：直線＝等速度",
+      "C＝180°、D＝等速度。読む対象を分けて判断する"
+    ],
+    "relatedQuestionIds": ["M_DESIGN_R5_MD2_Q001", "M_DESIGN_R5_MD2_Q002", "M_DESIGN_R5_MD2_Q003"]
+  },
+  {
+    "id": "SLIDE_M_DESIGN_R5_MD2_ROLLER_001",
+    "field": "機械設計",
+    "topic": "板カム・ころ従動節",
+    "title": "ころを付ける目的",
+    "description": "尖った先端のすべり・摩耗と、ころが回転する転がり接触を対比するスライド",
+    "image": "slides/mechanical-design-r5-roller-follower.svg",
+    "priority": "high",
+    "summary": [
+      "尖った先端はカム面をすべり、摩耗しやすい",
+      "先端にころを付けると、ころが回転して摩耗を抑える",
+      "ころ → 転がる → 転がり接触",
+      "点接触は接触形状の表現であり、ころを付ける目的を表す答えではない"
+    ],
+    "relatedQuestionIds": ["M_DESIGN_R5_MD2_Q004"]
+  },
+  {
+    "id": "SLIDE_M_DESIGN_R5_MD2_CAM_SPEED_001",
+    "field": "機械設計",
+    "topic": "板カム・カム速度",
+    "title": "カム速度は2段階",
+    "description": "回転角から時間を出し、変位を時間で割る二段階と分数除算を整理するスライド",
+    "image": "slides/mechanical-design-r5-cam-speed.svg",
+    "priority": "high",
+    "summary": [
+      "STEP1：時間＝回転角÷角速度",
+      "STEP2：速度＝変位÷時間",
+      "180°＝π rad、ω＝2 rad/sならt＝π/2 s",
+      "v＝35÷(π/2)＝35×2/π＝70/π≒22.3 mm/s",
+      "分数で割るときは逆数を掛ける"
+    ],
+    "relatedQuestionIds": ["M_DESIGN_R5_MD2_Q007", "M_DESIGN_R5_MD2_Q008", "MATH_RADIAN_004"]
+  },
+  {
+    "id": "SLIDE_M_DESIGN_R5_MD2_FORMULA_001",
+    "field": "機械設計",
+    "topic": "板カム・式変形",
+    "title": "Pの式はRを消して作る",
+    "description": "P/QでRを消し、加法・減法公式の符号とtanρ＝μを順に確認するスライド",
+    "image": "slides/mechanical-design-r5-cam-formula.svg",
+    "priority": "high",
+    "summary": [
+      "① P＝R cos(θ－ρ)、Q＝R cos(β＋ρ)",
+      "② P/Qにして共通因子Rを消す",
+      "③ cos(θ－ρ)は＋、cos(β＋ρ)は－",
+      "④ cosρで整理してtanρ＝μへ置き換える",
+      "⑤ P＝Q(cosθ＋μsinθ)/(cosβ－μsinβ)"
+    ],
+    "relatedQuestionIds": ["M_DESIGN_R5_MD2_Q005", "M_DESIGN_R5_MD2_Q006"]
   }
 ]
