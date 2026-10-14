@@ -749,5 +749,56 @@
       "⑤ P＝Q(cosθ＋μsinθ)/(cosβ－μsinβ)"
     ],
     "relatedQuestionIds": ["M_DESIGN_R5_MD2_Q005", "M_DESIGN_R5_MD2_Q006"]
+  },
+  {
+    "id": "SLIDE_D_R4_M1_FALL_ENERGY_001",
+    "field": "機械力学",
+    "topic": "自由落下とエネルギー",
+    "title": "高さのエネルギーが速さに変わる",
+    "description": "位置エネルギーmghが落下によって運動エネルギー1/2 mv²へ変わり、v²＝2ghへ進む意味を図で確認する",
+    "image": "slides/mechanics-r4-fall-energy.svg",
+    "priority": "high",
+    "summary": [
+      "高い位置では位置エネルギーmghを持つ",
+      "落下すると高さのエネルギーが速さのエネルギーへ変わる",
+      "落下直前はmgh＝1/2 mv²。位置エネルギー→運動エネルギー",
+      "両辺のmを消してgh＝1/2 v²、両辺を2倍してv²＝2gh",
+      "最重要：高さ → 速さ。公式だけでなく変換の流れを思い浮かべる"
+    ],
+    "relatedQuestionIds": ["D_R4_M1_Q001", "D_R4_M1_Q002", "D_R4_M1_Q003"]
+  },
+  {
+    "id": "SLIDE_D_R4_M1_AVERAGE_SPEED_001",
+    "field": "機械力学",
+    "topic": "一定加減速と平均速度",
+    "title": "加速・減速中は平均速度を使う",
+    "description": "一定加速度・一定減速度では初速度と終速度の平均を使い、終速度×時間の再発を防ぐ",
+    "image": "slides/mechanics-r4-average-velocity.svg",
+    "priority": "high",
+    "summary": [
+      "一定加速度・一定減速度なら平均速度＝(初速度＋終速度)/2",
+      "14 m/s→0 m/sなら平均速度＝(14＋0)/2＝7 m/s",
+      "距離＝平均速度×時間",
+      "静止からの加速でも同じ。0→12 m/sなら平均速度は6 m/s",
+      "最重要：最後の速度×時間ではない。初速と終速の真ん中"
+    ],
+    "relatedQuestionIds": ["D_R4_M1_Q004", "D_R4_M1_Q005"]
+  },
+  {
+    "id": "SLIDE_D_R4_M1_IMPULSE_001",
+    "field": "機械力学",
+    "topic": "力積と衝撃力",
+    "title": "衝撃力は“短時間で止めるほど大きい”",
+    "description": "F＝maからFΔt＝mΔvを導き、同じ速度変化なら停止時間が短いほど力が大きいことを示す",
+    "image": "slides/mechanics-r4-impulse.svg",
+    "priority": "high",
+    "summary": [
+      "F＝ma、a＝Δv/ΔtなのでF＝mΔv/Δt",
+      "両辺にΔtを掛けるとFΔt＝mΔv",
+      "力積FΔt＝運動量の変化mΔv",
+      "同じ質量・同じ速度変化なら、ゆっくり止まるほど力は小さく急に止まるほど力は大きい",
+      "最重要：力×時間＝動きの変化"
+    ],
+    "relatedQuestionIds": ["D_R4_M1_Q006", "D_R4_M1_Q007"]
   }
 ]
