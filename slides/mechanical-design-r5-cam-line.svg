@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">カム線図は横と線の形を見る</title>
+  <desc id="desc">横軸の0度から180度が回転角180度を示し、直線状の変位線が等速度運動を示す図</desc>
+  <rect width="960" height="540" rx="28" fill="#f7fafc"/>
+  <text x="54" y="66" font-family="sans-serif" font-size="34" font-weight="700" fill="#17324d">カム線図は横と線の形を見る</text>
+  <rect x="54" y="92" width="852" height="318" rx="24" fill="#ffffff" stroke="#d5e2ea" stroke-width="2"/>
+  <line x1="124" y1="342" x2="838" y2="342" stroke="#365b73" stroke-width="4"/>
+  <line x1="124" y1="342" x2="124" y2="142" stroke="#365b73" stroke-width="4"/>
+  <polyline points="124,342 480,172 838,172" fill="none" stroke="#e25d3f" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="480" y1="342" x2="480" y2="172" stroke="#8ea6b5" stroke-width="3" stroke-dasharray="10 9"/>
+  <text x="106" y="378" font-family="sans-serif" font-size="24" fill="#365b73">0°</text>
+  <text x="451" y="378" font-family="sans-serif" font-size="24" font-weight="700" fill="#17324d">180°</text>
+  <text x="804" y="378" font-family="sans-serif" font-size="24" fill="#365b73">360°</text>
+  <text x="729" y="326" font-family="sans-serif" font-size="22" fill="#365b73">回転角</text>
+  <text x="66" y="132" font-family="sans-serif" font-size="22" fill="#365b73">変位</text>
+  <path d="M140 396 H466" stroke="#167c80" stroke-width="5" marker-end="url(#arrow)"/>
+  <text x="208" y="433" font-family="sans-serif" font-size="25" font-weight="700" fill="#167c80">横の幅＝180°</text>
+  <text x="555" y="222" font-family="sans-serif" font-size="26" font-weight="700" fill="#e25d3f">直線＝等速度</text>
+  <rect x="118" y="458" width="322" height="54" rx="16" fill="#dff3f1"/>
+  <rect x="520" y="458" width="322" height="54" rx="16" fill="#fde7df"/>
+  <text x="169" y="494" font-family="sans-serif" font-size="27" font-weight="700" fill="#12656a">横の幅＝角度</text>
+  <text x="568" y="494" font-family="sans-serif" font-size="27" font-weight="700" fill="#a94028">直線＝等速度</text>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0 L10 3 L0 6 Z" fill="#167c80"/></marker></defs>
+</svg>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">衝撃力は短時間で止めるほど大きい</title>
+  <desc id="desc">Fイコールmaから力積と運動量の関係を導き、ゆっくり停止と急停止の衝撃力を比較する図</desc>
+  <rect width="960" height="540" rx="28" fill="#f7fafc"/>
+  <text x="54" y="66" font-family="sans-serif" font-size="34" font-weight="700" fill="#17324d">衝撃力は“短時間で止めるほど大きい”</text>
+  <rect x="54" y="102" width="852" height="154" rx="24" fill="#ffffff" stroke="#d5e2ea" stroke-width="2"/>
+  <text x="90" y="152" font-family="sans-serif" font-size="27" font-weight="700" fill="#17324d">F＝ma</text>
+  <path d="M205 144 H283" stroke="#365b73" stroke-width="5" marker-end="url(#arrow)"/>
+  <text x="310" y="152" font-family="sans-serif" font-size="27" font-weight="700" fill="#17324d">a＝Δv/Δt</text>
+  <path d="M492 144 H570" stroke="#365b73" stroke-width="5" marker-end="url(#arrow)"/>
+  <text x="598" y="152" font-family="sans-serif" font-size="27" font-weight="700" fill="#17324d">F＝mΔv/Δt</text>
+  <path d="M480 174 V205" stroke="#365b73" stroke-width="5" marker-end="url(#downArrow)"/>
+  <text x="339" y="238" font-family="sans-serif" font-size="32" font-weight="700" fill="#12656a">FΔt ＝ mΔv</text>
+  <rect x="54" y="286" width="390" height="150" rx="22" fill="#e8f3fb"/>
+  <text x="104" y="329" font-family="sans-serif" font-size="27" font-weight="700" fill="#28617f">ゆっくり止まる</text>
+  <text x="102" y="374" font-family="sans-serif" font-size="25" fill="#17324d">停止時間が長い</text>
+  <text x="119" y="413" font-family="sans-serif" font-size="28" font-weight="700" fill="#12656a">力は小さい</text>
+  <rect x="516" y="286" width="390" height="150" rx="22" fill="#fff4ef"/>
+  <text x="596" y="329" font-family="sans-serif" font-size="27" font-weight="700" fill="#a94028">急に止まる</text>
+  <text x="566" y="374" font-family="sans-serif" font-size="25" fill="#17324d">停止時間が短い</text>
+  <text x="606" y="413" font-family="sans-serif" font-size="28" font-weight="700" fill="#a94028">力は大きい</text>
+  <rect x="190" y="466" width="580" height="50" rx="16" fill="#dff3f1"/>
+  <text x="287" y="500" font-family="sans-serif" font-size="28" font-weight="700" fill="#12656a">力 × 時間 ＝ 動きの変化</text>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0 L10 3 L0 6 Z" fill="#365b73"/></marker>
+    <marker id="downArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0 L10 3 L0 6 Z" fill="#365b73"/></marker>
+  </defs>
+</svg>

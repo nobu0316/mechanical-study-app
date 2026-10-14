@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">加速・減速中は平均速度を使う</title>
+  <desc id="desc">14メートル毎秒から0まで一定減速する例で平均速度7メートル毎秒と距離の求め方を示す図</desc>
+  <rect width="960" height="540" rx="28" fill="#f7fafc"/>
+  <text x="54" y="66" font-family="sans-serif" font-size="34" font-weight="700" fill="#17324d">加速・減速中は平均速度を使う</text>
+  <rect x="54" y="106" width="852" height="206" rx="24" fill="#ffffff" stroke="#d5e2ea" stroke-width="2"/>
+  <text x="94" y="158" font-family="sans-serif" font-size="28" font-weight="700" fill="#28617f">初速度 14 m/s</text>
+  <path d="M285 148 H664" stroke="#e25d3f" stroke-width="8" marker-end="url(#arrow)"/>
+  <text x="414" y="132" font-family="sans-serif" font-size="23" font-weight="700" fill="#a94028">一定減速</text>
+  <text x="694" y="158" font-family="sans-serif" font-size="28" font-weight="700" fill="#28617f">終速度 0</text>
+  <circle cx="480" cy="226" r="58" fill="#dff3f1" stroke="#9dcec8" stroke-width="3"/>
+  <text x="442" y="219" font-family="sans-serif" font-size="20" fill="#12656a">真ん中</text>
+  <text x="444" y="251" font-family="sans-serif" font-size="27" font-weight="700" fill="#12656a">7 m/s</text>
+  <text x="112" y="290" font-family="sans-serif" font-size="27" fill="#17324d">平均速度 ＝ (14＋0)/2 ＝ 7 m/s</text>
+  <rect x="54" y="344" width="396" height="88" rx="20" fill="#e8f3fb"/>
+  <text x="92" y="398" font-family="sans-serif" font-size="29" font-weight="700" fill="#17324d">距離＝平均速度×時間</text>
+  <rect x="510" y="344" width="396" height="88" rx="20" fill="#fff4ef"/>
+  <text x="552" y="382" font-family="sans-serif" font-size="25" font-weight="700" fill="#a94028">最後の速度×時間</text>
+  <line x1="548" y1="398" x2="866" y2="398" stroke="#e25d3f" stroke-width="6"/>
+  <text x="652" y="423" font-family="sans-serif" font-size="22" font-weight="700" fill="#a94028">ではない</text>
+  <rect x="204" y="464" width="552" height="50" rx="16" fill="#dff3f1"/>
+  <text x="314" y="498" font-family="sans-serif" font-size="27" font-weight="700" fill="#12656a">初速と終速の真ん中</text>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0 L10 3 L0 6 Z" fill="#e25d3f"/></marker></defs>
+</svg>

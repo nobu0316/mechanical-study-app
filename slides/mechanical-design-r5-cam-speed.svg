@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">カム速度は2段階</title>
+  <desc id="desc">回転角を角速度で割って時間を求め、変位を時間で割って速度を求める手順</desc>
+  <rect width="960" height="540" rx="28" fill="#f7fafc"/>
+  <text x="54" y="66" font-family="sans-serif" font-size="34" font-weight="700" fill="#17324d">カム速度は2段階</text>
+  <rect x="54" y="104" width="390" height="130" rx="22" fill="#e8f3fb" stroke="#b8d5e8" stroke-width="2"/>
+  <text x="82" y="145" font-family="sans-serif" font-size="23" font-weight="700" fill="#28617f">STEP 1</text>
+  <text x="82" y="195" font-family="sans-serif" font-size="30" font-weight="700" fill="#17324d">時間 ＝ 回転角 ÷ 角速度</text>
+  <path d="M458 169 H500" stroke="#365b73" stroke-width="6" marker-end="url(#arrow)"/>
+  <rect x="516" y="104" width="390" height="130" rx="22" fill="#eef8f6" stroke="#b9ddd8" stroke-width="2"/>
+  <text x="544" y="145" font-family="sans-serif" font-size="23" font-weight="700" fill="#167c80">STEP 2</text>
+  <text x="544" y="195" font-family="sans-serif" font-size="30" font-weight="700" fill="#17324d">速度 ＝ 変位 ÷ 時間</text>
+  <rect x="54" y="266" width="852" height="178" rx="24" fill="#ffffff" stroke="#d5e2ea" stroke-width="2"/>
+  <text x="82" y="307" font-family="sans-serif" font-size="23" font-weight="700" fill="#365b73">今回の例</text>
+  <text x="82" y="350" font-family="sans-serif" font-size="27" fill="#17324d">180° → π rad</text>
+  <text x="328" y="350" font-family="sans-serif" font-size="27" fill="#17324d">t ＝ π ÷ 2 ＝ π/2 s</text>
+  <text x="82" y="403" font-family="sans-serif" font-size="28" font-weight="700" fill="#a94028">v ＝ 35 ÷ (π/2) ＝ 35 × 2/π ＝ 70/π ≒ 22.3 mm/s</text>
+  <rect x="174" y="468" width="612" height="48" rx="15" fill="#fde7df"/>
+  <text x="227" y="501" font-family="sans-serif" font-size="25" font-weight="700" fill="#a94028">分数で割る → 逆数を掛ける</text>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0 L10 3 L0 6 Z" fill="#365b73"/></marker></defs>
+</svg>
