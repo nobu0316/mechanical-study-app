@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">棒が伸びるとエネルギーがたまる</title>
+  <desc id="desc">左右2本の斜め棒をばねのように描き、軸力から伸び、ひずみエネルギーへ進む流れと1本・2本の式を示す図</desc>
+  <rect width="960" height="540" rx="28" fill="#f7fafc"/>
+  <text x="52" y="62" font-family="sans-serif" font-size="34" font-weight="700" fill="#17324d">棒が伸びるとエネルギーがたまる</text>
+
+  <rect x="52" y="96" width="360" height="315" rx="24" fill="#eaf4fb" stroke="#b7d4e7" stroke-width="2"/>
+  <line x1="94" y1="132" x2="370" y2="132" stroke="#365b73" stroke-width="8"/>
+  <circle cx="142" cy="132" r="10" fill="#17324d"/>
+  <circle cx="322" cy="132" r="10" fill="#17324d"/>
+  <path d="M142 142 L162 166 L148 184 L174 204 L160 222 L186 242 L172 260 L198 280 L232 315" fill="none" stroke="#167c80" stroke-width="7"/>
+  <path d="M322 142 L302 166 L316 184 L290 204 L304 222 L278 242 L292 260 L266 280 L232 315" fill="none" stroke="#167c80" stroke-width="7"/>
+  <circle cx="232" cy="315" r="15" fill="#e25d3f"/>
+  <line x1="232" y1="330" x2="232" y2="374" stroke="#e25d3f" stroke-width="6" marker-end="url(#redArrow)"/>
+  <text x="116" y="112" font-family="sans-serif" font-size="19" font-weight="700" fill="#365b73">天井</text>
+  <text x="203" y="352" font-family="sans-serif" font-size="22" font-weight="700" fill="#a94028">C</text>
+  <text x="260" y="365" font-family="sans-serif" font-size="21" font-weight="700" fill="#a94028">荷重</text>
+  <text x="97" y="398" font-family="sans-serif" font-size="20" fill="#365b73">左右の棒＝斜めのばね</text>
+
+  <rect x="450" y="96" width="458" height="315" rx="24" fill="#ffffff" stroke="#d5e2ea" stroke-width="2"/>
+  <g font-family="sans-serif" font-size="25" font-weight="700" fill="#17324d">
+    <text x="492" y="148">その棒の軸力 T1</text>
+    <text x="492" y="224">棒の伸び λ</text>
+    <text x="492" y="300">ひずみエネルギー U</text>
+  </g>
+  <g stroke="#e25d3f" stroke-width="5" marker-end="url(#redArrow)">
+    <line x1="680" y1="164" x2="680" y2="193"/>
+    <line x1="680" y1="240" x2="680" y2="269"/>
+  </g>
+  <text x="686" y="210" font-family="sans-serif" font-size="21" fill="#365b73">λ = T1L / AE</text>
+  <text x="490" y="340" font-family="sans-serif" font-size="22" fill="#365b73">1本：U = 1/2 × 力 × 伸び</text>
+  <text x="490" y="380" font-family="sans-serif" font-size="22" font-weight="700" fill="#12656a">2本：2本分を合計 → U = T1λ</text>
+
+  <rect x="150" y="442" width="660" height="64" rx="20" fill="#dff3f1"/>
+  <text x="258" y="483" font-family="sans-serif" font-size="30" font-weight="700" fill="#12656a">伸びた棒 ＝ エネルギーを蓄える</text>
+  <defs>
+    <marker id="redArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0 L10 3 L0 6 Z" fill="#e25d3f"/></marker>
+  </defs>
+</svg>
