@@ -272,6 +272,17 @@ const QUESTION_PRACTICE = {
   M_R5_M2_Q008: { tags: ["力学", "仮想荷重", "仮想荷重法", "たわみ", "方向", "理解×", "要復習", "長期定着△"], priority: "high", initialWeakness: "wrong", reviewIntervals: [1, 3, 7], studyType: "memory", diagram: { src: "slides/mechanics-r5-virtual-load-probe.svg", alt: "たわみを知りたい翼端Oへ、知りたい上下方向に単位仮想荷重1を置く探針のイメージ図。" } },
   M_R5_M2_Q009: { tags: ["力学", "仮想荷重", "仮想荷重法", "単位荷重", "曲げモーメント", "Mとm", "たわみ", "理解×", "要復習", "長期定着△"], priority: "high", initialWeakness: "wrong", reviewIntervals: [1, 3, 7], studyType: "memory", inputAnswers: ["m=±x", "m = ±x", "±x", "m=xまたは-x", "m=x又は-x", "m=x・-x"], diagram: { src: "slides/mechanics-r5-virtual-load-probe.svg", alt: "翼端の単位仮想荷重1により、切断位置までの距離xを腕として仮想曲げモーメントmがプラスマイナスxになる図。" } },
   M_R5_M2_Q010: { tags: ["力学", "仮想荷重", "仮想荷重法", "ひずみエネルギ", "たわみ", "Mとm", "EI", "積分基礎", "x^4", "理解×", "要復習", "長期定着△"], priority: "high", initialWeakness: "wrong", reviewIntervals: [1, 3, 7], studyType: "calculation", diagram: { src: "slides/mechanics-r5-virtual-load-probe.svg", alt: "たわみ式δ=∫Mm/(EI)dxと、Mは実際の曲げ、mは知りたい方向への効き、EIは曲がりにくさ、積分は梁全体の足し合わせという対応図。" } },
+  // R5力学③：（4）～（6）の一本道を、公式暗記より「次に何をするか」の想起で定着させる。
+  M_R5_M3_Q001: { tags: ["令和5年度", "力学③", "力学", "解法フロー", "軸力", "棒の伸び", "FL/AE", "理解△", "長期定着△"], priority: "high", initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", diagram: { src: "slides/mechanics-r5-impact-strain-energy.svg", alt: "左右2本の斜め棒に軸力が生じ、棒の伸びからひずみエネルギーが蓄えられるまでを示す図。" } },
+  M_R5_M3_Q002: { tags: ["令和5年度", "力学③", "力学", "解法フロー", "軸力", "棒の伸び", "FL/AE", "Fの意味", "理解△", "長期定着△"], priority: "high", initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", diagram: { src: "slides/mechanics-r5-impact-strain-energy.svg", alt: "棒の伸びλ=T1L/(AE)で、Fには構造全体の外力でなくその棒の中の軸力T1を使うことを示す図。" } },
+  M_R5_M3_Q003: { tags: ["令和5年度", "力学③", "力学", "解法フロー", "棒の伸び", "ひずみエネルギー", "U=1/2Fλ", "理解△", "長期定着△"], priority: "high", initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", diagram: { src: "slides/mechanics-r5-impact-strain-energy.svg", alt: "棒が伸びると、1本につきU=1/2×力×伸びのひずみエネルギーを蓄えることを示す図。" } },
+  M_R5_M3_Q004: { tags: ["令和5年度", "力学③", "力学", "解法フロー", "ひずみエネルギー", "棒2本", "T1λ", "理解△", "長期定着△"], priority: "high", initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", diagram: { src: "slides/mechanics-r5-impact-strain-energy.svg", alt: "同じ棒が2本なら、1本分のひずみエネルギーを2倍して全体U=T1λとする図。" } },
+  M_R5_M3_Q005: { tags: ["令和5年度", "力学③", "力学", "解法フロー", "落下衝撃", "落下距離", "h+δ", "理解△", "長期定着△"], priority: "high", initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", diagram: { src: "slides/mechanics-r5-impact-drop-distance.svg", alt: "錘が高さhを落ち、衝突後も構造とともにδだけ沈むため、総落下距離がh+δになる図。" } },
+  M_R5_M3_Q006: { tags: ["令和5年度", "力学③", "力学", "解法フロー", "位置エネルギー", "ひずみエネルギー", "エネルギー一致", "理解△", "長期定着△"], priority: "high", initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", diagram: { src: "slides/mechanics-r5-impact-drop-distance.svg", alt: "錘が失う位置エネルギーMg(h+δ)を、棒に蓄えられるひずみエネルギーと等しくする図。" } },
+  M_R5_M3_Q007: { tags: ["令和5年度", "力学③", "力学", "解法フロー", "順番", "軸力", "棒の伸び", "ひずみエネルギー", "理解△", "長期定着△"], priority: "high", initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", diagram: { src: "slides/mechanics-r5-impact-solution-flow.svg", alt: "軸力、伸び、ひずみエネルギー、落下距離、位置エネルギー、エネルギー一致、最大変位へ進む一本道。" } },
+  M_R5_M3_Q008: { tags: ["令和5年度", "力学③", "力学", "解法フロー", "順番", "最重要弱点", "衝撃最大変位", "理解×", "要復習", "長期定着△"], priority: "high", initialWeakness: "wrong", reviewIntervals: [1, 3, 7], studyType: "memory", inputPrompt: "選択肢を見ずに、落下衝撃で最大変位δを求める6段階を矢印でつないで答えよ。", inputAnswers: ["軸力→伸び→ひずみエネルギー→h+δ→エネルギーを等しくする→最大変位δ", "軸力→棒の伸び→ひずみエネルギー→h+δ→位置エネルギーとひずみエネルギーを等しくする→最大変位δ", "軸力・伸び・ひずみエネルギー・h+δ・エネルギーを等しくする・最大変位δ", "軸力 伸び ひずみエネルギー h+δ エネルギーを等しくする 最大変位δ"], diagram: { src: "slides/mechanics-r5-impact-solution-flow.svg", alt: "力から伸び、エネルギー、落下、変位へ至る6段階の縦フロー。" } },
+  M_R5_M3_Q009: { tags: ["令和5年度", "力学③", "力学", "解法フロー", "誤り発見", "落下距離", "h+δ", "理解△", "長期定着△"], priority: "high", initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", diagram: { src: "slides/mechanics-r5-impact-drop-distance.svg", alt: "衝突後の沈みδを含めないMghだけの考え方が誤りであることを示す図。" } },
+  M_R5_M3_Q010: { tags: ["令和5年度", "力学③", "力学", "解法フロー", "静的変位", "δs", "衝撃最大変位", "理解△", "長期定着△"], priority: "high", initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", diagram: { src: "slides/mechanics-r5-impact-solution-flow.svg", alt: "静荷重時の基準変位δsを使って構造の変形しやすさをまとめ、衝撃最大変位へつなぐ図。" } },
   // R4環境・安全①：直後正解は△、FSCは×のまま開始し、既存の1日・3日・7日後確認へつなげる。
   ENV_R4_ES1_Q001: { tags: ["令和4年度", "環境・安全①", "パリ協定", "環境数値", "理解○", "長期定着△"], initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", inputUnit: "℃" },
   ENV_R4_ES1_Q002: { tags: ["令和4年度", "環境・安全①", "LED", "環境数値", "理解○", "長期定着△"], initialWeakness: "unsure", reviewIntervals: [1, 3, 7], studyType: "memory", inputAnswers: ["40000", "40,000", "40000時間", "40,000時間", "約40000時間", "約40,000時間", "4万時間", "約4万時間"] },
@@ -384,6 +395,8 @@ const INITIAL_CRITICAL_QUESTION_IDS = new Set([
   "M_R5_M2_Q008",
   "M_R5_M2_Q009",
   "M_R5_M2_Q010",
+  // R5力学③の（4）～（6）は、選択肢なしで6段階を再現できるまで最重要弱点として扱う。
+  "M_R5_M3_Q008",
   // R4環境・安全①のFSCは「FRT」と誤答した現在×の最優先弱点。
   "ENV_R4_ES1_Q003"
 ]);
