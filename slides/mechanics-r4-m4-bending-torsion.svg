@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <title>同じ荷重でも、曲げとねじりは別</title><desc>棒の軸、紙面に垂直な荷重P、長さℓ、偏心距離dと曲げ・ねじりモーメントを示す。</desc>
+  <defs><style>text{font-family:'Noto Sans JP','Yu Gothic',sans-serif;fill:#0f172a}.title{font-size:43px;font-weight:800}.label{font-size:25px;font-weight:700}.small{font-size:20px}.formula{font-size:41px;font-weight:800}</style><marker id="o" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#f97316"/></marker><marker id="b" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2563eb"/></marker></defs>
+  <rect width="1200" height="720" rx="32" fill="#f8fafc"/><rect x="35" y="30" width="1130" height="82" rx="22" fill="#e0f2fe"/><text x="70" y="85" class="title">同じ荷重でも、曲げとねじりは別</text>
+  <rect x="65" y="145" width="1070" height="350" rx="24" fill="#fff" stroke="#cbd5e1" stroke-width="3"/>
+  <rect x="125" y="205" width="70" height="210" rx="8" fill="#64748b"/><text x="105" y="445" class="small">固定側</text>
+  <line x1="195" y1="310" x2="920" y2="310" stroke="#0f766e" stroke-width="24"/><line x1="195" y1="270" x2="920" y2="270" stroke="#94a3b8" stroke-width="3" stroke-dasharray="10 8"/><text x="450" y="252" class="small">棒の軸</text>
+  <line x1="920" y1="310" x2="920" y2="205" stroke="#2563eb" stroke-width="12"/><line x1="920" y1="205" x2="1040" y2="205" stroke="#2563eb" stroke-width="12"/>
+  <circle cx="1040" cy="205" r="34" fill="#fff7ed" stroke="#f97316" stroke-width="7"/><line x1="1022" y1="187" x2="1058" y2="223" stroke="#f97316" stroke-width="7"/><line x1="1058" y1="187" x2="1022" y2="223" stroke="#f97316" stroke-width="7"/><text x="1000" y="150" class="label" fill="#ea580c">P（紙面奥向き）</text>
+  <line x1="205" y1="380" x2="915" y2="380" stroke="#2563eb" stroke-width="3" marker-start="url(#b)" marker-end="url(#b)"/><text x="545" y="415" class="label" fill="#2563eb">ℓ = 1.4 m</text>
+  <line x1="945" y1="310" x2="945" y2="205" stroke="#2563eb" stroke-width="3" marker-start="url(#b)" marker-end="url(#b)"/><text x="960" y="270" class="label" fill="#2563eb">d = 0.8 m</text>
+  <path d="M800 245 A65 65 0 0 1 865 310" fill="none" stroke="#7c3aed" stroke-width="6" marker-end="url(#b)"/><text x="750" y="220" class="small" fill="#7c3aed">軸まわりのねじり</text>
+  <rect x="70" y="525" width="500" height="125" rx="22" fill="#ecfdf5"/><text x="110" y="570" class="label">曲げ：棒の長さ</text><text x="165" y="625" class="formula" fill="#0f766e">M = Pℓ = 5.6 kN・m</text>
+  <rect x="600" y="525" width="530" height="125" rx="22" fill="#f5f3ff"/><text x="640" y="570" class="label">ねじり：軸からのずれ</text><text x="690" y="625" class="formula" fill="#7c3aed">T = Pd = 3.2 kN・m</text>
+  <text x="290" y="690" class="small" fill="#92400e">一般には、対象軸と力の作用線の垂直距離を図から判断する。</text>
+</svg>

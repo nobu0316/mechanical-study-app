@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <title>高さの3乗が曲げに効く</title>
+  <desc>長方形断面の幅b、高さh、中立軸と断面二次モーメントの公式を示す。</desc>
+  <defs><style>text{font-family:'Noto Sans JP','Yu Gothic',sans-serif;fill:#0f172a}.title{font-size:46px;font-weight:800}.label{font-size:26px;font-weight:700}.small{font-size:21px}.formula{font-size:55px;font-weight:800}.note{font-size:25px;font-weight:700;fill:#92400e}</style><marker id="a" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2563eb"/></marker></defs>
+  <rect width="1200" height="720" rx="32" fill="#f8fafc"/><rect x="35" y="30" width="1130" height="82" rx="22" fill="#e0f2fe"/>
+  <text x="70" y="86" class="title">高さの3乗が曲げに効く</text>
+  <rect x="70" y="155" width="470" height="390" rx="24" fill="#fff" stroke="#cbd5e1" stroke-width="3"/>
+  <rect x="205" y="215" width="210" height="260" rx="6" fill="#bae6fd" stroke="#0f766e" stroke-width="5"/>
+  <line x1="170" y1="345" x2="450" y2="345" stroke="#0f172a" stroke-width="4" stroke-dasharray="12 9"/><text x="165" y="333" class="small">中立軸</text>
+  <line x1="205" y1="505" x2="415" y2="505" stroke="#2563eb" stroke-width="3" marker-start="url(#a)" marker-end="url(#a)"/><text x="300" y="537" class="label" fill="#2563eb">b</text>
+  <line x1="455" y1="215" x2="455" y2="475" stroke="#2563eb" stroke-width="3" marker-start="url(#a)" marker-end="url(#a)"/><text x="472" y="354" class="label" fill="#2563eb">h</text>
+  <text x="122" y="585" class="small">h＝曲げる方向の高さ</text>
+  <rect x="585" y="155" width="545" height="225" rx="24" fill="#ecfdf5" stroke="#99f6e4" stroke-width="3"/>
+  <text x="625" y="210" class="label">断面二次モーメント</text><text x="675" y="300" class="formula" fill="#0f766e">I = bh³ / 12</text>
+  <text x="625" y="345" class="small">単位：mm⁴　／　EI：曲げ剛性</text>
+  <rect x="585" y="410" width="545" height="135" rx="22" fill="#fff7ed" stroke="#fdba74" stroke-width="3"/>
+  <text x="625" y="460" class="label">hを2倍</text><text x="810" y="507" class="formula" fill="#ea580c">→ Iは8倍</text>
+  <rect x="70" y="610" width="1060" height="72" rx="18" fill="#fef3c7"/><text x="108" y="658" class="note">覚え方：幅は1乗・高さは3乗・分母は12　※断面の向きに注意</text>
+</svg>

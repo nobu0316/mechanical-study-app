@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <title>最大主応力は半分＋三平方</title><desc>曲げ応力の半分とせん断応力で作る直角三角形、最大主応力の公式、特殊ケースを示す。</desc>
+  <defs><style>text{font-family:'Noto Sans JP','Yu Gothic',sans-serif;fill:#0f172a}.title{font-size:43px;font-weight:800}.label{font-size:24px;font-weight:700}.small{font-size:19px}.mainFormula{font-size:34px;font-weight:800}.calcFormula{font-size:32px;font-weight:800}.step{font-size:22px;font-weight:800}</style></defs>
+  <rect width="1200" height="720" rx="32" fill="#f8fafc"/><rect x="35" y="30" width="1130" height="82" rx="22" fill="#ede9fe"/><text x="70" y="85" class="title">最大主応力は半分＋三平方</text>
+  <rect x="65" y="145" width="450" height="375" rx="24" fill="#fff" stroke="#cbd5e1" stroke-width="3"/>
+  <path d="M140 440 L430 440 L430 215 Z" fill="#f5f3ff" stroke="#7c3aed" stroke-width="6"/><rect x="406" y="416" width="24" height="24" fill="none" stroke="#334155" stroke-width="3"/>
+  <text x="245" y="478" class="label" fill="#2563eb">横：σb / 2</text><text x="445" y="340" class="label" fill="#f97316">縦：τ</text><text x="150" y="290" class="small" fill="#7c3aed" transform="rotate(-38 150 290)">斜辺：√((σb/2)²＋τ²)</text>
+  <text x="105" y="190" class="label">三平方で「半径」を作る</text>
+  <rect x="550" y="145" width="580" height="190" rx="24" fill="#ecfdf5"/><text x="585" y="190" class="step" fill="#2563eb">① 半分</text><text x="735" y="190" class="step" fill="#7c3aed">② 三平方</text><text x="930" y="190" class="step" fill="#ea580c">③ 足す</text><text x="590" y="245" class="mainFormula" fill="#0f766e">σ1 = σb/2 +</text><text x="640" y="290" class="mainFormula" fill="#0f766e">√((σb/2)² + τ²)</text><text x="590" y="320" class="small">中心 σb/2 ＋ 半径 ＝ 最大主応力</text>
+  <rect x="550" y="365" width="580" height="155" rx="24" fill="#fff7ed"/><text x="585" y="410" class="label">計算例</text><text x="585" y="452" class="small">σb＝268.8 MPa　τ＝123.08 MPa</text><text x="585" y="500" class="calcFormula" fill="#ea580c">σ1 ≒ 316.6 MPa</text><text x="900" y="500" class="label" fill="#ea580c">≈ 317 MPa</text>
+  <rect x="70" y="555" width="510" height="120" rx="22" fill="#eff6ff"/><text x="105" y="600" class="label">τ = 0（曲げだけ）</text><text x="105" y="642" class="label" fill="#2563eb">σ1 = 引張り側の σb</text>
+  <rect x="610" y="555" width="520" height="120" rx="22" fill="#fef2f2"/><text x="645" y="600" class="label">σb = 0（純せん断）</text><text x="645" y="642" class="label" fill="#dc2626">主応力は +|τ| と -|τ|</text>
+  <text x="210" y="705" class="small" fill="#92400e">曲げ応力とせん断応力を単純加算しない。今回の平面応力条件に使う式。</text>
+</svg>

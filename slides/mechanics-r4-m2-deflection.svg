@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <title>長いほど大きくたわむ</title><desc>両端単純支持ばりの中央集中荷重と中央たわみの公式を示す。</desc>
+  <defs><style>text{font-family:'Noto Sans JP','Yu Gothic',sans-serif;fill:#0f172a}.title{font-size:46px;font-weight:800}.label{font-size:25px;font-weight:700}.small{font-size:21px}.formula{font-size:50px;font-weight:800}.warn{font-size:22px;font-weight:700;fill:#9a3412}</style><marker id="o" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#f97316"/></marker><marker id="b" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2563eb"/></marker></defs>
+  <rect width="1200" height="720" rx="32" fill="#f8fafc"/><rect x="35" y="30" width="1130" height="82" rx="22" fill="#e0f2fe"/><text x="70" y="86" class="title">長いほど大きくたわむ</text>
+  <rect x="65" y="145" width="1070" height="290" rx="24" fill="#fff" stroke="#cbd5e1" stroke-width="3"/>
+  <path d="M180 260 Q600 380 1020 260" fill="none" stroke="#0f766e" stroke-width="12"/><line x1="180" y1="260" x2="1020" y2="260" stroke="#94a3b8" stroke-width="3" stroke-dasharray="10 8"/>
+  <path d="M150 315 L180 265 L210 315 Z" fill="#cbd5e1" stroke="#334155" stroke-width="3"/><circle cx="990" cy="307" r="10" fill="#cbd5e1" stroke="#334155" stroke-width="3"/><circle cx="1020" cy="307" r="10" fill="#cbd5e1" stroke="#334155" stroke-width="3"/><line x1="960" y1="320" x2="1050" y2="320" stroke="#334155" stroke-width="4"/>
+  <line x1="600" y1="155" x2="600" y2="240" stroke="#f97316" stroke-width="7" marker-end="url(#o)"/><text x="625" y="195" class="label" fill="#ea580c">荷重 P</text>
+  <line x1="600" y1="262" x2="600" y2="375" stroke="#7c3aed" stroke-width="4" marker-end="url(#b)"/><text x="620" y="350" class="label" fill="#7c3aed">たわみ δ</text>
+  <line x1="180" y1="398" x2="1020" y2="398" stroke="#2563eb" stroke-width="3" marker-start="url(#b)" marker-end="url(#b)"/><text x="585" y="427" class="label" fill="#2563eb">L</text>
+  <rect x="70" y="465" width="660" height="155" rx="24" fill="#ecfdf5"/><text x="110" y="515" class="label">中央たわみ</text><text x="205" y="585" class="formula" fill="#0f766e">δ = PL³ / (48EI)</text>
+  <rect x="760" y="465" width="370" height="155" rx="24" fill="#fff7ed"/><text x="795" y="512" class="label">式の向き</text><text x="795" y="553" class="small" fill="#ea580c">上：荷重P・長さL³</text><text x="795" y="590" class="small" fill="#0f766e">下：硬さE・断面I</text>
+  <rect x="70" y="642" width="1060" height="50" rx="14" fill="#fef3c7"/><text x="100" y="676" class="warn">使用条件：両端単純支持＋中央集中荷重。片持ちはり・等分布荷重と混同しない。</text>
+</svg>
