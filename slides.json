@@ -852,5 +852,156 @@
       "力 → 伸び → エネルギー → 落下 → 変位"
     ],
     "relatedQuestionIds": ["M_R5_M3_Q007", "M_R5_M3_Q008", "M_R5_M3_Q010"]
+  },
+  {
+    "id": "SLIDE_M_R4_M2_SECOND_MOMENT_001",
+    "field": "材料力学",
+    "topic": "力学②・断面二次モーメント",
+    "title": "高さの3乗が曲げに効く",
+    "description": "長方形断面の向きと中立軸を見て、曲げる方向の高さhが3乗で効くことを確認する",
+    "image": "slides/mechanics-r4-m2-second-moment.svg",
+    "priority": "high",
+    "summary": [
+      "長方形断面の中立軸まわりは I＝bh³/12",
+      "bは幅、hは曲げる方向の高さ。断面の向きでIが変わる",
+      "hを2倍にするとIは8倍になる",
+      "Eは材料の性質、Iは断面形状の性質、EIは曲げ剛性",
+      "覚え方：幅は1乗・高さは3乗・分母は12"
+    ],
+    "relatedQuestionIds": ["M_R4_M2_Q001"]
+  },
+  {
+    "id": "SLIDE_M_R4_M2_DEFLECTION_001",
+    "field": "材料力学",
+    "topic": "力学②・はりのたわみ",
+    "title": "長いほど大きくたわむ",
+    "description": "両端単純支持・中央集中荷重という使用条件と、たわみ式の分子・分母の意味を結び付ける",
+    "image": "slides/mechanics-r4-m2-deflection.svg",
+    "priority": "high",
+    "summary": [
+      "両端単純支持ばりの中央集中荷重では δ＝PL³/(48EI)",
+      "荷重Pと長さL³は分子。長くなるほど急激にたわみが増える",
+      "材料の硬さEと断面の曲げにくさIは分母。大きいほどたわみにくい",
+      "中央荷重なら48。片持ちはりや等分布荷重の式と混同しない",
+      "覚え方：PとL³は上・硬さEIは下"
+    ],
+    "relatedQuestionIds": ["M_R4_M2_Q002"]
+  },
+  {
+    "id": "SLIDE_M_R4_M2_SPRING_CONSTANT_001",
+    "field": "材料力学",
+    "topic": "力学②・ばね定数",
+    "title": "1 mm変形させる力",
+    "description": "同じ荷重を受ける硬いばねと柔らかいばねを比べ、ばね定数の物理的な意味を確認する",
+    "image": "slides/mechanics-r4-m2-spring-constant.svg",
+    "summary": [
+      "線形な荷重・変位関係では k＝P/δ",
+      "ばね定数kは1 mmまたは1 m変形させるために必要な力",
+      "同じ荷重なら変位が小さいほど硬いばね",
+      "単位はN/mmまたはN/m。固有振動数の計算ではN/mへ変換する",
+      "1 N/mm＝1000 N/m"
+    ],
+    "relatedQuestionIds": ["M_R4_M2_Q003"]
+  },
+  {
+    "id": "SLIDE_D_R4_M2_NATURAL_FREQUENCY_001",
+    "field": "機械力学",
+    "topic": "力学②・固有振動数",
+    "title": "硬いと速い、重いと遅い",
+    "description": "ばねとおもりの位置関係から、固有振動数の式と単位変換を再現する",
+    "image": "slides/mechanics-r4-m2-natural-frequency.svg",
+    "priority": "high",
+    "summary": [
+      "1自由度ばね質量系は f＝(1/2π)√(k/m)",
+      "硬さkが上、重さmが下。ルートを取って2πで割る",
+      "kが4倍ならfは2倍、mが4倍ならfは1/2倍",
+      "kはN/m、mはkgにそろえてから計算する",
+      "1 N/mm＝1000 N/mを忘れない"
+    ],
+    "relatedQuestionIds": ["M_R4_M2_Q004"]
+  },
+  {
+    "id": "SLIDE_M_R4_M4_BENDING_TORSION_001",
+    "field": "材料力学",
+    "topic": "力学④・曲げとねじり",
+    "title": "同じ荷重でも、曲げとねじりは別",
+    "description": "棒の軸と偏心腕を含む平面に垂直な荷重Pが作用する今回の配置で、棒の長さℓと軸からのずれdを読み分ける",
+    "image": "slides/mechanics-r4-m4-bending-torsion.svg",
+    "priority": "high",
+    "summary": [
+      "今回の配置では曲げモーメント M＝Pℓ＝5.6 kN・m",
+      "今回の配置ではねじりモーメント T＝Pd＝3.2 kN・m",
+      "曲げの腕は棒の長さℓ、ねじりの腕は軸から力の作用線までの偏心距離d",
+      "一般には対象軸・力の作用線・垂直距離を図から判断する",
+      "1 kN・m＝1000000 N・mm"
+    ],
+    "relatedQuestionIds": ["M_R4_M4_Q005", "M_R4_M4_Q006", "M_R4_M4_Q007"]
+  },
+  {
+    "id": "SLIDE_M_R4_M4_RECTANGULAR_TORSION_001",
+    "field": "材料力学",
+    "topic": "力学④・長方形断面のねじり",
+    "title": "ねじり応力は断面形状で決まる",
+    "description": "正方形断面と係数表を対応させ、長方形断面のねじり応力を単位も含めて計算する",
+    "image": "slides/mechanics-r4-m4-rectangular-torsion.svg",
+    "priority": "high",
+    "summary": [
+      "今回与えられた式は τmax＝T/(k1ab²)",
+      "50 mm×50 mmの正方形はa/b＝1.0。係数表からk1＝0.208",
+      "T＝3.2 kN・m＝3200000 N・mm",
+      "τmax＝3200000/(0.208×50×50²)≒123.08 MPa",
+      "長方形断面の式であり丸軸のねじり公式と混同しない"
+    ],
+    "relatedQuestionIds": ["M_R4_M4_Q008", "M_R4_M4_Q009"]
+  },
+  {
+    "id": "SLIDE_M_R4_M4_SECTION_MODULUS_001",
+    "field": "材料力学",
+    "topic": "力学④・断面係数",
+    "title": "Iは3乗・12、Zは2乗・6",
+    "description": "中立軸から最外縁までの距離h/2でIを割り、断面係数Zを導く",
+    "image": "slides/mechanics-r4-m4-section-modulus.svg",
+    "priority": "high",
+    "summary": [
+      "長方形断面の断面二次モーメントは I＝bh³/12・単位mm⁴",
+      "断面係数は Z＝I/c。長方形ではc＝h/2",
+      "Z＝I/(h/2)＝bh²/6・単位mm³",
+      "50 mm角ではI≒520833 mm⁴・Z≒20833.3 mm³",
+      "IとZは役割・指数・単位を一組で区別する"
+    ],
+    "relatedQuestionIds": ["M_R4_M2_Q001", "M_R4_M4_Q010"]
+  },
+  {
+    "id": "SLIDE_M_R4_M4_BENDING_STRESS_001",
+    "field": "材料力学",
+    "topic": "力学④・曲げ応力",
+    "title": "曲げ応力はMをZで割る",
+    "description": "曲げを受ける棒の引張り・圧縮と、外縁曲げ応力の計算を結び付ける",
+    "image": "slides/mechanics-r4-m4-bending-stress.svg",
+    "summary": [
+      "外縁の曲げ応力は σb＝M/Z",
+      "曲げを受ける棒では中立軸を境に引張り側と圧縮側が生じる",
+      "MをN・mm、Zをmm³にするとσbはN/mm²＝MPa",
+      "M＝5600000 N・mm、Z≒20833.3 mm³ならσb≒268.8 MPa",
+      "断面二次モーメントIでなく断面係数Zで割る"
+    ],
+    "relatedQuestionIds": ["M_R4_M4_Q011"]
+  },
+  {
+    "id": "SLIDE_M_R4_M4_PRINCIPAL_STRESS_001",
+    "field": "材料力学",
+    "topic": "力学④・最大主応力",
+    "title": "最大主応力は半分＋三平方",
+    "description": "曲げ応力の半分とせん断応力から作る直角三角形で、最大主応力の式と特殊ケースを理解する",
+    "image": "slides/mechanics-r4-m4-principal-stress.svg",
+    "priority": "high",
+    "summary": [
+      "一方向の曲げ応力σbとせん断応力τでは σ1＝σb/2＋√((σb/2)²＋τ²)",
+      "モールの応力円の中心はσb/2・半径は三平方の斜辺・最大主応力は中心＋半径",
+      "σb＝268.8 MPa・τ＝123.08 MPaならσ1≒316.6 MPa＝約317 MPa",
+      "τ＝0なら引張り側の曲げ応力だけが残る",
+      "σb＝0の純せん断でも主応力は＋|τ|と－|τ|。最大主応力は|τ|"
+    ],
+    "relatedQuestionIds": ["M_R4_M4_Q012", "M_R4_M4_Q013", "M_R4_M4_Q014"]
   }
 ]
